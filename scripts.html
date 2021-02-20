@@ -1,0 +1,999 @@
+<script>
+  // The code in this function runs when the page is loaded.
+  $(document).ready(function () {
+
+    $("#ready").hide();
+    $(".pleaseHide").hide();
+    // $('.toast').hide();
+    var gSmL = localStorage.getItem('glLvl');
+    var gSmA = localStorage.getItem('glArea');
+    // get saved search options for goals
+    if (localStorage.getItem('glLvl') && localStorage.getItem('glArea')) {
+      $("select option[value=" + gSmL + "]").attr('selected', 'selected');
+      $("select option[value=" + gSmA + "]").attr('selected', 'selected');
+    }
+
+
+    // when clicking on a goal, puts goal number into one of the goal boxes at bottom
+    $("body").on("click", ".goalList", function (e) {
+      // console.log('event triggered a[name=goalList clicked');
+      e.preventDefault();
+      if (e.shiftKey) {
+        // open goal for editing
+        var thisGoal = JSON.parse($(this).text());
+        var gId = parseInt(thisGoal[thisGoal.length - 1], 10);
+        google.script.run
+          .withSuccessHandler(editGoalInModal)
+          .getGoal(gId);
+
+        // console.log('sent to goal edit: %s', $(this).text());
+      } else {
+        // console.log('put the goal number into a gl field');
+        var item = JSON.parse($(this).text());
+        var gId = item[item.length - 1]
+        // item = item.toString().match(/\d+$/);
+
+        $("input[name='gls']").each(function (i, el) {
+          if ($(this).val() == "") {
+            $(this).val(gId);
+            $(this).attr("title", gId);
+            return false;
+          }
+        });
+        var crntScrl = $(window).scrollTop();
+      }
+    });
+
+    // shift-click clears a litte goal number box
+    // click builds text blaze snippet from data in table
+    $("body").on("click", "input[name=gls]", function (event) {
+      if (event.shiftKey) {
+        $(this).val("");
+        $(this).attr("title", "");
+      } else {
+        var id = $('#idNo').val();
+        var gId = $(this).val();
+        google.script.run
+          .withSuccessHandler(showTBsnippetGl)
+          .getOneGoalForEditing(gId);
+      }
+    });
+
+    // $("body").on("click", "#emParentsMenuItem", emParents());
+
+    $(function () {
+      $('[data-toggle="tooltip"]').tooltip()
+    })
+    // console.log('gSmL is %s', gSmL);
+
+    $("body").on("click", "#gVoiceMenuItem", function () { firstSnipThenGvoice() });
+    $(".alert").alert();
+
+    //set cursor to pointer when entering a nav item
+    $("body").on("mouseenter", ".nav-link", function () {
+      $(this).css("cursor", "pointer");
+    });
+
+    // set cursor to pointer when entering table row
+    $("body").on("mouseenter", ".setStudent", function () {
+      $(".setStudent").css("cursor", "pointer");
+    });
+
+    //set cursor to pointer when entering an icon
+    $("body").on("mouseenter", ".material-icons", function () {
+      $(".setStudent").css("cursor", "pointer");
+    });
+
+    // set cursor to normal when leaving an icon
+    $("body").on("mouseleave", ".material-icons", function () {
+      $(".setStudent").css("cursor", "default");
+    });
+
+
+    // modals
+    $("body").on("show.bs.modal", function () {
+      // alert('event');
+      var addresses = ($("#tem").val() + ',' + $("#pem").val() + ',' + $("#pem2").val()).replace(/,$/, "");
+      var subject = $("#stuName").val();
+      // console.log(addresses);
+      $("#emailRecipients").val(addresses);
+      $("#emailSubject").val(subject);
+    })
+
+    // change the cursor to a pointer when entering a text Blaze field
+    $("body").on("mouseenter", '[name$="Copy"]', function () {
+      $("[name$='Copy']").css("cursor", "pointer");
+    });
+
+    // if shift key is down turning the cursor into a trash can and then delete on click (next function)
+    $("body").on("mousemove", "input[name='gls']", function () {
+      if (event.shiftKey) {
+        $("input[name='gls'").css("cursor", "url(https://drive.google.com/uc?export=view&id=1HSHKH6IvS3mfL0wsINR73RrvAWR-7uB_), auto");
+      } else {
+        $("input[name='gls'").css("cursor", "pointer");
+      }
+    });
+
+    $("body").on("click", ".snipThis", function (event) {
+      event.preventDefault();
+      snipInfo();
+    });
+    // copy a text blaze snippet to clipboard when clicking on the item
+    $("body").on("click", '[name$="Copy"]', function () {
+      $(this).select();
+      document.execCommand('copy');
+    });
+
+    $("body").on("click", ".setStudent", function (event) {
+      event.preventDefault();
+      var id = $(this).attr("data-stuId");
+      // $(this).css("background-color", "#5bf5db")
+      focus(id);
+    });
+
+    // when clicking on a table row, change the color of the field
+    $("body").on("mousedown", ".setStudent", function (event) {
+      event.preventDefault();
+      $(this).css("background-color", "#5bf5db");
+      // console.log('mouse down');
+    });
+
+    // this goes with the one just above changing the color back to White
+    $("body").on("mouseup", ".setStudent", function (event) {
+      event.preventDefault();
+      $(this).css("background-color", "#ffffff");
+      // console.log('mouse up');
+    });
+
+    $("body").on("click", "#calRefresh", function () {
+      document.body.style.cursor = "wait";
+      google.script.run
+        .withSuccessHandler(showCalData)
+        .getCalData_events();
+    });
+    // save all data in changeable fields in the  spreadsheet
+    $("body").on("click", ".saveEntryBtn", function (event) {
+      event.preventDefault();
+      document.body.style.cursor = "wait";
+      var entry = $("#logEntry").val();
+      var id = $("#idNo").val();
+      var phone = $("#phone").val();
+      var pem = $("#pem").val();
+      var phone2 = $("#phone2").val();
+      var pem2 = $("#pem2").val();
+      var tem = $("#tem").val();
+      var notes = $("#notes").val();
+
+      // console.log('vars = %s;  %s;  %s;  %s;  %s;  %s;  %s;  ', id, phone, pem, phone2, pem2, tem, notes);
+      google.script.run
+        .withSuccessHandler(showLogUpdates)
+        .updateRecord([id, phone, pem, phone2, pem2, tem, notes]);
+      if (entry.length > 0) {
+        $("html,body").css("cursor", "wait");
+        google.script.run.withSuccessHandler(focus)
+          .saveLogEntry([id, entry]);
+      }
+    });
+
+
+
+    // turn the color of the button back to green without doing anything
+    $("body").on("click", "#cancelEntryBtn", function (event) {
+      event.preventDefault();
+      $("#saveEntry").attr("class", "btn btn-sm btn-success my-1 svChngs");
+    });
+
+
+    // click builds text blaze snippet from data in table 
+    $("body").on("click", "#getIEPcompForm", function (event) {
+      var flName = $("#stuName").val("");
+      var fn = flName.replace(/([A-z]+)( .*)/g, "$1");
+      var ln = flName.replace(/([A-z]+ )(.*)/g, "$2");
+      var dob = $("#dob").val("");
+
+      document.execCommand('copy');
+
+      $(this).attr("title", "");
+
+      var gId = $(this).val();
+      google.script.run
+        .withSuccessHandler(showTBsnippetGl)
+        .getGoal(gId);
+    });
+
+    // retrieves data from a seis generated csv file (seis search report)
+    $("body").on("click", "#seis_roster", function () {
+      document.body.style.cursor = "wait";
+      var id = $("#idNo").val();
+      google.script.run
+        .withSuccessHandler(window.open('https://script.google.com/a/hemetusd.org/macros/s/AKfycbwS6Hct9vxEl3IJLrsuYxRegcpIo2XCXZs-4VPSJco/exec', '_top'))
+        .updateRoster(id);
+    });
+    $("body").on("click", ".toBtn", function () {
+      $("#toModal").modal("hide");
+      if ($(this).val() !== "Cancel") {
+        if ($(this).val() == "Yes") {
+          var tem = $("#tem").val() + ", dpaight@hemetusd.org";
+        } else {
+          var tem = "dpaight@hemetusd.org";
+        }
+        var id = $("#idNo").val();
+        var stuName = $("#stuName").val();
+        // console.log("sendPFLQToTchr() fired; running server script with params: " + stuName + "; " + id + "; " + tem);
+        google.script.run
+          .withSuccessHandler(focus)
+          .sendLevelsForm(stuName, id, tem);
+      }
+    });
+
+    // loading data into the cards
+    // this gets the data to be displayed for the student in focus, but not the log entries yet
+    document.body.style.cursor = "wait";
+
+    // this gets the data for the table in the middle
+    google.script.run
+      .withSuccessHandler(showRosterTable)
+      .getTableData_roster();
+
+    // this retrieves information from the meetings sheet to display
+    document.body.style.cursor = "wait";
+    google.script.run
+      .withSuccessHandler(showCalData)
+      .getCalData_events();
+
+
+  });
+  function showTBsnippetGl(goalObj) {
+    // console.log('goalObj = %s', JSON.stringify(goalObj));
+    // this.snip = function () {
+    //     return '[' +
+    //         '"area" = "' + goalObj.area + '",' +
+    //         '"strand" = "' + goalObj.strand + '",' +
+    //         '"stnd" = "' + goalObj.standard + '",' +
+    //         '"gl" = "' + goalObj.annual + '"' +
+    //         ']';
+    // }
+    // var goalObj = JSON.stringify(goalObjJSN)
+    var snippet = '[' +
+      '"area" = "' + goalObj.area + '",' +
+      '"strand" = "' + goalObj.strand + '",' +
+      '"stnd" = "' + goalObj.standard + '",' +
+      '"gl" = "' + goalObj.annual + '"' +
+      ']'
+    $("#tbSnippetCopy").text(snippet);
+    $("#tbSnippetCopy").select();
+    document.execCommand('copy');
+    showToast('goal copied; type "/gl" starting in date field');
+
+    document.body.style.cursor = "default";
+  }
+
+  function store(records) {
+    records.forEach(function (el, i) {
+      const key = 'rec' + el[9];
+      sessionStorage[key] = JSON.stringify(el);
+      // console.log(sessionStorage[key]);
+    });
+  }
+  // search the goal bank for goals of a given level and area
+  function findGoals() {
+    var glLvl = $("#glLvl").children("option:selected").val();
+    var glLvlElid = $("#glLvl").children("option:selected").attr('id');
+
+    var glArea = $("#glArea").children("option:selected").val();
+    var glAreaElid = $("#glArea").children("option:selected").attr('id');
+
+    var id = $("#idNo").val();
+    // console.log("data passed to goal search: %s, %s, %s", glLvl, glArea, id);
+
+    localStorage.setItem('glLvl', glLvl);
+    localStorage.setItem('glArea', glArea);
+    var search = glLvl + '_' + glArea;
+
+
+    if (sessionStorage.getItem('goals' + search)) {
+      // console.log('getting items from cache for ' + search);
+      showGoals(sessionStorage.getItem('goals' + search));
+    } else {
+      google.script.run
+        .withSuccessHandler(showGoals)
+        .getGoalListItems([glLvl, glArea, id]);
+    }
+    // returns [[gId, gLvl, gArea, gDmn, gAnl, gO1, gO2, gO3]]
+  }
+
+  // calls function on server side to return data for this student
+  function focus(id) {
+    $("#loc01tb").hide();
+    var key = 'rec' + id;
+    if (sessionStorage[key] != null) {
+      showFocusRecord(JSON.parse(sessionStorage[key]));
+    } else {
+      google.script.run
+        .withSuccessHandler(showFocusRecord)
+        .getTableData_roster();
+    }
+    google.script.run
+      .saveLastId(id);
+
+    var loc = 'loc01';
+    printLogs(id, loc);
+
+
+    document.body.style.cursor = "default";
+  }
+  function printLogs(id, loc) {
+    google.script.run
+      .withSuccessHandler(showLog)
+      .getTableData_logs(id, loc);
+  }
+
+  function getAllLevSnipForTB() {
+    var id = $("#idNo").val();
+    if (sessionStorage['lSnp' + $('#idNo').val()] != null) {
+      showTBsnippet(sessionStorage['lvlsSnp' + $('#idNo').val()]);
+    } else {
+      google.script.run
+        .withSuccessHandler(showTBsnippet)
+        .getPresentLevelsAsTextBlazeListItem(id);
+    }
+  }
+  function getAllLevSnipForGoal() {
+    var id = $("#idNo").val();
+    if (sessionStorage['lSnp' + $('#idNo').val()] != null) {
+      makeGoalSnip(sessionStorage['lvlsSnp' + $('#idNo').val()]);
+    } else {
+      google.script.run
+        .withSuccessHandler(makeGoalSnip)
+        .getPresentLevelsAsTextBlazeListItem(id);
+    }
+  }
+
+  // show functions ; functions named show... should be call backs success handlers 
+  // that display data retrieved from a script run on the server
+  function showFocusRecord(record) {
+    var key = 'rec' + record[9];
+    sessionStorage.key = JSON.stringify(record);
+    var [
+      nmJdob, idAeries, teacherEmail, u1_phone, u2_stuEmail, u3_Parent_1a_Email, u4_corr, u5_lang, u6_teacher, SEIS_ID, Last_Name, First_Name, Date_of_Birth, Case_Manager, Date_of_Last_Annual_IEP, Date_of_Last_Evaluation, Date_of_Initial_Parent_Consent, Parent_1_Mail_Address, Parent_1_Email, Parent_1_Home_Phone, Parent_1_Cell_Phone, Grade_Code, Student_Eligibility_Status, Disability_1, Disability_2, Parent_Guardian_1_Name, Parent_Guardian_2_Name, Date_of_Next_Annual_IEP, reading_group, notes
+    ] = record;
+
+    $("#lang").val(u5_lang);
+    $("#corr").val(u4_corr);
+    $("#stuName").val(First_Name + ' ' + Last_Name);
+    $("#nameNav").text(First_Name + ' ' + Last_Name);
+    $("#dob").val(Date_of_Birth);
+    $("#parentsCopy").val(Parent_Guardian_1_Name);
+    $("#phone").val(Parent_1_Home_Phone);
+    $("#phone2").val(u1_phone);
+    $("#pem").val(Parent_1_Email);
+    $("#pem2").val(u3_Parent_1a_Email);
+    $("#tch").val(u6_teacher);
+    $("#tem").val(teacherEmail);
+    $("#idNo").val(SEIS_ID);
+    $("#stuem").val(u2_stuEmail);
+    $("#notes").val(notes);
+
+  }
+  function showFocusedLog(id) {
+  }
+  function calRefresh() {
+    document.body.style.cursor = "wait";
+    // google.script.run
+    //     .getSyncedEvents();
+    google.script.run
+      .withSuccessHandler(showCalData)
+      .getCalData_events();
+  }
+  function sndEm(buttonVal) {
+    var params = {};
+    var corrLang = $('#corr').val().toString();
+    if (corrLang == '1' || corrLang == '01') {
+      params['translate'] = true;
+    } else {
+      params['translate'] = false;
+    }
+    params['to'] = $('#emailRecipients').val();
+    params['subj'] = $('#emailSubject').val();
+    params['body'] = $('#emailBody').val();
+
+    google.script.run
+      .withSuccessHandler(copyToClipboard)
+      .createDraftEmail(buttonVal, JSON.stringify(params));
+  }
+  function sndMassEm(buttonVal) {
+    var params = {};
+    var corrLang = $('#corr').val().toString();
+    if (corrLang == '1' || corrLang == '01') {
+      params['translate'] = true;
+    } else {
+      params['translate'] = false;
+    }
+
+    var toAsStr = '';
+    $.each($('#emSelect').val(), function (i, val) {
+      toAsStr += val + ',';
+    });
+    $.each($('#teacherSelect').val(), function (i, val) {
+      toAsStr += val + ',';
+    });
+
+    // console.log('asStr = %s', toAsStr);
+
+    params['to'] = toAsStr;
+    params['subj'] = $('#emailSubject').val();
+    params['body'] = $('#emailBody').val();
+
+    // console.log('params = %s', JSON.stringify(params));
+    // return;
+    google.script.run
+      .withSuccessHandler(copyToClipboard)
+      .createDraftEmail(buttonVal, JSON.stringify(params));
+  }
+  // function writeEmail(addressee) {
+  // console.log("writeEmail fired");
+  //   // window.open('mailto:' + adr[0] + '?subject=' + adr[1] + '&cc=dpaight@hemetusd.org');
+  //   $('#mailModal').modal({
+  //     focus: true
+  //   });
+  //   if (addressee == 'pem') {
+  //     $('#emailRecipients').val($('#pem').val() + ', ' + $('#pem2').val());
+  //   } else if (addressee == 'tem') {
+  //     $('#emailRecipients').val($('#tem').val());
+  //   }
+  //   $('#emailSubject').val($('#stuName').val());
+  //   $('#emailBody').val('\n\n--\n' +
+  //     'Dan Paight\n' +
+  //     'Special Education Teacher\n' +
+  //     'Ramona Elementary (951.765.1670)\n' +
+  //     '951.364.4479 (mobile)'
+  //   );
+  // }
+
+  // +
+  // '\n\n\nNOTICE OF PROCEDURAL SAFEGUARDS AND PARENTS’ RIGHTS.pdf\n' +
+  // 'https://drive.google.com/file/d/1hRKDCRV0UB79E_V_KZKIF13gXpFPeW9u/view?usp=sharing' +
+  // '\n\n\nAVISO DE GARANTÍAS PROCESALES Y DERECHOS DE LOS PADRES\n'+
+  // 'https://drive.google.com/file/d/1JbzZ12pxkRGTv_jSu8hccXMRheSJXso_/view?usp=sharing'
+
+  function editGoalInModal(goal) {
+    // goal is a goal object from 'getGoal'
+    // this.id = id;
+    // this.lvl = grdLvl;
+    // this.area = area;
+    // this.strand = strand;
+    // this.annual = annual;
+    // this.standard = standard;
+    // this.objective1 = objctv1;
+    // this.objective2 = objctv2;
+    // this.objective3 = objctv3;
+
+    $('#goalModal').modal({
+      focus: true
+    });
+
+    $('#glEditId').val(goal.id);
+    $('#glEditLvl').val(goal.lvl);
+    $('#glEditStrand').val(goal.strand);
+    $('#glEditAnnual').val(goal.annual);
+    $('#glEditArea').val(goal.area);
+    $('#glEditStandard').val(goal.standard);
+    $('#glEditobj1').val(goal.objective1);
+    $('#glEditobj2').val(goal.objective2);
+    $('#glEditobj3').val(goal.objective3);
+    $('#timestamp').val(goal.timestamp);
+  }
+  function clearEmailFields() {
+    $("textarea.email").val("");
+  }
+
+  // this is a bit of code I stole from w3 schools; works great!; 
+  // together with the code in the HTML file, this allows sorting by columns when the headings are clicked
+  function sortTable(t_id, n) {
+    var table, rows, switching, i, x, y, shouldSwitch, dir, switchcount = 0;
+    table = document.getElementById("rosterList");
+    switching = true;
+    // Set the sorting direction to ascending:
+    dir = "asc";
+    /* Make a loop that will continue until
+    no switching has been done: */
+    while (switching) {
+      // Start by saying: no switching is done:
+      switching = false;
+      rows = table.rows;
+      /* Loop through all table rows (except the
+      first, which contains table headers): */
+      for (i = 1; i < (rows.length - 1); i++) {
+        // Start by saying there should be no switching:
+        shouldSwitch = false;
+        /* Get the two elements you want to compare,
+        one from current row and one from the next: */
+        x = rows[i].getElementsByTagName("TD")[n];
+        y = rows[i + 1].getElementsByTagName("TD")[n];
+        /* Check if the two rows should switch place,
+        based on the direction, asc or desc: */
+        if (dir == "asc") {
+          if (x.innerHTML.toLowerCase() > y.innerHTML.toLowerCase()) {
+            // If so, mark as a switch and break the loop:
+            shouldSwitch = true;
+            break;
+          }
+        } else if (dir == "desc") {
+          if (x.innerHTML.toLowerCase() < y.innerHTML.toLowerCase()) {
+            // If so, mark as a switch and break the loop:
+            shouldSwitch = true;
+            break;
+          }
+        }
+      }
+      if (shouldSwitch) {
+        /* If a switch has been marked, make the switch
+        and mark that a switch has been done: */
+        rows[i].parentNode.insertBefore(rows[i + 1], rows[i]);
+        switching = true;
+        // Each time a switch is done, increase this count by 1:
+        switchcount++;
+      } else {
+        /* If no switching has been done AND the direction is "asc",
+        set the direction to "desc" and run the while loop again. */
+        if (switchcount == 0 && dir == "asc") {
+          dir = "desc";
+          switching = true;
+        }
+      }
+    }
+  }
+
+  function openLogPrintDialog() {
+    $('#logModal').modal({
+      focus: true
+    });
+    $('#printedLogsth').empty();
+    $('#printedLogstb').empty();
+    $('#printLogStuName').html('<h4>' + $('#stuName').val() + '</h4>');
+
+  }
+  function showLog(loc_and_logEntries) {
+    // input is an array containing one arrays and one string ('loc'): loc_and_logEntries contains all the log entries that correspond to that record
+    var logEntries = loc_and_logEntries[0];
+    var loc = loc_and_logEntries[1];
+
+    var list = $("#" + loc + "tb");
+    list.empty();
+
+    var entries = [];
+    var stuName = First_Name + ' ' + Last_Name;
+    for (var i = 0; i < logEntries.length; i++) {
+      var [
+        Timestamp, email, studentMC, log_entry, empty, SEIS_ID, Last_Name, First_Name, First_Name, Student_ID
+      ] = logEntries[i];
+      var dateStamp = moment(Timestamp).format('YYYY-MM-DD');
+      var tmStamp = moment(Timestamp).format('HH:mm')
+      entries.push([dateStamp + 'T' + tmStamp, log_entry]);
+    }
+
+    if (entries.length > 0) {
+      var dateStart = moment().subtract(1, 'y');
+      var dateEnd = moment(new Date());
+      if (loc == 'printedLogs') {
+        // return only items within the defined date range in the printLog dialog.val();
+        $('#logModal').modal({
+          focus: true
+        });
+        var bDt = moment($('#stDtEdit').val()).format('YYYY-MM-DD');
+        var eDt = moment($('#endDtEdit').val()).format('YYYY-MM-DD');
+
+        // console.log('begin %s; end %s', JSON.stringify(bDt), JSON.stringify(eDt));
+
+        dateStart = (bDt == 'Invalid date') ?
+          moment().subtract(1, 'y') :
+          moment(bDt).subtract(1, 'd');
+
+
+        dateEnd = (eDt == 'Invalid date') ?
+          moment() :
+          moment($('#endDtEdit').val()).format('YYYY-MM-DD');
+
+        $('#stDtEdit').attr('value', moment(dateStart).subtract(1, 'd').format('YYYY-MM-DD'));
+        $('#endDtEdit').attr('value', moment(dateEnd).add(1, 'd').format('YYYY-MM-DD'));
+
+        $('#printLogStuName').html('<h4>' + $('#stuName').val() + '</h4>');
+      }
+      var list = $("#" + loc + "th");
+      list.empty();
+      list.append(
+        "<tr><thead><th >" + "Date" + "</th><th >" + "Entry" + "</thead></th>"
+      );
+      list = $("#" + loc + "tb");
+      list.empty();
+      // array will be put in sessionStorage
+      var array = [];
+      for (let j = 0; j < entries.length; j++) {
+        let [theDate, theEvent] = entries[j];
+        // console.log('this log date is %s; start is: %s; end is: %s', JSON.stringify(theDate), JSON.stringify(dateStart), JSON.stringify(dateEnd));
+        if (moment(theDate).isAfter(dateStart) && moment(theDate).isBefore(dateEnd)) {
+          var timeStamp = moment(theDate).format("YYYY-MM-DD") + '\n' +
+            moment(theDate).format("HH:mm");
+            var timeStampDt = moment(theDate).format("YYYY-MM-DD");
+            var timeStampTm = moment(theDate).format("HH:mm");
+            
+          list.append(
+            '<tr><td class="tableDateL">' +
+            timeStampDt + '<br>' + timeStampTm +
+            "</td>" +
+            "<td>" +
+            theEvent.toString() +
+            "</td>" +
+            "</tr>"
+          );
+          array.push([timeStamp, theEvent]);
+        }
+      }
+      // stores array in sessionStorage for retrieval in case we want to write a pdf file
+      sessionStorage.setItem('logPrint', JSON.stringify(array));
+    } else {
+      // no log entries returned
+      list = $("#" + loc + "tb");
+      list.append(
+        '<tr><td class="tableDate">' +
+        "no data" +
+        "</td>" +
+        "<td>" +
+        entries[i][1].toString() +
+        "</td>" +
+        "</tr>"
+      );
+    }
+    $("#corr[value='01']", function () {
+      $(this).css("background-color", "#ff0000")
+    });
+
+    $("#" + loc + "tb").show();
+
+    document.body.style.cursor = "default";
+  }
+
+  function printSelectedLogEntries() {
+    var stuName = $('#stuName').val();
+    var array = JSON.parse(sessionStorage.getItem('logPrint'));
+    document.body.style.cursor = "wait";
+    google.script.run
+      .withSuccessHandler(showToast)
+      .printSelectedLogEntries(stuName, array);
+  }
+
+
+  // // this one displays the contact log table
+  // function showLog(loc_and_logEntries) {
+  //   // input is an array containing one arrays and one string ('loc'): loc_and_logEntries contains all the log entries that correspond to that record
+  //   var logEntries = loc_and_logEntries[0];
+  //   var loc = loc_and_logEntries[1];
+
+  //   var list = $("#" + loc + "tb");
+  //   list.empty();
+
+  //   var entries = [];
+  //   var stuName = First_Name + ' ' + Last_Name;
+  //   for (var i = 0; i < logEntries.length; i++) {
+  //     var [
+  //       Timestamp, email, studentMC, log_entry, empty, SEIS_ID, Last_Name, First_Name, First_Name, Student_ID
+  //     ] = logEntries[i];
+
+  //     entries.push([Timestamp, log_entry]);
+  //   }
+
+  //   if (entries.length > 0) {
+  //     var list = $("#" + loc + "th");
+  //     list.empty();
+  //     list.append(
+  //       "<tr><thead><th >" + "Date" + "</th><th >" + "Entry" + "</thead></th>"
+  //     );
+  //     list = $("#" + loc + "tb");
+  //     list.empty();
+  //     for (let j = 0; j < entries.length; j++) {
+  //       let [theDate, theEvent] = entries[j];
+  //       let timeStamp = moment(theDate).format("MM-DD-YY") + "<br>" +
+  //         moment(theDate).format("HH:mm");
+  //       list.append(
+  //         '<tr><td class="tableDateL">' +
+  //         timeStamp +
+  //         "</td>" +
+  //         "<td>" +
+  //         theEvent.toString() +
+  //         "</td>" +
+  //         "</tr>"
+  //       );
+  //     }
+  //   } else {
+  //     list = $("#" + loc + "tb");
+  //     list.append(
+  //       '<tr><td class="tableDate">' +
+  //       "no data" +
+  //       "</td>" +
+  //       "<td>" +
+  //       entries[i][1].toString() +
+  //       "</td>" +
+  //       "</tr>"
+  //     );
+  //   }
+  //   $("#corr[value='01']", function () {
+  //     $(this).css("background-color", "#ff0000")
+  //   });
+
+  //   $("#loc01tb").show();
+
+  //   document.body.style.cursor = "default";
+  // }
+  // lt_consLogTimeEnd(eval(fname));
+
+
+  // clears new log entry field and resets button colors
+  function showLogUpdates(record) {
+    //update the browser cache with saved data
+    var key = 'rec' + record[9];
+    sessionStorage[key] = JSON.stringify(record);
+    // console.log(sessionStorage[key]);
+    // get contact logs
+    $("#logEntry").val("");
+    document.body.style.cursor = "default";
+    $("#saveEntry").attr("class", "btn btn-sm btn-success my-1 svChngs");
+  }
+  // display table of names sorted by due dates
+  function showRosterTable(loc_and_data) {
+    var [loc, data, id] = loc_and_data;
+    var list = $("#" + loc + "th");
+    list.empty();
+    list = $("#" + loc + "tb");
+    list.empty();
+    list.append(
+      "<tr >" +
+      "<th class='sticky-top' onclick=\"sortTable(\'rosterList\',0)\">" +
+      "Name" +
+      "</th>" +
+      "<th class='sticky-top tableDate' onclick=\"sortTable(\'rosterList\',1)\">" +
+      "Annual" +
+      "</th>" +
+      "<th class='sticky-top tableDate' onclick=\"sortTable(\'rosterList\',2)\">" +
+      "Triennial" +
+      "</th></tr>"
+    );
+    for (let i = 0; i < data.length; i++) {
+      const el = data[i];
+      var [
+        nmJdob, idAeries, teacherEmail, u1_phone, u2_stuEmail, u3_Parent_1a_Email, u4_unused, u5_unused, u6_unused, SEIS_ID, Last_Name, First_Name, Date_of_Birth, Case_Manager, Date_of_Last_Annual_IEP, Date_of_Last_Evaluation, Date_of_Initial_Parent_Consent, Parent_1_Mail_Address, Parent_1_Email, Parent_1_Home_Phone, Parent_1_Cell_Phone, Grade_Code, Student_Eligibility_Status, Disability_1, Disability_2, Parent_Guardian_1_Name, Parent_Guardian_2_Name, Date_of_Next_Annual_IEP
+      ] = el;
+      list = $("#" + loc + "tb");
+      if (!SEIS_ID) {
+
+        alert(" has no id"); // lnCmafn + 
+      } else {
+        list.append(
+          '<tr><td class="setStudent" data-stuId=' +
+          SEIS_ID +
+          "> " +
+          Last_Name + ', ' + First_Name.toString().slice(0, 1) + "." +
+          "</td>" +
+          '<td class="tableDate">' +
+          moment(Date_of_Last_Annual_IEP).format('YYYY-MM-DD') +
+          "</td>" +
+          '<td class="tableDate">' +
+          moment(Date_of_Last_Evaluation).format('YYYY-MM-DD') +
+          "</td>" +
+          "</tr></div>"
+        );
+      }
+    }
+    store(data);
+
+    google.script.run
+      .withSuccessHandler(focus)
+      .getLastId();
+
+  }
+
+  // bindSetStudentClick();
+  // show upcoming iep meetings on the calendar
+  function showCalData(data) {
+    $("#loc00hd").empty();
+    $("#loc00hd").append("<ul>");
+    for (let i = 0; i < data.length; i++) {
+      var [a, b, c, d, e, f, g, h] = data[i];
+      var p = moment(c, 'YYYY-MM-DD');
+      var q = moment();
+
+
+      if (p.diff(q) > -1 && h.toString().match(/.*paight.*/g)) {
+        $("#loc00hd").append(
+          "<li ' class='upcomingEvent'>" + c + "     " + b + "; \n" + f + '\n');
+      }
+    }
+    /*                 "<a href='" + htmlLink + "' target='_blank'>" + date + "          " + summary + "</a><br>"); */
+    document.body.style.cursor = "default";
+  }
+  /**
+   *
+   * @param searchAndItems [search term in form 'gradeLevel_area' , last search result] 
+   * 
+   */
+  function showGoals(goalListItemsArray) {
+    // console.log(goalListItemsArray);
+    $("#glLst").empty();
+
+    for (let i = 0; i < goalListItemsArray.length; i++) {
+      const element = goalListItemsArray[i];
+      $("#glLst").append(element);
+    }
+
+    document.body.style.cursor = "default";
+  }
+  function showTBsnippet(snippet) {
+    // console.log('session storage item: ' + lvlsSnp + $('#idNo'));
+    $("#tbSnippetCopy").text(snippet);
+    $("#tbSnippetCopy").select();
+    document.execCommand('copy');
+    // $("#snippetSelected").toast({ delay: 5000 });
+    // $("#snippetSelected").toast("show");
+    document.body.style.cursor = "default";
+  }
+
+
+  function snipInfo() {
+    var id = $("#idNo").val();
+    google.script.run
+      .withSuccessHandler(appendSnips)
+      .getPresentLevelsAsTextBlazeListItem(id);
+  }
+
+  function appendSnips(levelsSnip) {
+    var snip = "[";
+    snip += '"corr"="' + $("#corr").val() + '"';
+    snip += ',"nm"="' + $("#stuName").val() + '"';
+    snip += ',"fn"="' + $("#stuName").val().toString().replace(/([A-Z]{1}[a-z]+) ([A-Z]{1}[A-z]+)/, "$1") + '"';
+    snip += ',"ln"="' + $("#stuName").val().toString().replace(/([A-Z]{1}[a-z]+) ([A-Z]{1}[A-z]+)/, "$2") + '"';
+    snip += ',"dob"="' + $("#dob").val() + '"';
+    snip += ',"par"="' + $("#parentsCopy").val() + '"';
+    snip += ',"ph1"="' + $("#phone").val() + '"';
+    snip += ',"ph2"="' + $("#phone2").val() + '"';
+    snip += ',"pem1"="' + $("#pem").val() + '"';
+    snip += ',"pem2"="' + $("#pem2").val() + '"';
+    snip += ',"tem"="' + $("#tem").val() + '"';
+    snip += ',"tch"="' + $("#tch").val() + '"';
+    snip += ',"sid"="' + $("#idNo").val() + '"';
+    snip += ',"id"="' + $("#stuem").val().toString().replace(/[A-z]{2}(\d{6}).*/, "$1") + '"';
+    snip += ',"sem"="' + $("#stuem").val() + '"';
+    snip += "]";
+    // console.log(snip);
+
+    if (levelsSnip == "not found") {
+      levelsSnip = "[\"not found\"=\"not found\"]"
+      // do nothing
+    } else {
+      // combine snips
+      snip = snip.toString().replace(/\]/, ",");
+      // console.log(snip);
+      levelsSnip = levelsSnip.toString().replace(/\[/, "");
+      // console.log(levelsSnip);
+      snip = snip.toString() + levelsSnip.toString();
+      // console.log(snip);
+    }
+    // copy the whole thing to the clipboard
+    copyToClipboard(snip);
+  };
+  function copyToClipboard(content) {
+    var container = document.createElement('div');
+    container.textContent = content;
+    container.style.position = 'fixed';
+    container.style.pointerEvents = 'none';
+    container.style.opacity = 0;
+    document.body.appendChild(container);
+    window.getSelection().removeAllRanges();
+    var range = document.createRange();
+    range.selectNode(container);
+    window.getSelection().addRange(range);
+    document.execCommand('copy');
+    document.body.removeChild(container);
+    showToast('data copied to the clipboard');
+
+    // alert("The data has been copied as a TextBlaze key-value list to the clipboard.");
+  }
+  function showToast(object) {
+
+    if (object.url) {
+      $('#toastBody').html('<a href=' + object.url + ' target="_blank" style="color: white;">' + object.msg + ' (click to open pdf file) ' + '</a>')
+    } else {
+      // $('#toastBody').html('<p>' + msg + '</p>')
+    }
+    $('.toast').toast({ delay: 20000 });
+    $('.toast').toast('show');
+    document.body.style.cursor = "default";
+
+  }
+
+  function saveGoal(newReplace) {
+    var glEditLevel, glEditArea, glEditStnd, glEditStandard, glEditAnnual, glEditObj1, glEditObj2, glEditObj3, timestamp;
+    if (newReplace != -1) {
+      glEditId = parseInt($('#glEditId').val(), 10);
+    } else {
+      glEditId = -1;
+    }
+
+    glEditLevel = parseInt($('#glEditLvl').val(), 10);
+    glEditArea = $('#glEditArea').val();
+    glEditStrand = $('#glEditStrand').val();
+    glEditStandard = $('#glEditStandard').val();
+    glEditAnnual = $('#glEditAnnual').val();
+    glEditObj1 = $('#glEditobj1').val();
+    glEditObj2 = $('#glEditobj2').val();
+    glEditObj3 = $('#glEditobj3').val();
+    timestamp = new Date();
+
+    var data = [glEditId, glEditLevel, glEditArea, glEditStrand, glEditAnnual, glEditStandard, glEditObj1, glEditObj2, glEditObj3, timestamp];
+    // console.log('data = %s', JSON.stringify(data));
+    google.script.run
+      .withSuccessHandler(saveGoalSuccess)
+      .saveGoalSS(data);
+  }
+  function saveGoalSuccess() {
+    findGoals();
+  }
+  function Goal(id, grdLvl, area, strand, annual, standard, objctv1, objctv2, objctv3, timestamp) {
+    this.id = id;
+    this.lvl = grdLvl;
+    this.area = area;
+    this.strand = strand;
+    this.annual = annual;
+    this.standard = standard;
+    this.objective1 = objctv1;
+    this.objective2 = objctv2;
+    this.objective3 = objctv3;
+    this.timestamp = timestamp;
+
+    this.snip = function () {
+      return '[' +
+        '"area" = "' + this.area + '",' +
+        '"strand" = "' + this.strand + '",' +
+        '"stnd" = "' + this.standard + '",' +
+        '"gl" = "' + this.annual + '"' +
+        ']';
+    }
+    this.list = function () {
+      return '<li class="goalList" glId="' + this.id
+        + '["' + this.lvl + '"' + ', '
+        + '"' + this.strand + '"' + ', '
+        + '"' + this.annual + '"' + ', '
+        + '"' + this.id + '"]</li>';
+    }
+
+  }
+
+  function firstSnipThenGvoice() {
+    snipInfo();
+    setTimeout(function () { window.open("https://voice.google.com/u/0/messages/", target = "_blank"); }, 2000);
+  }
+
+
+  function printLogs(id, loc) {
+    // console.log('upon start: id = %s; loc = %s', id, loc);
+    document.body.style.cursor = "wait";
+    var stuId, stuName;
+    stuName = $("#stuName").val();
+    google.script.run
+      .withSuccessHandler(showLog)
+      .getTableData_logs(id, loc)
+  }
+  function successMsg(msgAndUrlJSON) {
+    var object = JSON.parse(msgAndUrlJSON);
+    var msg = object.msg;
+    var url = object.url;
+    document.body.style.cursor = "default";
+    showToast(msg, url);
+  }
+
+  function NORMSDIST(z) {
+    // Uses https://cdn.jsdelivr.net/jstat/latest/jstat.min.js
+    if (isNaN(z)) return '#VALUE!';
+    var mean = 0, sd = 1;
+    return jStat.normal.cdf(z, mean, sd);
+  }
+
+</script>
