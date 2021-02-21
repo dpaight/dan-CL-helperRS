@@ -229,8 +229,12 @@
     // loading data into the cards
     // this gets the data to be displayed for the student in focus, but not the log entries yet
     document.body.style.cursor = "wait";
+    google.script.run
+      .withSuccessHandler(focus)
+      .getLastId();
 
     // this gets the data for the table in the middle
+    document.body.style.cursor = "wait";
     google.script.run
       .withSuccessHandler(showRosterTable)
       .getTableData_roster();
@@ -240,7 +244,6 @@
     google.script.run
       .withSuccessHandler(showCalData)
       .getCalData_events();
-
 
   });
   function showTBsnippetGl(goalObj) {
@@ -599,13 +602,10 @@
 
         $('#printLogStuName').html('<h4>' + $('#stuName').val() + '</h4>');
       }
-      var list = $("#" + loc + "th");
-      list.empty();
-      list.append(
-        "<tr><thead><th >" + "Date" + "</th><th >" + "Entry" + "</thead></th>"
-      );
+
       list = $("#" + loc + "tb");
       list.empty();
+
       // array will be put in sessionStorage
       var array = [];
       for (let j = 0; j < entries.length; j++) {
@@ -614,16 +614,13 @@
         if (moment(theDate).isAfter(dateStart) && moment(theDate).isBefore(dateEnd)) {
           var timeStamp = moment(theDate).format("YYYY-MM-DD") + '\n' +
             moment(theDate).format("HH:mm");
-            var timeStampDt = moment(theDate).format("YYYY-MM-DD");
-            var timeStampTm = moment(theDate).format("HH:mm");
-            
+          var timeStampDt = moment(theDate).format("YYYY-MM-DD");
+          var timeStampTm = moment(theDate).format("HH:mm");
+
           list.append(
-            '<tr><td class="tableDateL">' +
-            timeStampDt + '<br>' + timeStampTm +
-            "</td>" +
-            "<td>" +
-            theEvent.toString() +
-            "</td>" +
+            "<tr>" +
+            "<td class='tableDateL'>" + timeStampDt + '<br>' + timeStampTm + "</td>" +
+            "<td>" + theEvent.toString() + "</td>" +
             "</tr>"
           );
           array.push([timeStamp, theEvent]);
@@ -899,7 +896,7 @@
   function showToast(object) {
 
     if (object.url) {
-      $('#toastBody').html('<a href=' + object.url + ' target="_blank" style="color: white;">' + object.msg + ' (click to open pdf file) ' + '</a>')
+      $('#toastBody').html('<a href=' + object.url + ' target="_blank" style="color: black;">' + object.msg + ' (click to open pdf file) ' + '</a>')
     } else {
       // $('#toastBody').html('<p>' + msg + '</p>')
     }
