@@ -791,6 +791,7 @@
   // bindSetStudentClick();
   // show upcoming iep meetings on the calendar
   function showCalData(data) {
+    console.log('the data: %s', JSON.stringify(data));
     $("#loc00hd").empty();
     $("#loc00hd").append("<ul>");
     for (let i = 0; i < data.length; i++) {
@@ -799,13 +800,15 @@
       var q = moment();
 
 
-      if (p.diff(q) > -1 && h.toString().match(/.*paight.*/g)) {
+      if (1==1) {  //p.diff(q) > 1 && h.toString().match(/.*paight.*/g)
         $("#loc00hd").append(
           "<li ' class='upcomingEvent'>" + moment(c, 'YYYY-MM-DD').format('dd YY-MM-DD') + "     " + b + "; \n" + f + '\n');
+      } else {
+        console.log('this did not pass the test: %s %s', b, c);
       }
+      /*                 "<a href='" + htmlLink + "' target='_blank'>" + date + "          " + summary + "</a><br>"); */
+      document.body.style.cursor = "default";
     }
-    /*                 "<a href='" + htmlLink + "' target='_blank'>" + date + "          " + summary + "</a><br>"); */
-    document.body.style.cursor = "default";
   }
   /**
    *

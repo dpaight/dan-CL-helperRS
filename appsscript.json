@@ -1,10 +1,16 @@
 {
   "timeZone": "America/New_York",
-  "dependencies": {},
-  "exceptionLogging": "STACKDRIVER",
-  "runtimeVersion": "V8",
+  "dependencies": {
+    "libraries": [{
+      "userSymbol": "Moment",
+      "libraryId": "15hgNOjKHUG4UtyZl9clqBbl23sDvWMS8pfDJOyIapZk5RBqwL3i-rlCo",
+      "version": "9"
+    }]
+  },
   "webapp": {
-    "executeAs": "USER_DEPLOYING",
-    "access": "MYSELF"
-  }
+    "access": "MYSELF",
+    "executeAs": "USER_DEPLOYING"
+  },
+  "exceptionLogging": "STACKDRIVER",
+  "runtimeVersion": "V8"
 }

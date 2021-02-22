@@ -1,13 +1,13 @@
+import { logging } from "googleapis/build/src/apis/logging";
+
 var ss = SpreadsheetApp.getActiveSpreadsheet();
 var roster = ss.getSheetByName('roster');
 var ss2 = SpreadsheetApp.openById("1Pe-unMy1vkj3joBvGru03YB1W3a35zNn_vXw9eF0KKk");
 var sp = CacheService.getScriptCache(); //PropertiesService.getScriptProperties();
 var fname = 'arguments.callee.toString().match(/function ([^\(]+)/)[1]';
 // import "/home/paight/devG/git/caseLog_dphusd/node_modules/@types/google-apps-script"
-function moment(parameters?,dummyParam?) {
-    if (!arguments[0]) return eval("moment().format('YYYY-MM-DD')")
-    return eval("moment()"+(arguments[0])) 
-  }
+// @ts-ignoren
+var moment = Moment.load();
 function sendLevelsForm(stuName, stuId, teacherEmail) {
     Logger.log('stuName: %s, stuId: %s, teacherEmail: %s', stuName, stuId, teacherEmail);
     // stuName = 'Wanda Wanderer', stuId = 'WandererWanda123456', teacherEmail = 'dpaight@hemetusd.org';
@@ -1004,11 +1004,14 @@ function getCalData_events() {
     var y = [];
     for (let i = 0; i < x.length; i++) {
         const element = x[i];
-        if (moment(element[2]).format("YYYY-MM-DD") < moment().format("YYYY-MM-DD")) {
+        if (moment(element[2], 'YYYY-MM-DDTHH:mm:SS') < moment()) {
             // do nothing
+            Logger.log('did nothing for %s', element[1]);
         }
         else {
-            let thisDate = moment(element[2], 'YYYY-MM-DD HH:mm');
+            
+            Logger.log('did SOMEthing for %s', element[1]);
+            let thisDate = moment(element[2], 'YYYY-MM-DDTHH:mm:SS');
             element.splice(2, 1, moment(thisDate).format('YYYY-MM-DD HH:mm'));
             y.push(element);
         }
