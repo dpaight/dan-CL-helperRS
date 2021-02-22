@@ -801,7 +801,7 @@
 
       if (p.diff(q) > -1 && h.toString().match(/.*paight.*/g)) {
         $("#loc00hd").append(
-          "<li ' class='upcomingEvent'>" + c + "     " + b + "; \n" + f + '\n');
+          "<li ' class='upcomingEvent'>" + moment(c, 'YYYY-MM-DD').format('dd YY-MM-DD') + "     " + b + "; \n" + f + '\n');
       }
     }
     /*                 "<a href='" + htmlLink + "' target='_blank'>" + date + "          " + summary + "</a><br>"); */
