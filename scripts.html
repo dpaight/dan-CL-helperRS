@@ -2,7 +2,27 @@
   // The code in this function runs when the page is loaded.
   $(document).ready(function () {
 
+    // loading data into the cards
+    // this gets the data to be displayed for the student in focus, but not the log entries yet
+    document.body.style.cursor = "wait";
+    google.script.run
+      .withSuccessHandler(focus)
+      .getLastId();
+
+    // this gets the data for the table in the middle
+    document.body.style.cursor = "wait";
+    google.script.run
+      .withSuccessHandler(showRosterTable)
+      .getTableData_roster();
+
+    // this retrieves information from the meetings sheet to display
+    document.body.style.cursor = "wait";
+    google.script.run
+      .withSuccessHandler(showCalData)
+      .getCalData_events();
+
     $("#ready").hide();
+
     $(".pleaseHide").hide();
     // $('.toast').hide();
     var gSmL = localStorage.getItem('glLvl');
@@ -42,210 +62,192 @@
         });
         var crntScrl = $(window).scrollTop();
       }
-    });
 
-    // shift-click clears a litte goal number box
-    // click builds text blaze snippet from data in table
-    $("body").on("click", "input[name=gls]", function (event) {
-      if (event.shiftKey) {
-        $(this).val("");
+      // shift-click clears a litte goal number box
+      // click builds text blaze snippet from data in table
+      $("body").on("click", "input[name=gls]", function (event) {
+        if (event.shiftKey) {
+          $(this).val("");
+          $(this).attr("title", "");
+        } else {
+          var id = $('#idNo').val();
+          var gId = $(this).val();
+          google.script.run
+            .withSuccessHandler(showTBsnippetGl)
+            .getOneGoalForEditing(gId);
+        }
+      });
+
+      // $("body").on("click", "#emParentsMenuItem", emParents());
+
+      $(function () {
+        $('[data-toggle="tooltip"]').tooltip()
+      })
+      // console.log('gSmL is %s', gSmL);
+
+      $("body").on("click", "#gVoiceMenuItem", function () { firstSnipThenGvoice() });
+      $(".alert").alert();
+
+      //set cursor to pointer when entering a nav item
+      $("body").on("mouseenter", ".nav-link", function () {
+        $(this).css("cursor", "pointer");
+      });
+
+      // set cursor to pointer when entering table row
+      $("body").on("mouseenter", ".setStudent", function () {
+        $(".setStudent").css("cursor", "pointer");
+      });
+
+      //set cursor to pointer when entering an icon
+      $("body").on("mouseenter", ".material-icons", function () {
+        $(".setStudent").css("cursor", "pointer");
+      });
+
+      // set cursor to normal when leaving an icon
+      $("body").on("mouseleave", ".material-icons", function () {
+        $(".setStudent").css("cursor", "default");
+      });
+
+
+      // modals
+      $("body").on("show.bs.modal", function () {
+        // alert('event');
+        var addresses = ($("#tem").val() + ',' + $("#pem").val() + ',' + $("#pem2").val()).replace(/,$/, "");
+        var subject = $("#stuName").val();
+        // console.log(addresses);
+        $("#emailRecipients").val(addresses);
+        $("#emailSubject").val(subject);
+      })
+
+      // change the cursor to a pointer when entering a text Blaze field
+      $("body").on("mouseenter", '[name$="Copy"]', function () {
+        $("[name$='Copy']").css("cursor", "pointer");
+      });
+
+      // if shift key is down turning the cursor into a trash can and then delete on click (next function)
+      $("body").on("mousemove", "input[name='gls']", function () {
+        if (event.shiftKey) {
+          $("input[name='gls'").css("cursor", "url(https://drive.google.com/uc?export=view&id=1HSHKH6IvS3mfL0wsINR73RrvAWR-7uB_), auto");
+        } else {
+          $("input[name='gls'").css("cursor", "pointer");
+        }
+      });
+
+      $("body").on("click", ".snipThis", function (event) {
+        event.preventDefault();
+        snipInfo();
+      });
+      // copy a text blaze snippet to clipboard when clicking on the item
+      $("body").on("click", '[name$="Copy"]', function () {
+        $(this).select();
+        document.execCommand('copy');
+      });
+
+      $("body").on("click", ".setStudent", function (event) {
+        event.preventDefault();
+        var id = $(this).attr("data-stuId");
+        // $(this).css("background-color", "#5bf5db")
+        focus(id);
+      });
+
+      // when clicking on a table row, change the color of the field
+      $("body").on("mousedown", ".setStudent", function (event) {
+        event.preventDefault();
+        $(this).css("background-color", "#5bf5db");
+        // console.log('mouse down');
+      });
+
+      // this goes with the one just above changing the color back to White
+      $("body").on("mouseup", ".setStudent", function (event) {
+        event.preventDefault();
+        $(this).css("background-color", "#ffffff");
+        // console.log('mouse up');
+      });
+
+      $("body").on("click", "#calRefresh", function () {
+        document.body.style.cursor = "wait";
+        google.script.run
+          .withSuccessHandler(showCalData)
+          .getCalData_events();
+      });
+      // save all data in changeable fields in the  spreadsheet
+      $("body").on("click", ".saveEntryBtn", function (event) {
+        event.preventDefault();
+        document.body.style.cursor = "wait";
+        var entry = $("#logEntry").val();
+        var id = $("#idNo").val();
+        var phone = $("#phone").val();
+        var pem = $("#pem").val();
+        var phone2 = $("#phone2").val();
+        var pem2 = $("#pem2").val();
+        var tem = $("#tem").val();
+        var notes = $("#notes").val();
+
+        // console.log('vars = %s;  %s;  %s;  %s;  %s;  %s;  %s;  ', id, phone, pem, phone2, pem2, tem, notes);
+        google.script.run
+          .withSuccessHandler(showLogUpdates)
+          .updateRecord([id, phone, pem, phone2, pem2, tem, notes]);
+        if (entry.length > 0) {
+          $("html,body").css("cursor", "wait");
+          google.script.run.withSuccessHandler(focus)
+            .saveLogEntry([id, entry]);
+        }
+      });
+
+
+
+      // turn the color of the button back to green without doing anything
+      $("body").on("click", "#cancelEntryBtn", function (event) {
+        event.preventDefault();
+        $("#saveEntry").attr("class", "btn btn-sm btn-success my-1 svChngs");
+      });
+
+
+      // click builds text blaze snippet from data in table 
+      $("body").on("click", "#getIEPcompForm", function (event) {
+        var flName = $("#stuName").val("");
+        var fn = flName.replace(/([A-z]+)( .*)/g, "$1");
+        var ln = flName.replace(/([A-z]+ )(.*)/g, "$2");
+        var dob = $("#dob").val("");
+
+        document.execCommand('copy');
+
         $(this).attr("title", "");
-      } else {
-        var id = $('#idNo').val();
+
         var gId = $(this).val();
         google.script.run
           .withSuccessHandler(showTBsnippetGl)
-          .getOneGoalForEditing(gId);
-      }
-    });
+          .getGoal(gId);
+      });
 
-    // $("body").on("click", "#emParentsMenuItem", emParents());
-
-    $(function () {
-      $('[data-toggle="tooltip"]').tooltip()
-    })
-    // console.log('gSmL is %s', gSmL);
-
-    $("body").on("click", "#gVoiceMenuItem", function () { firstSnipThenGvoice() });
-    $(".alert").alert();
-
-    //set cursor to pointer when entering a nav item
-    $("body").on("mouseenter", ".nav-link", function () {
-      $(this).css("cursor", "pointer");
-    });
-
-    // set cursor to pointer when entering table row
-    $("body").on("mouseenter", ".setStudent", function () {
-      $(".setStudent").css("cursor", "pointer");
-    });
-
-    //set cursor to pointer when entering an icon
-    $("body").on("mouseenter", ".material-icons", function () {
-      $(".setStudent").css("cursor", "pointer");
-    });
-
-    // set cursor to normal when leaving an icon
-    $("body").on("mouseleave", ".material-icons", function () {
-      $(".setStudent").css("cursor", "default");
-    });
-
-
-    // modals
-    $("body").on("show.bs.modal", function () {
-      // alert('event');
-      var addresses = ($("#tem").val() + ',' + $("#pem").val() + ',' + $("#pem2").val()).replace(/,$/, "");
-      var subject = $("#stuName").val();
-      // console.log(addresses);
-      $("#emailRecipients").val(addresses);
-      $("#emailSubject").val(subject);
-    })
-
-    // change the cursor to a pointer when entering a text Blaze field
-    $("body").on("mouseenter", '[name$="Copy"]', function () {
-      $("[name$='Copy']").css("cursor", "pointer");
-    });
-
-    // if shift key is down turning the cursor into a trash can and then delete on click (next function)
-    $("body").on("mousemove", "input[name='gls']", function () {
-      if (event.shiftKey) {
-        $("input[name='gls'").css("cursor", "url(https://drive.google.com/uc?export=view&id=1HSHKH6IvS3mfL0wsINR73RrvAWR-7uB_), auto");
-      } else {
-        $("input[name='gls'").css("cursor", "pointer");
-      }
-    });
-
-    $("body").on("click", ".snipThis", function (event) {
-      event.preventDefault();
-      snipInfo();
-    });
-    // copy a text blaze snippet to clipboard when clicking on the item
-    $("body").on("click", '[name$="Copy"]', function () {
-      $(this).select();
-      document.execCommand('copy');
-    });
-
-    $("body").on("click", ".setStudent", function (event) {
-      event.preventDefault();
-      var id = $(this).attr("data-stuId");
-      // $(this).css("background-color", "#5bf5db")
-      focus(id);
-    });
-
-    // when clicking on a table row, change the color of the field
-    $("body").on("mousedown", ".setStudent", function (event) {
-      event.preventDefault();
-      $(this).css("background-color", "#5bf5db");
-      // console.log('mouse down');
-    });
-
-    // this goes with the one just above changing the color back to White
-    $("body").on("mouseup", ".setStudent", function (event) {
-      event.preventDefault();
-      $(this).css("background-color", "#ffffff");
-      // console.log('mouse up');
-    });
-
-    $("body").on("click", "#calRefresh", function () {
-      document.body.style.cursor = "wait";
-      google.script.run
-        .withSuccessHandler(showCalData)
-        .getCalData_events();
-    });
-    // save all data in changeable fields in the  spreadsheet
-    $("body").on("click", ".saveEntryBtn", function (event) {
-      event.preventDefault();
-      document.body.style.cursor = "wait";
-      var entry = $("#logEntry").val();
-      var id = $("#idNo").val();
-      var phone = $("#phone").val();
-      var pem = $("#pem").val();
-      var phone2 = $("#phone2").val();
-      var pem2 = $("#pem2").val();
-      var tem = $("#tem").val();
-      var notes = $("#notes").val();
-
-      // console.log('vars = %s;  %s;  %s;  %s;  %s;  %s;  %s;  ', id, phone, pem, phone2, pem2, tem, notes);
-      google.script.run
-        .withSuccessHandler(showLogUpdates)
-        .updateRecord([id, phone, pem, phone2, pem2, tem, notes]);
-      if (entry.length > 0) {
-        $("html,body").css("cursor", "wait");
-        google.script.run.withSuccessHandler(focus)
-          .saveLogEntry([id, entry]);
-      }
-    });
-
-
-
-    // turn the color of the button back to green without doing anything
-    $("body").on("click", "#cancelEntryBtn", function (event) {
-      event.preventDefault();
-      $("#saveEntry").attr("class", "btn btn-sm btn-success my-1 svChngs");
-    });
-
-
-    // click builds text blaze snippet from data in table 
-    $("body").on("click", "#getIEPcompForm", function (event) {
-      var flName = $("#stuName").val("");
-      var fn = flName.replace(/([A-z]+)( .*)/g, "$1");
-      var ln = flName.replace(/([A-z]+ )(.*)/g, "$2");
-      var dob = $("#dob").val("");
-
-      document.execCommand('copy');
-
-      $(this).attr("title", "");
-
-      var gId = $(this).val();
-      google.script.run
-        .withSuccessHandler(showTBsnippetGl)
-        .getGoal(gId);
-    });
-
-    // retrieves data from a seis generated csv file (seis search report)
-    $("body").on("click", "#seis_roster", function () {
-      document.body.style.cursor = "wait";
-      var id = $("#idNo").val();
-      google.script.run
-        .withSuccessHandler(window.open('https://script.google.com/a/hemetusd.org/macros/s/AKfycbwS6Hct9vxEl3IJLrsuYxRegcpIo2XCXZs-4VPSJco/exec', '_top'))
-        .updateRoster(id);
-    });
-    $("body").on("click", ".toBtn", function () {
-      $("#toModal").modal("hide");
-      if ($(this).val() !== "Cancel") {
-        if ($(this).val() == "Yes") {
-          var tem = $("#tem").val() + ", dpaight@hemetusd.org";
-        } else {
-          var tem = "dpaight@hemetusd.org";
-        }
+      // retrieves data from a seis generated csv file (seis search report)
+      $("body").on("click", "#seis_roster", function () {
+        document.body.style.cursor = "wait";
         var id = $("#idNo").val();
-        var stuName = $("#stuName").val();
-        // console.log("sendPFLQToTchr() fired; running server script with params: " + stuName + "; " + id + "; " + tem);
         google.script.run
-          .withSuccessHandler(focus)
-          .sendLevelsForm(stuName, id, tem);
-      }
+          .withSuccessHandler(window.open('https://script.google.com/a/hemetusd.org/macros/s/AKfycbwS6Hct9vxEl3IJLrsuYxRegcpIo2XCXZs-4VPSJco/exec', '_top'))
+          .updateRoster(id);
+      });
+      $("body").on("click", ".toBtn", function () {
+        $("#toModal").modal("hide");
+        if ($(this).val() !== "Cancel") {
+          if ($(this).val() == "Yes") {
+            var tem = $("#tem").val() + ", dpaight@hemetusd.org";
+          } else {
+            var tem = "dpaight@hemetusd.org";
+          }
+          var id = $("#idNo").val();
+          var stuName = $("#stuName").val();
+          // console.log("sendPFLQToTchr() fired; running server script with params: " + stuName + "; " + id + "; " + tem);
+          google.script.run
+            .withSuccessHandler(focus)
+            .sendLevelsForm(stuName, id, tem);
+        }
+      });
     });
-
-    // loading data into the cards
-    // this gets the data to be displayed for the student in focus, but not the log entries yet
-    document.body.style.cursor = "wait";
-    google.script.run
-      .withSuccessHandler(focus)
-      .getLastId();
-
-    // this gets the data for the table in the middle
-    document.body.style.cursor = "wait";
-    google.script.run
-      .withSuccessHandler(showRosterTable)
-      .getTableData_roster();
-
-    // this retrieves information from the meetings sheet to display
-    document.body.style.cursor = "wait";
-    google.script.run
-      .withSuccessHandler(showCalData)
-      .getCalData_events();
-
   });
+
+
   function showTBsnippetGl(goalObj) {
     // console.log('goalObj = %s', JSON.stringify(goalObj));
     // this.snip = function () {
@@ -377,8 +379,6 @@
     $("#stuem").val(u2_stuEmail);
     $("#notes").val(notes);
 
-  }
-  function showFocusedLog(id) {
   }
   function calRefresh() {
     document.body.style.cursor = "wait";
@@ -559,6 +559,7 @@
   function showLog(loc_and_logEntries) {
     // input is an array containing one arrays and one string ('loc'): loc_and_logEntries contains all the log entries that correspond to that record
     var logEntries = loc_and_logEntries[0];
+    console.log('the entries: %s', JSON.stringify(logEntries));
     var loc = loc_and_logEntries[1];
 
     var list = $("#" + loc + "tb");
@@ -791,7 +792,7 @@
   // bindSetStudentClick();
   // show upcoming iep meetings on the calendar
   function showCalData(data) {
-    console.log('the data: %s', JSON.stringify(data));
+    // console.log('the data: %s', JSON.stringify(data));
     $("#loc00hd").empty();
     $("#loc00hd").append("<ul>");
     for (let i = 0; i < data.length; i++) {
@@ -800,12 +801,12 @@
       var q = moment();
 
 
-      if (1==1) {  //p.diff(q) > 1 && h.toString().match(/.*paight.*/g)
-        $("#loc00hd").append(
-          "<li ' class='upcomingEvent'>" + moment(c, 'YYYY-MM-DD').format('dd YY-MM-DD') + "     " + b + "; \n" + f + '\n');
-      } else {
-        console.log('this did not pass the test: %s %s', b, c);
-      }
+      // if (1==1) {  //p.diff(q) > 1 && h.toString().match(/.*paight.*/g)
+      $("#loc00hd").append(
+        "<li ' class='upcomingEvent'>" + moment(c, 'YYYY-MM-DD').format('dd YY-MM-DD') + "     " + b + "; \n" + f + '\n');
+      // } else {
+      // console.log('this did not pass the test: %s %s', b, c);
+      // }
       /*                 "<a href='" + htmlLink + "' target='_blank'>" + date + "          " + summary + "</a><br>"); */
       document.body.style.cursor = "default";
     }

@@ -1478,6 +1478,7 @@ function levData(id = '1010101') {
       return wholeSnip;
     }
   };
+
   
   
 //# sourceMappingURL=module.jsx.map
