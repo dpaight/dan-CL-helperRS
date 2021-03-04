@@ -83,7 +83,8 @@ function getLastId() {
     var scriptProp = PropertiesService.getScriptProperties();
     if (scriptProp
         .getProperty('lastId') != null &&
-        scriptProp.getProperty('lastId').length == 7) {
+        scriptProp
+            .getProperty('lastId').toString().length == 7) {
         var id = scriptProp.getProperty('lastId');
     }
     else {
@@ -120,11 +121,12 @@ function findLastRow(sheet, column) {
 function saveLogEntry(input) {
     var id = input[0], entry = input[1];
     var students = getAllRecords('roster');
-    var row = [[moment().format('MM/DD/YY HH:mm'), 'dpaight@hemetusd.org', , entry, , id]];
+    var row = [[moment().format('MM/DD/YY HH:mm'), Session.getActiveUser().getEmail(), , entry, , id]];
     var logResp = ss.getSheetByName('logRespMerged');
     var colAlen = logResp.getRange('A1:A').getValues().filter(String).length;
     var range = logResp.getRange(colAlen + 1, 1, 1, row[0].length);
     range.setValues(row);
+    SpreadsheetApp.flush();
     return id;
 }
 /**
@@ -543,7 +545,7 @@ function getSyncedEvents_bak(calendarId, fullSync) {
                 }
                 else {
                     // Events that don't last all day; they have defined start times.
-                     start = moment(event.start.dateTime).format("MM/DD/YY HH:mm");
+                    start = moment(event.start.dateTime).format("MM/DD/YY HH:mm");
                     var end = moment(event.end.dateTime).format("MM/DD/YY HH:mm");
                     if (event.attendees != null) {
                         var attendeeStr = JSON.stringify(event.attendees);
@@ -624,7 +626,7 @@ function getSyncedEvents(calendarId, fullSync) {
                 }
                 else {
                     // Events that don't last all day; they have defined start times.
-                     start = moment(event.start.dateTime).format("MM/DD/YY HH:mm");
+                    start = moment(event.start.dateTime).format("MM/DD/YY HH:mm");
                     var end = moment(event.end.dateTime).format("MM/DD/YY HH:mm");
                     if (event.attendees != null) {
                         var attendeeStr = JSON.stringify(event.attendees);
@@ -718,7 +720,7 @@ function getSyncedEventsDpaight(calendarId, fullSync) {
                 }
                 else {
                     // Events that don't last all day; they have defined start times.
-                     start = moment(event.start.dateTime).format("MM/DD/YY HH:mm");
+                    start = moment(event.start.dateTime).format("MM/DD/YY HH:mm");
                     var end = moment(event.end.dateTime).format("MM/DD/YY HH:mm");
                     if (event.attendees != null) {
                         var attendeeStr = JSON.stringify(event.attendees);
@@ -941,9 +943,14 @@ function getTableData_roster(id) {
     // Logger.log(JSON.stringify([loc, data, id]));
     return [loc, data, id];
 }
+
 // this returns contact log data to the client-side script
-function getTableData_logs(id, loc) {
-    // var loc = 'loc01';
+// called by "    $("body").on("click", ".setStudent", function (event) {..."
+function getLogEntries(array) {  // [id, loc]
+    Logger.log('array = %s', JSON.stringify(array));
+    var id = array[0];
+    var loc = array[1];
+    SpreadsheetApp.flush();
     if (id === void 0) {
         id = getLastId();
     }
@@ -1009,7 +1016,7 @@ function getCalData_events() {
             Logger.log('did nothing for %s', element[1]);
         }
         else {
-            
+
             Logger.log('did SOMEthing for %s', element[1]);
             let thisDate = moment(element[2], 'YYYY-MM-DDTHH:mm:SS');
             element.splice(2, 1, moment(thisDate).format('YYYY-MM-DD HH:mm'));
@@ -1261,225 +1268,225 @@ function levData(id = '1010101') {
     var values = sheet.getRange(1, 1, last, sheet.getLastColumn()).getValues();
     var headings = values.shift();
     for (let i = values.length - 1; i > -1; i--) {
-      const el = values[i];
-      if (el[3].toString() == id.toString()) {
-        return el;
-      }
+        const el = values[i];
+        if (el[3].toString() == id.toString()) {
+            return el;
+        }
     }
     return '["baseln"="for baseline data, refer to the appropriate section on the Levels of Performance page"]';
-  }
-  
-  function getPresentLevelsAsTextBlazeListItem(seisId = '1010101',
+}
+
+function getPresentLevelsAsTextBlazeListItem(seisId = '1010101',
     areas = ['reading', 'writing', 'math', 'lang', 'motor', 'bhvr', 'health', 'wrkHbts', 'prefs']) {
     var lvlsRecord = levData(seisId);
     if (lvlsRecord.toString().search(/baseln/) != -1) {
-      return lvlsRecord;
+        return lvlsRecord;
     } else {
-      var list = new LevelsPerformance(lvlsRecord);
-      var wholeSnip = list.getSnip(areas);
-      // Logger.log(wholeSnip);
-      return wholeSnip;
+        var list = new LevelsPerformance(lvlsRecord);
+        var wholeSnip = list.getSnip(areas);
+        // Logger.log(wholeSnip);
+        return wholeSnip;
     }
-  }
-  
-  function LevelsPerformance(el) {
+}
+
+function LevelsPerformance(el) {
     this['lvls'] = {};
     this['lvls'].bhvr1play = (el[25].length > 0) ?
-      'teacher observation: ' + el[25].toString().replace(/"/g, "'") :
-      '';
+        'teacher observation: ' + el[25].toString().replace(/"/g, "'") :
+        '';
     this['lvls'].heal11th = el[23].toString().replace(/"/g, "'");
     this['lvls'].heal2thattendance = el[24].toString().replace(/"/g, "'");
     this['lvls'].langOverall = (el[5].length > 0) ?
-      'teacher observation: ' + el[5].toString().replace(/"/g, "'") :
-      '';
+        'teacher observation: ' + el[5].toString().replace(/"/g, "'") :
+        '';
     this['lvls'].langOther = el[6].toString().replace(/"/g, "'");
     this['lvls'].math1Overall =
-      (el[16].length > 0) ?
-        'teacher observation: ' + el[16].toString().replace(/"/g, "'") :
-        '';
+        (el[16].length > 0) ?
+            'teacher observation: ' + el[16].toString().replace(/"/g, "'") :
+            '';
     this['lvls'].math2Facts = el[17].toString().replace(/"/g, "'");
     this['lvls'].math3Calc = el[18].toString().replace(/"/g, "'");
     this['lvls'].math4Reasoning = el[19].toString().replace(/"/g, "'");
     this['lvls'].math5Other = el[26].toString().replace(/"/g, "'");
     this['lvls'].moto1rM = (el[22].length > 0) ?
-      'teacher observation: ' + el[22].toString().replace(/"/g, "'") :
-      '';
+        'teacher observation: ' + el[22].toString().replace(/"/g, "'") :
+        '';
     this['lvls'].name = el[2].toString().replace(/"/g, "'");
     this['lvls'].prefs = el[4].toString().replace(/"/g, "'");
     this['lvls'].read1Overall = (el[7].length > 0) ?
-      'teacher observation: ' + el[7].toString().replace(/"/g, "'") :
-      '';
-    this['lvls'].read2Found = el[8].toString().replace(/"/g, "'");
-  
-    if (el[9].toString().length > 0) {
-      this['lvls'].read3HighFreq = el[9].toString().replace(/"/g, "'");
-    } else {
-      this['lvls'].read3HighFreq = '';
-    }
-  
-    if (el[10].toString().length > 0) {
-      this['lvls'].read4Comp = (el[10].length > 0) ?
-        'comprehension level (GE) = ' + el[10].toString().replace(/"/g, "'") :
+        'teacher observation: ' + el[7].toString().replace(/"/g, "'") :
         '';
+    this['lvls'].read2Found = el[8].toString().replace(/"/g, "'");
+
+    if (el[9].toString().length > 0) {
+        this['lvls'].read3HighFreq = el[9].toString().replace(/"/g, "'");
+    } else {
+        this['lvls'].read3HighFreq = '';
+    }
+
+    if (el[10].toString().length > 0) {
+        this['lvls'].read4Comp = (el[10].length > 0) ?
+            'comprehension level (GE) = ' + el[10].toString().replace(/"/g, "'") :
+            '';
     }
     this['lvls'].read5Other = el[11].toString().replace(/"/g, "'");
     this['lvls'].stuId = el[3].toString().replace(/"/g, "'");
     this['lvls'].timestamp = el[0].toString().replace(/"/g, "'");
     this['lvls'].wrkH1bts = el[20].toString().replace(/"/g, "'");
     this['lvls'].wrkH2bts = (el[21].length > 0) ?
-      'able to attend to a classwork task at instructional level for ' + el[21].toString().replace(/"/g, "'") + ' minutes' :
-      '';
+        'able to attend to a classwork task at instructional level for ' + el[21].toString().replace(/"/g, "'") + ' minutes' :
+        '';
     this['lvls'].writ1eOverall = (el[12].length > 0) ?
-      'teacher observation: ' + el[12].toString().replace(/"/g, "'") :
-      '';
+        'teacher observation: ' + el[12].toString().replace(/"/g, "'") :
+        '';
     this['lvls'].writ2eMech = el[13].toString().replace(/"/g, "'");
     this['lvls'].writ3eContent = el[14].toString().replace(/"/g, "'");
     this['lvls'].writ4eOther = el[15].toString().replace(/"/g, "'");
-  
-  
-    this.getSnip = function (snipAreas) {
-      // initialize the string vars for making snip lists
-      // snipAreas are those collections of questionnaire answers, collections that Tblaze uses to fill forms
-  
-      // convert object to an array object named 'ary'
-      this['lvlsAry'] = [];
-      for (const key in this.lvls) {
-        if (Object.prototype.hasOwnProperty.call(this.lvls, key)) {
-          const el = [key, this.lvls[key]];
-          this.lvlsAry.push(el);
-        }
-      }
-      // Logger.log('this.lvlsAry is %s', JSON.stringify(this.lvlsAry));
-  
-      // Logger.log('the length of this.lvlsAry is ' + this.lvlsAry.length);
-  
-  
-      var wholeSnip = '';
-      // wholeSnip is a set of snipAreas:  {["snipArea"="content of snip", "snipArea"="content of snip"]}
-      var partSnip = '';
-      // a partSnip is a single snipArea
-  
-      // iterate through list of areas on which to make items in a snip list
-      for (let i = 0; i < snipAreas.length; i++) {
-        const element = snipAreas[i];
-        var partialSnipArea = element.toString().slice(0, 4);
-  
-        if (i > 0) {
-          partSnip += ', ';
-        }
-  
-        partSnip += '"' + element + '"=' + '"'; // opening " for value
-  
-        for (let j = 0; j < this.lvlsAry.length; j++) {
-          const kyval = this.lvlsAry[j];
-          var partialKey = kyval[0].toString().slice(0, 4);
-          if (partialSnipArea == partialKey && kyval[1].toString().length > 0) {
-            partSnip += kyval[1] + '; '; // ; separator for items within area
-          }
-  
-        }
-        partSnip += '"'; // closing " for value
-        if (partSnip.length > 2) {
-          wholeSnip += partSnip;
-        } else {
-          wholeSnip += '"' + snipAreas[i] + '"=""'
-        }
-        partSnip = '';
-      }
-      wholeSnip = '[' + wholeSnip + ']';
-  
-      return wholeSnip;
-    }
-  
-    this.getSnip_old = function (snipAreas) {
-      // initialize the string vars for making snip lists
-      // snipAreas are those collections of questionnaire answers, collections that Tblaze uses to fill forms
-  
-      // convert object to an array object named 'ary'
-      this['lvlsAry'] = [];
-      for (const key in this.lvls) {
-        if (Object.prototype.hasOwnProperty.call(this.lvls, key)) {
-          const el = [key, this.lvls[key]];
-          this.lvlsAry.push(el);
-        }
-      }
-      // Logger.log('this.lvlsAry is %s', JSON.stringify(this.lvlsAry));
-  
-      // Logger.log('the length of this.lvlsAry is ' + this.lvlsAry.length);
-  
-      var wholeSnip = '[';
-      // wholeSnip is a set of snipAreas:  {["snipArea"="content of snip", "snipArea"="content of snip"]}
-      var partSnip = '';
-      // a partSnip is a single snipArea
-  
-      // iterate through list of areas on which to make items in a snip list
-      for (let i = 0; i < snipAreas.length; i++) {
-        const element = snipAreas[i];
-  
-        var partialSnipArea = element.toString().slice(0, 4);
-        var counter = 0;
-        for (const key in this.lvls) {
-          if (Object.prototype.hasOwnProperty.call(this.lvls, key)) {
-            const el = this.lvls[key];
-            counter++;
-            // areas ('math', 'read', 'writ', etc) are contained in first 4 characters of the key and 'snipArea'
-            // this should gather all the parts that match the category
-            var partialKey = key.toString().slice(0, 4);
-            if (partialSnipArea == partialKey) {
-              partSnip += el + '; ';
-            }
-            if (counter >= 26) {
-              partSnip = partSnip.toString().replace(/"/, "'");
-              partSnip = '"' + element + '"="' + partSnip + '"'
-              // now we have "area"="value of area"
-              wholeSnip = (wholeSnip == '[') ?
-                // if this is the firs addition to wholeSnip, omit the comma
-                wholeSnip + partSnip :
-                wholeSnip + ',' + partSnip;
-              partSnip = '';
-            }
-          }
-        }
-      }
-  
-      if (wholeSnip) {
-        wholeSnip = wholeSnip.toString().replace(/,$/, '');
-        wholeSnip += ']';
-        wholeSnip = wholeSnip.toString().replace(/[; ]+/g, '; ')
-  
-      }
-      // Logger.log('wholeSnip = %s; snipAreas = %s', wholeSnip, JSON.stringify(snipAreas));
-      // Logger.log('partSnip = %s; wholeSnip = %s; i = %s; snipArea = %s', partSnip, wholeSnip, i, snipAreas[i]);
-      return wholeSnip;
-    }
-  
-    this.getSnipGoal = function (snipAreas) {
-      // initialize the string vars for making snip lists
-      // snipAreas are those collections of questionnaire answers, collections that Tblaze uses to fill forms
-  
-  
-      // wholeSnip is a set of snipAreas:  {["snipArea"="content of snip", "snipArea"="content of snip"]}
-      var partSnip = this.getSnip(snipAreas);
-      partSnip = partSnip.toString().replace(/"snipAreas[0]="/, '"baseln"=');
-      partSnip = partSnip.toString().replace(/\]/, '');
-  
-      // a partSnip is a single snipArea
-  
-      // iterate through list of areas on which to make items in a snip list
-      var wholeSnip = partSnip + ']';
-      // now we have "baseln"="value of area"
-      if (wholeSnip) {
-        wholeSnip = wholeSnip.toString().replace(/,$/, '');
-        wholeSnip.toString().replace(/[; ]+/g, '; ')
-  
-      }
-      // Logger.log('wholeSnip = %s; snipAreas = %s', wholeSnip, JSON.stringify(snipAreas));
-      // Logger.log('partSnip = %s; wholeSnip = %s; i = %s; snipArea = %s', partSnip, wholeSnip, i, snipAreas[i]);
-      return wholeSnip;
-    }
-  };
 
-  
-  
+
+    this.getSnip = function (snipAreas) {
+        // initialize the string vars for making snip lists
+        // snipAreas are those collections of questionnaire answers, collections that Tblaze uses to fill forms
+
+        // convert object to an array object named 'ary'
+        this['lvlsAry'] = [];
+        for (const key in this.lvls) {
+            if (Object.prototype.hasOwnProperty.call(this.lvls, key)) {
+                const el = [key, this.lvls[key]];
+                this.lvlsAry.push(el);
+            }
+        }
+        // Logger.log('this.lvlsAry is %s', JSON.stringify(this.lvlsAry));
+
+        // Logger.log('the length of this.lvlsAry is ' + this.lvlsAry.length);
+
+
+        var wholeSnip = '';
+        // wholeSnip is a set of snipAreas:  {["snipArea"="content of snip", "snipArea"="content of snip"]}
+        var partSnip = '';
+        // a partSnip is a single snipArea
+
+        // iterate through list of areas on which to make items in a snip list
+        for (let i = 0; i < snipAreas.length; i++) {
+            const element = snipAreas[i];
+            var partialSnipArea = element.toString().slice(0, 4);
+
+            if (i > 0) {
+                partSnip += ', ';
+            }
+
+            partSnip += '"' + element + '"=' + '"'; // opening " for value
+
+            for (let j = 0; j < this.lvlsAry.length; j++) {
+                const kyval = this.lvlsAry[j];
+                var partialKey = kyval[0].toString().slice(0, 4);
+                if (partialSnipArea == partialKey && kyval[1].toString().length > 0) {
+                    partSnip += kyval[1] + '; '; // ; separator for items within area
+                }
+
+            }
+            partSnip += '"'; // closing " for value
+            if (partSnip.length > 2) {
+                wholeSnip += partSnip;
+            } else {
+                wholeSnip += '"' + snipAreas[i] + '"=""'
+            }
+            partSnip = '';
+        }
+        wholeSnip = '[' + wholeSnip + ']';
+
+        return wholeSnip;
+    }
+
+    this.getSnip_old = function (snipAreas) {
+        // initialize the string vars for making snip lists
+        // snipAreas are those collections of questionnaire answers, collections that Tblaze uses to fill forms
+
+        // convert object to an array object named 'ary'
+        this['lvlsAry'] = [];
+        for (const key in this.lvls) {
+            if (Object.prototype.hasOwnProperty.call(this.lvls, key)) {
+                const el = [key, this.lvls[key]];
+                this.lvlsAry.push(el);
+            }
+        }
+        // Logger.log('this.lvlsAry is %s', JSON.stringify(this.lvlsAry));
+
+        // Logger.log('the length of this.lvlsAry is ' + this.lvlsAry.length);
+
+        var wholeSnip = '[';
+        // wholeSnip is a set of snipAreas:  {["snipArea"="content of snip", "snipArea"="content of snip"]}
+        var partSnip = '';
+        // a partSnip is a single snipArea
+
+        // iterate through list of areas on which to make items in a snip list
+        for (let i = 0; i < snipAreas.length; i++) {
+            const element = snipAreas[i];
+
+            var partialSnipArea = element.toString().slice(0, 4);
+            var counter = 0;
+            for (const key in this.lvls) {
+                if (Object.prototype.hasOwnProperty.call(this.lvls, key)) {
+                    const el = this.lvls[key];
+                    counter++;
+                    // areas ('math', 'read', 'writ', etc) are contained in first 4 characters of the key and 'snipArea'
+                    // this should gather all the parts that match the category
+                    var partialKey = key.toString().slice(0, 4);
+                    if (partialSnipArea == partialKey) {
+                        partSnip += el + '; ';
+                    }
+                    if (counter >= 26) {
+                        partSnip = partSnip.toString().replace(/"/, "'");
+                        partSnip = '"' + element + '"="' + partSnip + '"'
+                        // now we have "area"="value of area"
+                        wholeSnip = (wholeSnip == '[') ?
+                            // if this is the firs addition to wholeSnip, omit the comma
+                            wholeSnip + partSnip :
+                            wholeSnip + ',' + partSnip;
+                        partSnip = '';
+                    }
+                }
+            }
+        }
+
+        if (wholeSnip) {
+            wholeSnip = wholeSnip.toString().replace(/,$/, '');
+            wholeSnip += ']';
+            wholeSnip = wholeSnip.toString().replace(/[; ]+/g, '; ')
+
+        }
+        // Logger.log('wholeSnip = %s; snipAreas = %s', wholeSnip, JSON.stringify(snipAreas));
+        // Logger.log('partSnip = %s; wholeSnip = %s; i = %s; snipArea = %s', partSnip, wholeSnip, i, snipAreas[i]);
+        return wholeSnip;
+    }
+
+    this.getSnipGoal = function (snipAreas) {
+        // initialize the string vars for making snip lists
+        // snipAreas are those collections of questionnaire answers, collections that Tblaze uses to fill forms
+
+
+        // wholeSnip is a set of snipAreas:  {["snipArea"="content of snip", "snipArea"="content of snip"]}
+        var partSnip = this.getSnip(snipAreas);
+        partSnip = partSnip.toString().replace(/"snipAreas[0]="/, '"baseln"=');
+        partSnip = partSnip.toString().replace(/\]/, '');
+
+        // a partSnip is a single snipArea
+
+        // iterate through list of areas on which to make items in a snip list
+        var wholeSnip = partSnip + ']';
+        // now we have "baseln"="value of area"
+        if (wholeSnip) {
+            wholeSnip = wholeSnip.toString().replace(/,$/, '');
+            wholeSnip.toString().replace(/[; ]+/g, '; ')
+
+        }
+        // Logger.log('wholeSnip = %s; snipAreas = %s', wholeSnip, JSON.stringify(snipAreas));
+        // Logger.log('partSnip = %s; wholeSnip = %s; i = %s; snipArea = %s', partSnip, wholeSnip, i, snipAreas[i]);
+        return wholeSnip;
+    }
+};
+
+
+
 //# sourceMappingURL=module.jsx.map
 
