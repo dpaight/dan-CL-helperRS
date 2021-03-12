@@ -61,7 +61,7 @@ function saveLastId(id) {
 }
 function doGet(e) {
     var t = HtmlService.createTemplateFromFile("caseLog");
-    t.version = "65";
+    t.version = 16;
     return t.evaluate().setXFrameOptionsMode(HtmlService.XFrameOptionsMode.ALLOWALL);
 }
 function doPost(e) {

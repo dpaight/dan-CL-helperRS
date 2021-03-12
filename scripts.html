@@ -10,28 +10,6 @@
     // this gets the data to be displayed for the student in focus, but not the log entries yet
     document.body.style.cursor = "wait";
 
-
-    google.script.run
-      .withSuccessHandler(contactInfo)
-      .getLastId();
-
-    document.body.style.cursor = "wait";
-    google.script.run
-      .withSuccessHandler(showRosterTable)
-      .getTableData_roster();
-
-    document.body.style.cursor = "wait";
-    google.script.run
-      .withSuccessHandler(showLog)
-      .getLogEntries([sessionStorage.getItem('lastId'), "loc01"]);
-
-
-    // this retrieves information from the meetings sheet to display
-    document.body.style.cursor = "wait";
-    google.script.run
-      .withSuccessHandler(showCalData)
-      .getCalData_events();
-
     // $('.toast').hide();
     // var gSmL = localStorage.getItem('glLvl');
     // var gSmA = localStorage.getItem('glArea');
@@ -253,19 +231,43 @@
     });
   });
 
+
+  //startup
+  google.script.run
+    .withSuccessHandler(contactInfo)
+    .getLastId();
+
+  document.body.style.cursor = "wait";
+  google.script.run
+    .withSuccessHandler(showRosterTable)
+    .getTableData_roster();
+
+  document.body.style.cursor = "wait";
+  // google.script.run
+  //   .withSuccessHandler(showLog)
+  //   .getLogEntries([sessionStorage.getItem('lastId'), "loc01"]);
+// removed above b/c getLogEntries is called at the end of focus()
+
+  // this retrieves information from the meetings sheet to display
+  document.body.style.cursor = "wait";
+  google.script.run
+    .withSuccessHandler(showCalData)
+    .getCalData_events();
+
+
   // named functions
   // calls function on server side to return data for this student
 
   function focus(id) {
-      google.script.run
-        .withSuccessHandler()
-        .saveLastId(id);
-      sessionStorage.setItem('lastId', id);
-      contactInfo(id);
-      google.script.run
-        .withSuccessHandler(showLog)
-        .getLogEntries([id, "loc01"]);
-    }
+    google.script.run
+      .withSuccessHandler()
+      .saveLastId(id);
+    sessionStorage.setItem('lastId', id);
+    contactInfo(id);
+    google.script.run
+      .withSuccessHandler(showLog)
+      .getLogEntries([id, "loc01"]);
+  }
 
   function contactInfo(id) {
     sessionStorage.setItem('lastId', id);
@@ -806,11 +808,12 @@
 
         alert(" has no id"); // lnCmafn + 
       } else {
+        // .toString().slice(0, 1) + "."
         list.append(
           '<tr><td class="setStudent" data-stuId=' +
           SEIS_ID +
           "> " +
-          Last_Name + ', ' + First_Name.toString().slice(0, 1) + "." +
+          Last_Name + ', ' + First_Name +
           "</td>" +
           '<td class="tableDate">' +
           moment(Date_of_Last_Annual_IEP).format('YYYY-MM-DD') +
