@@ -208,7 +208,8 @@
           </div>
           <div class="card-footer p-1">
             <p style="font-size: medium; margin: 5px;">Notes</p>
-            <textarea name="notes" id="notes" cols="40" rows="6" style="margin-top: 0px; width: 100%; height: 130px"></textarea>
+            <textarea name="notes" id="notes" cols="40" rows="6"
+              style="margin-top: 0px; width: 100%; height: 130px"></textarea>
           </div>
         </div>
       </div>
@@ -425,88 +426,92 @@
   parName, 
   emAdr
 -->
+<div class="container-fluid">
+  <div class="row">
+      <div class="modal fade centered " id="goalModal" tabindex="-1" role="dialog" aria-labelledby="goalModalLabel"
+        aria-hidden="true" style="margin-top: 30px;">
+        <div class="modal-dialog" style="height: 500px;" role="document">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h5 class="modal-title" id="goalModalLabel">Edit Goal</h5>
+              <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+              </button>
+            </div>
+            <div container-fluid>
+              <div class="form-row align-items-center p-2" style="display: inline-flexbox;">
 
-  <div class="modal fade centered " id="goalModal" tabindex="-1" role="dialog" aria-labelledby="goalModalLabel"
-    aria-hidden="true" style="margin-top: 30px;">
-    <div class="modal-dialog" style="height: 500px;" role="document">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h5 class="modal-title" id="goalModalLabel">Edit Goal</h5>
-          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-            <span aria-hidden="true">&times;</span>
-          </button>
+                <div class="input-group input-group-sm m-1 col-5">
+                  <div class="input-group-prepend">
+                    <span class="input-group-text" name="glEdit" id="glEditLvlPre">Grade: </span>
+                  </div>
+                  <input type="text" class="form-control" name="glEdit" id="glEditLvl">
+                </div>
+
+                <div class="input-group input-group-sm m-1 col-5">
+                  <div class="input-group-prepend">
+                    <span class="input-group-text" name="glEdit" id="glEditAreaPre">Area: </span>
+                  </div>
+                  <input type="text" class="form-control" name="glEdit" id="glEditArea">
+                </div>
+
+                <div class="input-group input-group-sm m-1 col-5">
+                  <div class="input-group-prepend">
+                    <span class="input-group-text" name="glEdit" id="glEditStrandPre">Strand:</span>
+                  </div>
+                  <input type="text" class="form-control" name="glEdit" id="glEditStrand">
+                </div>
+
+                <div class="input-group input-group-sm m-1 col-5">
+                  <div class="input-group-prepend">
+                    <span class="input-group-text" name="glEdit" id="glEditStandardPre">Standard:</span>
+                  </div>
+                  <input type="text" class="form-control" name="glEdit" id="glEditStandard">
+                </div>
+
+                <label for="glEditAnnual" class="form"
+                  style="margin-bottom: 0;margin-left: 2rem; font-size: medium;">Annual
+                  Goal:</label>
+                <br>
+              </div>
+              <textarea name="glEdit" id="glEditAnnual" class="editable goal col-11" style="height: 200px; "
+                name="goalText"></textarea>
+
+              <div class="input-group input-group-sm m-1 col-12">
+                <div class="input-group-prepend">
+                  <span class="input-group-text" name="glEdit" id="glEditobj1Pre">Obj 1: </span>
+                </div>
+                <input type="text" class="form-control" name="glEdit" id="glEditobj1">
+              </div>
+
+              <div class="input-group input-group-sm  m-1 col-12">
+                <div class="input-group-prepend">
+                  <span class="input-group-text" name="glEdit" id="glEditobj2Pre">Obj 2: </span>
+                </div>
+                <input type="text" class="form-control" name="glEdit" id="glEditobj2">
+              </div>
+
+              <div class="input-group input-group-sm m-1 col-12">
+                <div class="input-group-prepend">
+                  <span class="input-group-text" name="glEdit" id="glEditobj3Pre">Obj 3: </span>
+                </div>
+                <input type="text" class="form-control" name="glEdit" id="glEditobj3">
+              </div>
+
+
+            </div>
+            <div class="modal-footer">
+              <input id='glEditId' type='text' value='' style='background-color: lightyellow; width: 3rem;' readonly>
+              <button type="button" class="btn btn-sm btn-secondary" data-dismiss="modal">CANCEL</button>
+              <button type="button" class="btn btn-sm btn-success" data-dismiss="modal"
+                onclick="saveGoal(-1)">SAVE/NEW</button>
+              <button type="button" class="btn btn-sm btn-warning" data-dismiss="modal"
+                onclick="saveGoal()">SAVE/REPLACE</button>
+
+            </div>
+
+          </div>
         </div>
-        <div container-fluid>
-          <div class="form-row align-items-center p-2" style="display: inline-flexbox;">
-
-            <div class="input-group input-group-sm m-1 col-5">
-              <div class="input-group-prepend">
-                <span class="input-group-text" name="glEdit" id="glEditLvlPre">Grade: </span>
-              </div>
-              <input type="text" class="form-control" name="glEdit" id="glEditLvl">
-            </div>
-
-            <div class="input-group input-group-sm m-1 col-5">
-              <div class="input-group-prepend">
-                <span class="input-group-text" name="glEdit" id="glEditAreaPre">Area: </span>
-              </div>
-              <input type="text" class="form-control" name="glEdit" id="glEditArea">
-            </div>
-
-            <div class="input-group input-group-sm m-1 col-5">
-              <div class="input-group-prepend">
-                <span class="input-group-text" name="glEdit" id="glEditStrandPre">Strand:</span>
-              </div>
-              <input type="text" class="form-control" name="glEdit" id="glEditStrand">
-            </div>
-
-            <div class="input-group input-group-sm m-1 col-5">
-              <div class="input-group-prepend">
-                <span class="input-group-text" name="glEdit" id="glEditStandardPre">Standard:</span>
-              </div>
-              <input type="text" class="form-control" name="glEdit" id="glEditStandard">
-            </div>
-
-            <label for="glEditAnnual" class="form" style="margin-bottom: 0;margin-left: 2rem; font-size: medium;">Annual
-              Goal:</label>
-            <br>
-          </div>
-          <textarea name="glEdit" id="glEditAnnual" class="editable goal col-11" style="height: 200px; "
-            name="goalText"></textarea>
-
-          <div class="input-group input-group-sm m-1 col-12">
-            <div class="input-group-prepend">
-              <span class="input-group-text" name="glEdit" id="glEditobj1Pre">Obj 1: </span>
-            </div>
-            <input type="text" class="form-control" name="glEdit" id="glEditobj1">
-          </div>
-
-          <div class="input-group input-group-sm  m-1 col-12">
-            <div class="input-group-prepend">
-              <span class="input-group-text" name="glEdit" id="glEditobj2Pre">Obj 2: </span>
-            </div>
-            <input type="text" class="form-control" name="glEdit" id="glEditobj2">
-          </div>
-
-          <div class="input-group input-group-sm m-1 col-12">
-            <div class="input-group-prepend">
-              <span class="input-group-text" name="glEdit" id="glEditobj3Pre">Obj 3: </span>
-            </div>
-            <input type="text" class="form-control" name="glEdit" id="glEditobj3">
-          </div>
-
-
-        </div>
-        <div class="modal-footer">
-          <input id='glEditId' type='text' value='' style='background-color: lightyellow; width: 3rem;' readonly>
-          <button type="button" class="btn btn-sm btn-secondary" data-dismiss="modal">CANCEL</button>
-          <button type="button" class="btn btn-sm btn-success" data-dismiss="modal"
-            onclick="saveGoal(-1)">SAVE/NEW</button>
-          <button type="button" class="btn btn-sm btn-warning" data-dismiss="modal"
-            onclick="saveGoal()">SAVE/REPLACE</button>
-
-        </div>
-
       </div>
     </div>
   </div>
