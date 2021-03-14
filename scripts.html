@@ -246,7 +246,7 @@
   // google.script.run
   //   .withSuccessHandler(showLog)
   //   .getLogEntries([sessionStorage.getItem('lastId'), "loc01"]);
-// removed above b/c getLogEntries is called at the end of focus()
+  // removed above b/c getLogEntries is called at the end of focus()
 
   // this retrieves information from the meetings sheet to display
   document.body.style.cursor = "wait";
@@ -601,8 +601,8 @@
   function showLog(array) { // [entries, id]
     // input is an array containing one arrays and one string ('loc'): array contains all the log entries that correspond to that record
     var [logEntries, loc] = array;
-    console.log('the entries: %s', JSON.stringify(logEntries));
-    console.log('the locations: %s', loc);
+    // console.log('the entries: %s', JSON.stringify(logEntries));
+    // console.log('the locations: %s', loc);
 
     var list = $("#" + loc + "tb");
     list.empty();
@@ -954,32 +954,35 @@
 
   }
 
-  // this is not working as of 3-12-2021
   function saveGoal(newReplace) {
-    var glEditLevel, glEditArea, glEditStnd, glEditStandard, glEditAnnual, glEditObj1, glEditObj2, glEditObj3, timestamp;
-    if (newReplace != -1) {
-      glEditId = parseInt($('#glEditId').val(), 10);
+    if (newReplace === -1) {
+      var glEditId = -1;
     } else {
-      glEditId = -1;
+      var glEditId = parseInt($('#glEditId').val(), 10);
     }
 
-    glEditLevel = parseInt($('#glEditLvl').val(), 10);
-    glEditArea = $('#glEditArea').val();
-    glEditStrand = $('#glEditStrand').val();
-    glEditStandard = $('#glEditStandard').val();
-    glEditAnnual = $('#glEditAnnual').val();
-    glEditObj1 = $('#glEditobj1').val();
-    glEditObj2 = $('#glEditobj2').val();
-    glEditObj3 = $('#glEditobj3').val();
-    timestamp = new Date();
+    var obj = {};
 
-    var data = [glEditId, glEditLevel, glEditArea, glEditStrand, glEditAnnual, glEditStandard, glEditObj1, glEditObj2, glEditObj3, timestamp];
+    obj.glEditId = glEditId;
+    obj.glEditLevel = parseInt($('#glEditLvl').val(), 10);
+    obj.glEditArea = $('#glEditArea').val().toString();
+    obj.glEditStrand = $('#glEditStrand').val().toString();
+    obj.glEditStandard = $('#glEditStandard').val().toString();
+    obj.glEditAnnual = $('#glEditAnnual').val().toString();
+    obj.glEditObj1 = $('#glEditobj1').val().toString();
+    obj.glEditObj2 = $('#glEditobj2').val().toString();
+    obj.glEditObj3 = $('#glEditobj3').val().toString();
+    obj.timestamp = new Date().toLocaleDateString();
+
     // console.log('data = %s', JSON.stringify(data));
+    console.log('data is %s', JSON.stringify(obj));
     google.script.run
       .withSuccessHandler(saveGoalSuccess)
-      .saveGoalSS(data);
+      .saveGoalSS(obj);
+
   }
-  function saveGoalSuccess() {
+  function saveGoalSuccess(value) {
+    console.log('returned: %s', value);
     findGoals();
   }
   function Goal(id, grdLvl, area, strand, annual, standard, objctv1, objctv2, objctv3, timestamp) {

@@ -1,12 +1,9 @@
-import { logging } from "googleapis/build/src/apis/logging";
-
 var ss = SpreadsheetApp.getActiveSpreadsheet();
 var roster = ss.getSheetByName('roster');
 var ss2 = SpreadsheetApp.openById("1Pe-unMy1vkj3joBvGru03YB1W3a35zNn_vXw9eF0KKk");
 var sp = CacheService.getScriptCache(); //PropertiesService.getScriptProperties();
 var fname = 'arguments.callee.toString().match(/function ([^\(]+)/)[1]';
-// import "/home/paight/devG/git/caseLog_dphusd/node_modules/@types/google-apps-script"
-// @ts-ignoren
+// @ts-ignore
 var moment = Moment.load();
 function sendLevelsForm(stuName, stuId, teacherEmail) {
     Logger.log('stuName: %s, stuId: %s, teacherEmail: %s', stuName, stuId, teacherEmail);
@@ -61,7 +58,7 @@ function saveLastId(id) {
 }
 function doGet(e) {
     var t = HtmlService.createTemplateFromFile("caseLog");
-    t.version = 16;
+    t.version = "v17";
     return t.evaluate().setXFrameOptionsMode(HtmlService.XFrameOptionsMode.ALLOWALL);
 }
 function doPost(e) {
@@ -160,51 +157,71 @@ function openEvent(eventId) {
     var cal = CalendarApp.getCalendarById('hemetusd.k12.ca.us_mu0bm8h5amcsfvcvpmim3v1fag@group.calendar.google.com');
     // CalendarApp
 }
-
-
 /**
- * 
+ *
  * @param data array: [glEditId, glEditLevel, glEditArea, glEditStnd, glEditGl]
  * glEditId idNo or -1 for new id
  */
-function saveGoalSS(data) {
-    var [glEditId, glEditLevel, glEditArea, glEditStrand, glEditAnnual, glEditStandard, glEditObj1, glEditObj2, glEditObj3, timestamp] = data;
-    Logger.log('received data = %s', JSON.stringify(data));
+function saveGoalSS(obj) {
+    Logger.log('receive = %s', JSON.stringify(obj));
     var sheet = ss.getSheetByName('goals');
     var last = sheet.getRange('A1:A').getValues().filter(String).length;
-    var range = sheet.getRange(2, 1, last - 1, sheet.getLastColumn());
+    var range = sheet.getRange(1, 1, last, sheet.getLastColumn());
     var values = range.getValues();
+    var nextRow = last + 1;
+
+    var headings = values.shift();
     var max = 0;
-    if (glEditId != -1) {
+    Logger.log('the obj var = %s', JSON.stringify(obj));
+    var array0 = Object.values(obj);
+    var array = [
+        obj.glEditId,
+        obj.glEditLevel,
+        obj.glEditArea,
+        obj.glEditStrand,
+        obj.glEditAnnual,
+        obj.glEditStandard,
+        obj.glEditObj1,
+        obj.glEditObj2,
+        obj.glEditObj3,
+        obj.timestamp
+    ];
+
+
+
+    Logger.log('the array var = %s', JSON.stringify(array));
+    if (obj.glEditId != -1) {
         for (let i = 0; i < values.length; i++) {
             const eli = values[i];
-            var [glId, glLevel, glArea, glStrand, glGl, glStandard, glObj1, glObj2, glObj3, timestamp] = eli;
-            if (glId == glEditId) {
-                range = sheet.getRange(i + 2, 1, 1, eli.length);
-                range.setValues([data]);
+            var [glId,
+                glEditLevel,
+                glEditArea,
+                glEditStrand,
+                glEditAnnual,
+                glEditStandard,
+                glEditObj1,
+                glEditObj2,
+                glEditObj3,
+                timestamp] = eli;
+            if (glId == obj.glEditId) {
+                range = sheet.getRange(i + 2, 1, 1, array.length);
+                range.setValues([array]);
                 return "replaced";
             }
         }
-    } else {
-        var sorted = values.sort(function (a, b) {
-            max = Math.max(a[0], b[0], max);
-            if (a[0] > b[0]) {
-                return 1;
-            }
-            else if (a[0] < b[0]) {
-                return -1;
-            }
-            else {
-                return 0;
-            }
-        });
-        glEditId = max + 1;
-        range = sheet.getRange(last + 1, 1, 1, sheet.getLastColumn());
-        range.setValues([[glEditId, glEditLevel, glEditArea, glEditStrand, glEditAnnual, glEditStandard, glEditObj1, glEditObj2, glEditObj3, timestamp]]);
-        return glEditId;
+    }
+    else {
+
+        const arrayColumn = (arr, n) => arr.map(x => x[n]);
+        var idCol = arrayColumn(values, 0);
+        var newId = Math.max(...idCol) + 1;
+        Logger.log('idCol = %s; max value +1 = %s', JSON.stringify(idCol), newId);
+        array.splice(0, 1, newId);
+        range = sheet.getRange(nextRow, 1, 1, array.length);
+        range.setValues([array]);
+        return obj.glEditId;
     }
 }
-
 /**
  *
  * @param lvlArea [levels area, goal area, id]
@@ -230,7 +247,6 @@ function getGoalListItems(lvlArea = [2, "reading", "1010101"]) {
     // Logger.log(JSON.stringify(goals));
     return listItems;
 }
-
 function Goal(id, grdLvl, area, strand, annual, standard, objctv1, objctv2, objctv3) {
     this.id = id;
     this.lvl = grdLvl;
@@ -241,7 +257,6 @@ function Goal(id, grdLvl, area, strand, annual, standard, objctv1, objctv2, objc
     this.objective1 = objctv1;
     this.objective2 = objctv2;
     this.objective3 = objctv3;
-
     this.snip = function () {
         return '[' +
             '"area" = "' + this.area + '",' +
@@ -249,7 +264,7 @@ function Goal(id, grdLvl, area, strand, annual, standard, objctv1, objctv2, objc
             '"stnd" = "' + this.standard + '",' +
             '"gl" = "' + this.annual + '"' +
             ']';
-    }
+    };
     this.list = function () {
         return '<li class="goalList" glId="' + this.id + '">'
             + '["' + this.lvl + '"' + ', '
@@ -257,8 +272,7 @@ function Goal(id, grdLvl, area, strand, annual, standard, objctv1, objctv2, objc
             + '"' + this.annual + '"' + ', '
             + '"' + this.standard + '"' + ', '
             + '"' + this.id + '"]</li>';
-    }
-
+    };
 }
 /**
  *
@@ -275,7 +289,8 @@ function getGoal(gId = 47) {
         if (el[0] == gId) {
             var [id, grdLvl, area, strand, annual, standard, objctv1, objctv2, objctv3] = el;
             var goal = new Goal(id, grdLvl, area, strand, annual, standard, objctv1, objctv2, objctv3);
-        };
+        }
+        ;
         // return false;
     }
     return goal;
@@ -327,22 +342,19 @@ function getOneGoalForEditing(gId = 47) {
  */
 function updateRecord(data = ['1010101;', '9515995901;', 'dpaight@hemetusd.org;',
     '951555-6565;', 'silliussoddus@gmail.com;', 'jpaight@hemetusd.org;', 'testing']) {
-    data
-
+    data;
     var [id, phone, pem, phone2, pem2, tem, notes] = data;
     // var SEIS_ID = data[0], Parent_1_Home_Phone = data[1], Parent_1_Email = data[2], u1_phone = data[3], u3_Parent_1a_Email = data[4], teacherEmail = data[5];
     // data = data || ["145980", "(951) 305-1378", ""];
     var values = getAllRecords('roster');
     var hdngs = values[0].flat();
     // nmJdob	idAeries	teacherEmail	u1_phone	u2_stuEmail	u3_Parent_1a_Email	u4_corr	u5_EL	u6_teacher	SEIS_ID	Last_Name	First_Name	Date_of_Birth	Case_Manager	Date_of_Last_Annual_IEP	Date_of_Last_Evaluation	Date_of_Initial_Parent_Consent	Parent_1_Mail_Address	Parent_1_Email	Parent_1_Home_Phone	Parent_1_Cell_Phone	Grade_Code	Student_Eligibility_Status	Disability_1	Disability_2	Parent_Guardian_1_Name	Parent_Guardian_2_Name	Date_of_Next_Annual_IEP	reading group	notes
-    Logger.log('seis index: ' + hdngs.indexOf('SEIS_ID'))
+    Logger.log('seis index: ' + hdngs.indexOf('SEIS_ID'));
     var SEIS_ID_idx = hdngs.indexOf('SEIS_ID');
     var u3_Parent_1a_Email_idx = hdngs.indexOf('u3_Parent_1a_Email`');
     var notes_idx = hdngs.indexOf('notes');
     var u1_phone_idx = hdngs.indexOf('u1_phone');
     var teacherEmail_idx = hdngs.indexOf('teacherEmail');
-
-
     for (var i = 0; i < values.length; i++) {
         var el = values[i];
         if (id.toString() == el[SEIS_ID_idx].toString()) {
@@ -359,7 +371,6 @@ function updateRecord(data = ['1010101;', '9515995901;', 'dpaight@hemetusd.org;'
     return 'error: record not found';
 }
 function makeMatchVarFromRange(data) {
-
     var sheet = ss.getActiveSheet();
     var row = ss.getActiveCell().getRow();
     data = sheet.getRange(row, 11, 1, 3).getDisplayValues();
@@ -452,11 +463,9 @@ function getIndicesByHeading(array) {
 function createDraftEmail(buttonVal, paramsJSN) {
     Logger.log(paramsJSN);
     var params = JSON.parse(paramsJSN);
-
     var file = DriveApp.getFileById('1hRKDCRV0UB79E_V_KZKIF13gXpFPeW9u');
     var mt1 = file.getMimeType();
     var file2 = DriveApp.getFileById('1JbzZ12pxkRGTv_jSu8hccXMRheSJXso_');
-
     if (params.translate == '1') {
         params.bodySpan = LanguageApp.translate(params.body.toString(), 'en', 'es');
         params.subjSpan = LanguageApp.translate(params.subj.toString(), 'en', 'es');
@@ -465,7 +474,8 @@ function createDraftEmail(buttonVal, paramsJSN) {
     }
     if (buttonVal == 'send') {
         GmailApp.sendEmail(params.to, params.subj, params.body, { from: "dpaight@hemetusd.org" });
-    } else {
+    }
+    else {
         GmailApp.createDraft(params.to, params.subj, params.body, {
             // @ts-ignore
             // attachments: [file.getAs(MimeType.PDF), file2.getAs(MimeType.PDF)]
@@ -880,38 +890,29 @@ function removeOldMeetings() {
     }
 }
 //# sourceMappingURL=module.jsx.map
-
 function printSelectedLogEntries(stuName, array) {
     var destFile = SpreadsheetApp.openById('1sEkijMXT3j9uIJWPqExmREZ2M8U8pO1olxLo-WgsTtI');
     var destSheet = destFile.getSheets()[0];
-
-
     var sheet = ss.getSheetByName('logRespMerged');
     var last = findLastRow('logRespMerged', 1);
     var range = sheet.getRange('A2:F' + (last + 1).toString());
-
     var entries = range.getValues();
     var headings = [['Timestamp', 'Entries for ' + stuName]];
     var keepers = array;
-
     keepers = headings.concat(keepers);
     destSheet.clearContents();
     var destRange = destSheet.getRange(1, 1, keepers.length, 2);
     destRange.setValues(keepers);
     SpreadsheetApp.flush();
-
     var ssFile = DriveApp.getFileById('1sEkijMXT3j9uIJWPqExmREZ2M8U8pO1olxLo-WgsTtI');
-
     var file = DriveApp.createFile(ssFile.getBlob());
     var url = file.getUrl();
-
-
     try {
         var folder = DriveApp.getFolderById('1S7TEP1ixTjhHwZ0APcasGj0fqAaZhvqC');
         folder.createFile(file);
         // var fileUrl = file
-
-    } catch (error) {
+    }
+    catch (error) {
         Logger.log(error);
         return "failed " + error;
     }
@@ -919,7 +920,6 @@ function printSelectedLogEntries(stuName, array) {
         'msg': 'contact logs saved to ' + file.getName(),
         'url': url
     };
-
 }
 // Compiled using ts2gas 3.6.3 (TypeScript 3.9.7)
 // this returns table data to the success Handler on the client side
@@ -943,10 +943,9 @@ function getTableData_roster(id) {
     // Logger.log(JSON.stringify([loc, data, id]));
     return [loc, data, id];
 }
-
 // this returns contact log data to the client-side script
 // called by "    $("body").on("click", ".setStudent", function (event) {..."
-function getLogEntries(array) {  // [id, loc]
+function getLogEntries(array) {
     Logger.log('array = %s', JSON.stringify(array));
     var id = array[0];
     var loc = array[1];
@@ -1016,7 +1015,6 @@ function getCalData_events() {
             Logger.log('did nothing for %s', element[1]);
         }
         else {
-
             Logger.log('did SOMEthing for %s', element[1]);
             let thisDate = moment(element[2], 'YYYY-MM-DDTHH:mm:SS');
             element.splice(2, 1, moment(thisDate).format('YYYY-MM-DD HH:mm'));
@@ -1275,20 +1273,18 @@ function levData(id = '1010101') {
     }
     return '["baseln"="for baseline data, refer to the appropriate section on the Levels of Performance page"]';
 }
-
-function getPresentLevelsAsTextBlazeListItem(seisId = '1010101',
-    areas = ['reading', 'writing', 'math', 'lang', 'motor', 'bhvr', 'health', 'wrkHbts', 'prefs']) {
+function getPresentLevelsAsTextBlazeListItem(seisId = '1010101', areas = ['reading', 'writing', 'math', 'lang', 'motor', 'bhvr', 'health', 'wrkHbts', 'prefs']) {
     var lvlsRecord = levData(seisId);
     if (lvlsRecord.toString().search(/baseln/) != -1) {
         return lvlsRecord;
-    } else {
+    }
+    else {
         var list = new LevelsPerformance(lvlsRecord);
         var wholeSnip = list.getSnip(areas);
         // Logger.log(wholeSnip);
         return wholeSnip;
     }
 }
-
 function LevelsPerformance(el) {
     this['lvls'] = {};
     this['lvls'].bhvr1play = (el[25].length > 0) ?
@@ -1317,13 +1313,12 @@ function LevelsPerformance(el) {
         'teacher observation: ' + el[7].toString().replace(/"/g, "'") :
         '';
     this['lvls'].read2Found = el[8].toString().replace(/"/g, "'");
-
     if (el[9].toString().length > 0) {
         this['lvls'].read3HighFreq = el[9].toString().replace(/"/g, "'");
-    } else {
+    }
+    else {
         this['lvls'].read3HighFreq = '';
     }
-
     if (el[10].toString().length > 0) {
         this['lvls'].read4Comp = (el[10].length > 0) ?
             'comprehension level (GE) = ' + el[10].toString().replace(/"/g, "'") :
@@ -1342,12 +1337,9 @@ function LevelsPerformance(el) {
     this['lvls'].writ2eMech = el[13].toString().replace(/"/g, "'");
     this['lvls'].writ3eContent = el[14].toString().replace(/"/g, "'");
     this['lvls'].writ4eOther = el[15].toString().replace(/"/g, "'");
-
-
     this.getSnip = function (snipAreas) {
         // initialize the string vars for making snip lists
         // snipAreas are those collections of questionnaire answers, collections that Tblaze uses to fill forms
-
         // convert object to an array object named 'ary'
         this['lvlsAry'] = [];
         for (const key in this.lvls) {
@@ -1357,51 +1349,41 @@ function LevelsPerformance(el) {
             }
         }
         // Logger.log('this.lvlsAry is %s', JSON.stringify(this.lvlsAry));
-
         // Logger.log('the length of this.lvlsAry is ' + this.lvlsAry.length);
-
-
         var wholeSnip = '';
         // wholeSnip is a set of snipAreas:  {["snipArea"="content of snip", "snipArea"="content of snip"]}
         var partSnip = '';
         // a partSnip is a single snipArea
-
         // iterate through list of areas on which to make items in a snip list
         for (let i = 0; i < snipAreas.length; i++) {
             const element = snipAreas[i];
             var partialSnipArea = element.toString().slice(0, 4);
-
             if (i > 0) {
                 partSnip += ', ';
             }
-
             partSnip += '"' + element + '"=' + '"'; // opening " for value
-
             for (let j = 0; j < this.lvlsAry.length; j++) {
                 const kyval = this.lvlsAry[j];
                 var partialKey = kyval[0].toString().slice(0, 4);
                 if (partialSnipArea == partialKey && kyval[1].toString().length > 0) {
                     partSnip += kyval[1] + '; '; // ; separator for items within area
                 }
-
             }
             partSnip += '"'; // closing " for value
             if (partSnip.length > 2) {
                 wholeSnip += partSnip;
-            } else {
-                wholeSnip += '"' + snipAreas[i] + '"=""'
+            }
+            else {
+                wholeSnip += '"' + snipAreas[i] + '"=""';
             }
             partSnip = '';
         }
         wholeSnip = '[' + wholeSnip + ']';
-
         return wholeSnip;
-    }
-
+    };
     this.getSnip_old = function (snipAreas) {
         // initialize the string vars for making snip lists
         // snipAreas are those collections of questionnaire answers, collections that Tblaze uses to fill forms
-
         // convert object to an array object named 'ary'
         this['lvlsAry'] = [];
         for (const key in this.lvls) {
@@ -1411,18 +1393,14 @@ function LevelsPerformance(el) {
             }
         }
         // Logger.log('this.lvlsAry is %s', JSON.stringify(this.lvlsAry));
-
         // Logger.log('the length of this.lvlsAry is ' + this.lvlsAry.length);
-
         var wholeSnip = '[';
         // wholeSnip is a set of snipAreas:  {["snipArea"="content of snip", "snipArea"="content of snip"]}
         var partSnip = '';
         // a partSnip is a single snipArea
-
         // iterate through list of areas on which to make items in a snip list
         for (let i = 0; i < snipAreas.length; i++) {
             const element = snipAreas[i];
-
             var partialSnipArea = element.toString().slice(0, 4);
             var counter = 0;
             for (const key in this.lvls) {
@@ -1437,7 +1415,7 @@ function LevelsPerformance(el) {
                     }
                     if (counter >= 26) {
                         partSnip = partSnip.toString().replace(/"/, "'");
-                        partSnip = '"' + element + '"="' + partSnip + '"'
+                        partSnip = '"' + element + '"="' + partSnip + '"';
                         // now we have "area"="value of area"
                         wholeSnip = (wholeSnip == '[') ?
                             // if this is the firs addition to wholeSnip, omit the comma
@@ -1448,45 +1426,34 @@ function LevelsPerformance(el) {
                 }
             }
         }
-
         if (wholeSnip) {
             wholeSnip = wholeSnip.toString().replace(/,$/, '');
             wholeSnip += ']';
-            wholeSnip = wholeSnip.toString().replace(/[; ]+/g, '; ')
-
+            wholeSnip = wholeSnip.toString().replace(/[; ]+/g, '; ');
         }
         // Logger.log('wholeSnip = %s; snipAreas = %s', wholeSnip, JSON.stringify(snipAreas));
         // Logger.log('partSnip = %s; wholeSnip = %s; i = %s; snipArea = %s', partSnip, wholeSnip, i, snipAreas[i]);
         return wholeSnip;
-    }
-
+    };
     this.getSnipGoal = function (snipAreas) {
         // initialize the string vars for making snip lists
         // snipAreas are those collections of questionnaire answers, collections that Tblaze uses to fill forms
-
-
         // wholeSnip is a set of snipAreas:  {["snipArea"="content of snip", "snipArea"="content of snip"]}
         var partSnip = this.getSnip(snipAreas);
         partSnip = partSnip.toString().replace(/"snipAreas[0]="/, '"baseln"=');
         partSnip = partSnip.toString().replace(/\]/, '');
-
         // a partSnip is a single snipArea
-
         // iterate through list of areas on which to make items in a snip list
         var wholeSnip = partSnip + ']';
         // now we have "baseln"="value of area"
         if (wholeSnip) {
             wholeSnip = wholeSnip.toString().replace(/,$/, '');
-            wholeSnip.toString().replace(/[; ]+/g, '; ')
-
+            wholeSnip.toString().replace(/[; ]+/g, '; ');
         }
         // Logger.log('wholeSnip = %s; snipAreas = %s', wholeSnip, JSON.stringify(snipAreas));
         // Logger.log('partSnip = %s; wholeSnip = %s; i = %s; snipArea = %s', partSnip, wholeSnip, i, snipAreas[i]);
         return wholeSnip;
-    }
-};
-
-
-
+    };
+}
+;
 //# sourceMappingURL=module.jsx.map
-
