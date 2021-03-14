@@ -58,7 +58,7 @@ function saveLastId(id) {
 }
 function doGet(e) {
     var t = HtmlService.createTemplateFromFile("caseLog");
-    t.version = "v17";
+    t.version = "v18";
     return t.evaluate().setXFrameOptionsMode(HtmlService.XFrameOptionsMode.ALLOWALL);
 }
 function doPost(e) {
@@ -1456,4 +1456,46 @@ function LevelsPerformance(el) {
     };
 }
 ;
-//# sourceMappingURL=module.jsx.map
+function addStudentByIdFromRESstudentsServer(obj: any) {
+    var sheet = ss2.getSheetByName('allPupils');
+    var last = sheet.getRange('A1:A').getValues().filter(String).length;
+    var lastCol = sheet.getLastColumn();
+    var range = sheet.getRange(1, 1, last, lastCol);
+    var values = range.getValues();
+    var headings = values.shift();
+    var stuId = obj.StudentID;
+    var lastAnnual = obj.lastAnnual;
+    var lastEval = obj.lastEval;
+    var seisID = obj.seisID;
+    for (let i = 0; i < values.length; i++) {
+        const el = values[i];
+        if (stuId == el[0]) {
+            var stuToAdd = el;
+            break;
+        }
+    }
+    var [StudentID, StudentNo, LastName, FirstName, Sex, Grade, Birthdate, Parentguardian, MailingAddress, City, State,
+        Zipcode, TchrNum, LangFlu, RptgLng, StateStudentID, StuEmail, User10, User11, EnterDate, ParentEdLvl,
+        PrimaryPhone, FamilyKey, CorrLng, teachEmail, teachName, sdcrsp, nmJdob, LastName_FirstName_StudentID,
+        LastName_FirstName_dob_Birthdate, LastName_FirstName, FirstName_LastName, Parentguardian, PrimaryPhone] = stuToAdd;
+    var caseManager = Session.getActiveUser().getEmail().toString().match(/^[A-z0-9]+/)[0];
+
+    var newRosterRecord = [nmJdob, StudentID, teachEmail, PrimaryPhone, StuEmail, "parentEmail", CorrLng, LangFlu, teachName,
+        seisID, LastName, FirstName, Birthdate, caseManager, lastAnnual, lastEval, "", MailingAddress, PrimaryPhone, PrimaryPhone, Grade, "", "", "",
+        Parentguardian, "", "", "", "", ""];
+
+    var roster = ss.getSheetByName('roster');
+    var last = roster.getRange('A1:A').getValues().filter(String).length;
+    var destRange = roster.getRange(last + 1, 1, 1, newRosterRecord.length);
+
+    destRange.setValues([newRosterRecord]);
+
+    return seisID;
+
+    //  [nmJdob, idAeries, teacherEmail, u1_phone, u2_stuEmail, u3_Parent_1a_Email, u4_corr, u5_EL, u6_teacher,
+    //     SEIS_ID, Last_Name, First_Name, Date_of_Birth, Case_Manager, Date_of_Last_Annual_IEP, Date_of_Last_Evaluation,
+    //     Date_of_Initial_Parent_Consent, Parent_1_Mail_Address, Parent_1_Email, Parent_1_Home_Phone, Parent_1_Cell_Phone,
+    //     Grade_Code, Student_Eligibility_Status, Disability_1, Disability_2, Parent_Guardian_1_Name, Parent_Guardian_2_Name,
+    //     Date_of_Next_Annual_IEP, readingGroup, notes, meet]
+
+}
