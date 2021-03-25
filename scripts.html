@@ -210,7 +210,7 @@
       document.body.style.cursor = "wait";
       var id = $("#idNo").val();
       google.script.run
-        .withSuccessHandler(window.open('https://script.google.com/a/hemetusd.org/macros/s/AKfycbwS6Hct9vxEl3IJLrsuYxRegcpIo2XCXZs-4VPSJco/exec', '_top'))
+        .withSuccessHandler()
         .updateRoster(id);
     });
     $("body").on("click", ".toBtn", function () {
@@ -809,11 +809,20 @@
     );
     for (let i = 0; i < data.length; i++) {
       const el = data[i];
-      var [
-        nmJdob, idAeries, teacherEmail, u1_phone, u2_stuEmail, u3_Parent_1a_Email, u4_unused, u5_unused, u6_unused, SEIS_ID, Last_Name, First_Name, Date_of_Birth, Case_Manager, Date_of_Last_Annual_IEP, Date_of_Last_Evaluation, Date_of_Initial_Parent_Consent, Parent_1_Mail_Address, Parent_1_Email, Parent_1_Home_Phone, Parent_1_Cell_Phone, Grade_Code, Student_Eligibility_Status, Disability_1, Disability_2, Parent_Guardian_1_Name, Parent_Guardian_2_Name, Date_of_Next_Annual_IEP
-      ] = el;
       list = $("#" + loc + "tb");
-      if (!SEIS_ID) {
+      var [
+        nmjdob, studentid, teachemail, u1phone, stuemail, u3parent1aemail, corrlng, langflu, u5el,
+        seisid, lastname, firstname, dateofbirth, casemanager, dateoflastannualiep, dateoflastevaluation,
+        dateofinitialparentconsent, SEIS_ID, Last_Name, First_Name, Date_of_Birth, Case_Manager,
+        Date_of_Last_Annual_IEP, Date_of_Last_Evaluation, Date_of_Initial_Parent_Consent, Parent_1_Mail_Address,
+        Parent_1_Email, Parent_1_Home_Phone, Parent_1_Cell_Phone, Grade_Code, Student_Eligibility_Status,
+        Disability_1, Disability_2, ParentGuardian_1_Name, ParentGuardian_2_Name,
+        Adaptive_Physical_Ed, Assistive_Technology_Specialist, Audiologist_with_Valid_Credential,
+        ProviderOccupational_Therapist, Teacher_of_DeafHard_of_Hearing, Teacher_of_Visually_Impaired,
+        nmjdob, seisid, teachemail, u1phone, u2stuemail, u3parent1aemail, u4corr, u5el, u6teacher, notes
+      ] = el;
+
+      if (!el[9]) {
 
         alert(" has no id"); // lnCmafn + 
       } else {

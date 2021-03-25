@@ -346,15 +346,15 @@ function updateRecord(data = ['1010101;', '9515995901;', 'dpaight@hemetusd.org;'
     var [id, phone, pem, phone2, pem2, tem, notes] = data;
     // var SEIS_ID = data[0], Parent_1_Home_Phone = data[1], Parent_1_Email = data[2], u1_phone = data[3], u3_Parent_1a_Email = data[4], teacherEmail = data[5];
     // data = data || ["145980", "(951) 305-1378", ""];
-    var values = getAllRecords('roster');
+    var values = getAllRecords('rosterLoc');
     var hdngs = values[0].flat();
-    // nmJdob	idAeries	teacherEmail	u1_phone	u2_stuEmail	u3_Parent_1a_Email	u4_corr	u5_EL	u6_teacher	SEIS_ID	Last_Name	First_Name	Date_of_Birth	Case_Manager	Date_of_Last_Annual_IEP	Date_of_Last_Evaluation	Date_of_Initial_Parent_Consent	Parent_1_Mail_Address	Parent_1_Email	Parent_1_Home_Phone	Parent_1_Cell_Phone	Grade_Code	Student_Eligibility_Status	Disability_1	Disability_2	Parent_Guardian_1_Name	Parent_Guardian_2_Name	Date_of_Next_Annual_IEP	reading group	notes
-    Logger.log('seis index: ' + hdngs.indexOf('SEIS_ID'));
-    var SEIS_ID_idx = hdngs.indexOf('SEIS_ID');
-    var u3_Parent_1a_Email_idx = hdngs.indexOf('u3_Parent_1a_Email`');
+    // nmJdob	seisid	teachemail	u1phone	u2stuEmail	u3Parent1aEmail	u4_corr	u5_EL	u6_teacher	
+    Logger.log('seis index: ' + hdngs.indexOf('seisid'));
+    var SEIS_ID_idx = hdngs.indexOf('seisid');
+    var u3_Parent_1a_Email_idx = hdngs.indexOf('u3parent1aemail`');
     var notes_idx = hdngs.indexOf('notes');
-    var u1_phone_idx = hdngs.indexOf('u1_phone');
-    var teacherEmail_idx = hdngs.indexOf('teacherEmail');
+    var u1_phone_idx = hdngs.indexOf('u1phone');
+    var teacherEmail_idx = hdngs.indexOf('teachemail');
     for (var i = 0; i < values.length; i++) {
         var el = values[i];
         if (id.toString() == el[SEIS_ID_idx].toString()) {
@@ -363,7 +363,7 @@ function updateRecord(data = ['1010101;', '9515995901;', 'dpaight@hemetusd.org;'
             el.splice(u3_Parent_1a_Email_idx, 1, pem2);
             el.splice(teacherEmail_idx, 1, tem);
             el.splice(notes_idx, 1, notes);
-            var destRng = ss.getSheetByName('roster').getRange(i + 1, 1, 1, el.length);
+            var destRng = ss.getSheetByName('rosterLoc').getRange(i + 1, 1, 1, el.length);
             destRng.setValues([el]);
             return el;
         }
@@ -387,12 +387,13 @@ function makeMatchVarFromRange(data) {
  * @returns constructed "match" variable using lastName, firstName, and dob as julian date
  */
 function makeMatchVar(data) {
+
     if (data === void 0) {
-        data = ['Paight', 'Daniel', '1/21/2013'];
+        data = ['Paight', 'Daniel', '01/21/2013'];
     }
-    var y2 = moment(data[2], 'MM-DD-YYYY').format('YY');
-    var doy = moment(data[2], 'MM-DD-YYYY').dayOfYear();
-    return (data[0] + data[1] + y2 + doy).toString().replace(/[^A-z0-9]/g, "");
+    var y2 = moment(data[2], 'YYYY-MM-DD').format('YY');
+    var doy = moment(data[2], 'YYYY-MM-DD').dayOfYear();
+    return ((data[0] + data[1] + y2 + doy).toString().replace(/[^A-z0-9]/g, "")).toString().toLowerCase();
 }
 /**
  *
@@ -930,18 +931,34 @@ function getTableData_roster(id) {
     var loc = 'loc00';
     var sheetName = 'roster';
     var sheet = ss.getSheetByName(sheetName);
+    var sheetLoc = ss.getSheetByName('rosterLoc');
     var lastR = sheet.getRange('B1:B').getDisplayValues().filter(String).length;
     Logger.log('lastR = %s', lastR);
     var lastC = sheet.getLastColumn();
     lastR = (lastR > 1) ? lastR : 2;
     var data = sheet.getRange(2, 1, lastR - 1, lastC).getDisplayValues();
+
     // var sc = CacheService.getScriptCache();
     // var sp = PropertiesService.getScriptProperties();
     data.sort(function (a, b) { return moment(a[7]) - moment(b[7]); });
     // sc.put('counter', '0');
     // lt_logLogTimeEnd(arguments.callee.toString().match(/function ([^\(]+)/)[1]);
     // Logger.log(JSON.stringify([loc, data, id]));
-    return [loc, data, id];
+    var localLast = sheetLoc.getRange('B1:B').getDisplayValues().filter(String).length;
+    var local = sheetLoc.getRange(2, 1, localLast - 1, 10).getDisplayValues();
+    var allData = [];
+    var headings = data[0].concat(local[0]);
+    for (let i = 0; i < data.length; i++) {
+        var el = data[i];
+        for (let j = 0; j < local.length; j++) {
+            const elLoc = local[j];
+            if (elLoc[0] == el[0]) {
+                allData.push(el.concat(elLoc));
+            }
+        }
+    }
+    // Logger.log('all data is %s', JSON.stringify(headings));
+    return [loc, allData, id];
 }
 // this returns contact log data to the client-side script
 // called by "    $("body").on("click", ".setStudent", function (event) {..."
@@ -1044,6 +1061,7 @@ function getRecord(id) {
     else {
         // record was not cached; search for it
         var array = getAllRecords('roster');
+        var loc = getAllRecords('rosterLoc');
         for (var i = 0; i < array.length; i++) {
             Logger.log('after else ran ' + i);
             var el = array[i];
@@ -1051,6 +1069,14 @@ function getRecord(id) {
             // cache all records along the way
             if (id == el[9]) {
                 found = el;
+                for (let j = 0; j < loc.length; j++) {
+                    const elLoc = loc[j];
+                    if (elLoc[0] == el[0]) {
+                        found = found.concat(elLoc);
+                        Logger.log('the record is %s', JSON.stringify(found));
+                        break;
+                    }
+                }
                 break;
             }
         }
@@ -1069,123 +1095,13 @@ function getRosterValues() {
     var values = sheet.getRange(1, 1, lastR, lastC).getDisplayValues();
     return values;
 }
-// this retrieves data from a CSV file obtained from SEIS
-// also uses the current ramona students file to look up other values
 function updateRoster() {
     // get current data
-    var roster = SpreadsheetApp.getActiveSpreadsheet().getSheetByName('roster');
-    var last = roster.getRange('a1:a').getValues().filter(String).length;
-    var rosterVals = roster.getRange(1, 1, last, roster.getLastColumn()).getDisplayValues();
-    var rosterHeadings = rosterVals.shift();
-    // get aeries data for school
-    var allPupilsSheet = ss2.getSheetByName('allPupils');
-    var last = allPupilsSheet.getRange('a1:a').getValues().filter(String).length;
-    var allPupilsArray = allPupilsSheet.getRange(1, 1, last, allPupilsSheet.getLastColumn()).getDisplayValues();
-    var allPupilsHeadings = allPupilsArray.shift();
-    // get seis data
-    var folder = DriveApp.getFolderById('1g1JGj5L6QIIsYG-CLQj9np3m4QgtClLF');
-    var files = folder.getFiles();
-    var fileIds = [];
-    // looking for .csv file
-    var found = false;
-    while (files.hasNext() && found == false) {
-        var file = files.next();
-        var fileName = file.getName();
-        var status; // '1' if parse function is successful
-        if (fileName.toString().search(/roster_seis.csv/) !== -1) {
-            found = true;
-            var sheetName = 'roster_seis';
-            var csvFile = file.getBlob().getDataAsString();
-            fileIds.push(file.getId());
-            var seisData = Utilities.parseCsv(csvFile);
-            var iObj = getIndicesByHeading(seisData[0]);
-            var seisDataHeadings = seisData.shift();
-        }
-    }
-    // find matching records and update with new seis data
-    // new seis data by rows
-    var newRecords = [];
-    for (var i = 0; i < seisData.length; i++) {
-        var elNew = seisData[i];
-        // generate the matching key
-        var dob = elNew[iObj['Date of Birth']];
-        var fn = elNew[iObj['First Name']];
-        var ln = elNew[iObj['Last Name']];
-        var nmJdob = makeMatchVar([ln.toString(), fn.toString(), dob.toString()]);
-        var found = false;
-        // roster table by rows
-        for (var j = 0; j < rosterVals.length; j++) {
-            var elRos = rosterVals[j];
-            if (elRos[0] == nmJdob) {
-                // update lookups in cols 1-9 (0-8)
-                // only ones are teacherEmail and corr
-                var currentTem = elRos[2];
-                var updatedTem = getFieldFromNmJdob(elRos[0], allPupilsArray, 27, 24);
-                if (currentTem != updatedTem) {
-                    rosterVals[j].splice(2, 1, updatedTem);
-                }
-                var currentCorr = elRos[6].toString();
-                var updatedCorr = getFieldFromNmJdob(elRos[0], allPupilsArray, 27, 23);
-                if (currentCorr != updatedCorr) {
-                    rosterVals[j].splice(6, 1, updatedCorr);
-                }
-                var langProf = elRos[7].toString();
-                var updatedLangProf = getFieldFromNmJdob(elRos[0], allPupilsArray, 27, 13);
-                if (langProf != updatedLangProf) {
-                    rosterVals[j].splice(7, 1, updatedLangProf);
-                }
-                // matched roster row by columns, starting at column 10 (index 9)
-                found = true;
-                var updated = [
-                    elNew[0], elNew[1], elNew[2], elNew[3], elNew[4], elNew[5], elNew[6], elNew[7], elNew[8], elNew[9], elNew[10],
-                    elNew[11], elNew[12], elNew[13], elNew[14], elNew[15], elNew[16], elNew[17], elNew[18]
-                ];
-                for (var k = 0; k < updated.length; k++) {
-                    rosterVals[j].splice(k + 9, 1, updated[k]);
-                }
-            }
-        }
-        if (found == false) {
-            newRecords.push([i, nmJdob]);
-        }
-        found = false;
-    }
-    var rows = [];
-    if (newRecords.length > 0) { // i should go 0,2,4...; nmJdob: 1,3,5...
-        for (var i = 0; i < newRecords.length; i++) {
-            nmJdob = newRecords[i][1]; //.toString();
-            var element = seisData[newRecords[i][0]];
-            var key, id, tem, u1, u2, u3, u4, u5, u6;
-            key = nmJdob;
-            id = getFieldFromNmJdob(nmJdob, allPupilsArray, 27, 0);
-            tem = getFieldFromNmJdob(nmJdob, allPupilsArray, 27, 24);
-            u1 = "";
-            u2 = getFieldFromNmJdob(nmJdob, allPupilsArray, 27, 16);
-            u3 = "";
-            u4 = "";
-            u5 = getFieldFromNmJdob(nmJdob, allPupilsArray, 27, 13);
-            ;
-            u6 = "";
-            rows.push([key, id.toString(), tem, u1, u2, u3, u4, u5, u6,
-                element[0], element[1], element[2], element[3], element[4], element[5], element[6], element[7], element[8], element[9],
-                element[10],
-                element[11], element[12], element[13], element[14], element[15], element[16], element[17], element[18]]);
-            rows[i].splice(0, 1, nmJdob);
-            rows[i].splice(1, 1, id);
-            rows[i].splice(2, 1, tem);
-            // rows[i].splice(3,1,nmJdob);
-            rows[i].splice(4, 1, u2);
-            // rows[i].splice(5,1,nmJdob);
-            // rows[i].splice(6,1,nmJdob);
-            // rows[i].splice(7,1,nmJdob);
-            // rows[i].splice(8,1,nmJdob);
-            //  id, tem, u1, u2, u3, u4, u5, u6);
-        }
-        rosterVals = rosterVals.concat(rows);
-    }
-    rosterVals.unshift(rosterHeadings);
-    var destRng = roster.getRange(1, 1, rosterVals.length, rosterVals[0].length);
-    destRng.setValues(rosterVals);
+    var seisData = getSeiesData();
+    var destSheet = ss.getSheetByName('roster_seis');
+    var destRng = destSheet.getRange(1, 10, seisData.length, seisData[0].length);
+    destRng.setValues(seisData);
+
 }
 function addTimTest() {
     var fileIdS, fileIdD, lastCol, last, destSheet, destR;
@@ -1499,3 +1415,270 @@ function addStudentByIdFromRESstudentsServer(obj: any) {
     //     Date_of_Next_Annual_IEP, readingGroup, notes, meet]
 
 }
+
+function importXLS() {
+    var folderBId = "1V-hgTp8LrccnXI1rvQcekrUpV_WnJK85"; // Added // Please set the folder ID of "FolderB".
+
+    var files = DriveApp.getFolderById('1pjTSNCCVxKajDMNAZnPETR8WmthlgcOX').searchFiles('title != "nothing"');
+    while (files.hasNext()) {
+        var xFile = files.next();
+        var name = xFile.getName();
+        if (name.indexOf('.xlsx') > -1) {
+            var ID = xFile.getId();
+            var xBlob = xFile.getBlob();
+            var newFile = {
+                title: name + '_converted',
+                parents: [{ id: folderBId }] //  Added
+            };
+            var file = Drive.Files.insert(newFile, xBlob, {
+                convert: true
+            });
+            var fileId = file.id;
+
+        }
+    }
+    var newData = SpreadsheetApp.openById(fileId).getSheetByName('Sheet1').getDataRange().getValues();
+    var newlyScrubbedData = scrubHeadings(newData);
+    var newDataHead = newlyScrubbedData.shift();
+    newDataHead.unshift("nmjdob");
+    for (let i = 0; i < newlyScrubbedData.length; i++) {
+        const element = newlyScrubbedData[i];
+        element.splice(0, 1, element[0].toString());
+    }
+
+    for (let i = 0; i < newlyScrubbedData.length; i++) {
+        const element = newlyScrubbedData[i];
+        var ln = element[2], fn = element[3], dob = element[6];
+        element.unshift(makeMatchVar([ln.toString().toLowerCase(),
+        fn.toString().toLowerCase(), moment(dob, "MM/DD/YYY").format("YYYY-MM-DD")]));
+    }
+    var destSheet = ss.getSheetByName('allPupils');
+    destSheet.getRange(1, 1, 1000, 50).clearContent();
+    var headRng = destSheet.getRange(1, 1, 1, newDataHead.length);
+    headRng.setValues([newDataHead]);
+    var destRange = destSheet.getRange(2, 1, newData.length, newData[0].length);
+    SpreadsheetApp.flush();
+    destRange.setValues(newlyScrubbedData);
+    return 'done';
+}
+function getSeiesData() {
+    // get seis data
+    var folder = DriveApp.getFolderById('1g1JGj5L6QIIsYG-CLQj9np3m4QgtClLF');
+    var files = folder.getFiles();
+    var fileIds = [];
+    // looking for .csv file
+    var found = false;
+    while (files.hasNext() && found == false) {
+        var file = files.next();
+        var fileName = file.getName();
+        var status; // '1' if parse function is successful
+        if (fileName.toString().search(/roster_seis.csv/) !== -1) {
+            found = true;
+            var sheetName = 'roster_seis';
+            var csvFile = file.getBlob().getDataAsString();
+            fileIds.push(file.getId());
+            return Utilities.parseCsv(csvFile, ",");
+
+        }
+    }
+}
+function scrubHeadings(array) {
+    var headings = array.shift();
+
+    var newHd = headings.map(x => x.toLowerCase().replace(/[\W\/ |-]/g, ""));
+    var newArray = [newHd].concat(array);
+    return newArray;
+}
+
+function getIndicesAndNamesFromHeadings(array, searchKey) {
+    var Record = {};
+    var counter = 0;
+    var pattern = new RegExp(searchKey);
+    for (let i = 0; i < array.length; i++) {
+        const element = array[i];
+        if (element.toString().search(pattern) != -1) {
+            Record["index" + counter] = i;
+            Record["varName" + counter] = element;
+            counter++;
+        }
+    }
+    return Record;
+}
+
+/**
+ * 
+ * @param obj "name": array, "name": array
+ */
+function getCol0(nmjdob, obj) {
+    for (const key in obj) {
+        var array = [];
+        var stuObjectInfo = {};
+        if (Object.prototype.hasOwnProperty.call(obj, key)) {
+            const element = obj[key];
+            for (let i = 0; i < obj[key].length; i++) {
+                const element = obj[key][i];
+                array.push(element[0]);
+            }
+            stuObjectInfo[key] = array.indexOf(nmjdob);
+        }
+    }
+    Logger.log('stuObjectInfo is %s', JSON.stringify(stuObjectInfo));
+    return stuObjectInfo;
+}
+
+
+
+// this retrieves data from a CSV file obtained from SEIS
+// also uses the local sheet with current ramona students table to look up other values
+// function junk_updateRoster() {
+
+//     // get roster data
+//     var roster = SpreadsheetApp.getActiveSpreadsheet().getSheetByName('roster');
+//     var last = roster.getRange('a1:a').getValues().filter(String).length;
+//     var rosterValsTmp = roster.getRange(1, 1, last, roster.getLastColumn()).getDisplayValues();
+//     var rosterVals = scrubHeadings(rosterValsTmp);
+//     var rosterHeadings = rosterVals.shift();
+
+
+//     // get local component table
+//     var rosterLoc = SpreadsheetApp.getActiveSpreadsheet().getSheetByName('rosterLoc');
+//     var last = rosterLoc.getRange('a1:a').getValues().filter(String).length;
+//     var rosterLocValsTmp = rosterLoc.getRange(1, 1, last, rosterLoc.getLastColumn()).getDisplayValues();
+//     var rosterLocVals = (rosterLocValsTmp);
+//     var localHeadings = rosterLocVals.shift();
+//     var rosterLocRng = rosterLoc.getDataRange();
+
+//     // get allPupils (aeries) component table
+//     importXLS();
+//     SpreadsheetApp.flush();
+//     var allPupils = SpreadsheetApp.getActiveSpreadsheet().getSheetByName('allPupils');
+//     var last = allPupils.getRange('a1:a').getValues().filter(String).length;
+//     var allPupilsValsRng = allPupils.getRange(1, 1, last, allPupils.getLastColumn());
+//     var allPupilsValsTmp = allPupilsValsRng.getDisplayValues();
+//     var allPupilsVals = scrubHeadings(allPupilsValsTmp);
+//     var allPupilsHeadings = allPupilsVals.shift();
+
+//     // get seis component table (directly from csv file)
+//     let seisDataTemp = getSeiesData();
+//     Logger.log('seisDataTemp ', JSON.stringify(seisDataTemp));
+//     // add match variable (nmjdob) to seis data and write it to a sheet
+//     for (let i = 0; i < seisDataTemp.length; i++) {
+//         const element = seisDataTemp[i];
+//         const match = makeMatchVar([element[1], element[2], moment(element[3], "MM-DD-YYYY").format("YYYY-MM-DD")]);
+//         if (i == 0) {
+//             seisDataTemp[i].unshift('nmjdob');
+//         }
+//         else {
+//             seisDataTemp[i].unshift(match);
+//         }
+//     }
+//     var seisData = scrubHeadings(seisDataTemp);
+//     var seisSheet = ss.getSheetByName('roster_seis');
+//     seisSheet.clear();
+//     var seisRng = seisSheet.getRange(1, 1, seisData.length, seisData[0].length);
+//     seisRng.setValues(seisData);
+//     var seisHeadings = seisData.shift();
+
+//     Logger.log('roster = %s', JSON.stringify(rosterHeadings));
+//     Logger.log('allPup = %s', JSON.stringify(allPupilsHeadings));
+//     Logger.log('seis = %s', JSON.stringify(seisHeadings));
+//     Logger.log('local = %s', JSON.stringify(localHeadings));
+
+
+//     var aryObjs = checkHeadings([rosterHeadings, allPupilsHeadings, seisHeadings, localHeadings]);
+//     var [aObj, sObj, lObj] = aryObjs;
+
+//     // the aObj, sObj and lObj objects contain heading used by roster table (key: value) (headingText: index)
+//     // now for the updating
+
+//     // if a record is new (no match in roster for a record in seis or no match in seis for a
+//     // record in roster)
+
+
+//     function getFrom(targetArray, sourceArrayName, nmjdob, col) {
+//         rosterVals[indices["rosterVals"]].splice(col, 1, sourceArrayName[indices[sourceArrayName]]);
+//     };
+
+
+//     var rosterHdngsTrm = rosterHeadings.map(x => x.toString().substr(0, (x.length - 2)));
+
+//     var existingRecords = [];
+//     var newRecords = [];
+
+//     for (let i = 0; i < rosterVals.length; i++) {
+//         var el_r = rosterVals[i];
+//         var nmjdob = el_r[0];
+//         // extract nmjdob to flat arrays for index lookup
+//         var indices = getCol0(nmjdob,
+//             {
+//                 "rosterVals": rosterVals,
+//                 "allPupilsVals": allPupilsVals,
+//                 "rosterLocVals": rosterLocVals,
+//                 "seisData": seisData
+//             });
+//         el_r.forEach((element, j) => {
+//             var len: number = rosterHeadings[i].length;
+//             var m = rosterHeadings[i].toString().slice(len - 0, len - 2);
+//             if (m = "_a") {
+//                 Logger.log('rosterVals is: %s; rosterHeadings[i] is: %s; m is: %s; el_r[0] is: %s; i is: %s; ',
+//                     JSON.stringify(rosterVals), rosterHeadings[i], m, el_r[0], j);
+//                 getFrom(allPupilsVals, 'allPupilsVals', el_r[0], i);
+//             } else if (m = "_s") {
+//                 getFrom(seisData, 'seisData', el_r[0], i);
+//             } else if (m = "_l") {
+//                 getFrom(rosterLocVals, 'rosterLocVals', el_r[0], i);
+//             }
+//         });
+//     }
+//     write(rosterVals);
+// }
+function write(array) {
+    var sheet, range;
+    sheet = ss.getSheetByName('temp');
+    range = sheet.getRange(1, 1, array.length, array[0].length);
+    range.setValues(array);
+}
+function checkHeadings(rosters) {
+    var allPupilsObj = {};
+    var seisObj = {};
+    var localObj = {};
+    var [roster, allPupils, seis, local] = rosters;
+
+    for (let i = 0; i < roster.length; i++) {
+        const element = roster[i];
+        if (element.search(/_a$/) != -1) {
+            var x = allPupils.indexOf(element.toString().replace(/_a$/, ""));
+            if (x == -1) {
+                throw "no match for " + element;
+            }
+            else {
+
+                Logger.log(element + " matches " + allPupils.indexOf(element.toString().replace(/_a$/, "")));
+                allPupilsObj[element] = x;
+            }
+        }
+        else if (element.search(/_s$/) != -1) {
+            var x = seis.indexOf(element.toString().replace(/_s$/, ""));
+            if (x == -1) {
+                throw "no match for " + element;
+            }
+            else {
+                Logger.log(element + " matches " + seis.indexOf(element.toString().replace(/_s$/, "")));
+                seisObj[element] = x;
+            }
+        }
+        else if (element.search(/_l$/) != -1) {
+            var x = local.indexOf(element.toString().replace(/_l$/, ""));
+            if (x == -1) {
+                throw "no match for " + element;
+            }
+            else {
+                Logger.log(element + " matches " + local.indexOf(element.toString().replace(/_l$/, "")));
+                localObj[element] = x;
+            }
+        }
+    }
+    Logger.log('the objs = %s %s %s', JSON.stringify(allPupilsObj), JSON.stringify(seisObj), JSON.stringify(localObj));
+    return [allPupilsObj, seisObj, localObj];
+}
+//# sourceMappingURL=module.jsx.map
