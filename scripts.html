@@ -10,28 +10,6 @@
     // this gets the data to be displayed for the student in focus, but not the log entries yet
     document.body.style.cursor = "wait";
 
-
-    google.script.run
-      .withSuccessHandler(contactInfo)
-      .getLastId();
-
-    document.body.style.cursor = "wait";
-    google.script.run
-      .withSuccessHandler(showRosterTable)
-      .getTableData_roster();
-
-    document.body.style.cursor = "wait";
-    google.script.run
-      .withSuccessHandler(showLog)
-      .getLogEntries([sessionStorage.getItem('lastId'), "loc01"]);
-
-
-    // this retrieves information from the meetings sheet to display
-    document.body.style.cursor = "wait";
-    google.script.run
-      .withSuccessHandler(showCalData)
-      .getCalData_events();
-
     // $('.toast').hide();
     // var gSmL = localStorage.getItem('glLvl');
     // var gSmA = localStorage.getItem('glArea');
@@ -47,16 +25,8 @@
       event.preventDefault();
       var id = $(this).attr("data-stuId");
       console.log('id = %s', id);
-      google.script.run
-        .withSuccessHandler()
-        .saveLastId(id);
-      sessionStorage.setItem('lastId', id);
-      contactInfo(id);
-      google.script.run
-        .withSuccessHandler(showLog)
-        .getLogEntries([id, "loc01"]);
+      focus(id);
     });
-
 
     $("body").on("click", ".goalList", function (e) {
       // console.log('event triggered a[name=goalList clicked');
@@ -240,7 +210,7 @@
       document.body.style.cursor = "wait";
       var id = $("#idNo").val();
       google.script.run
-        .withSuccessHandler(window.open('https://script.google.com/a/hemetusd.org/macros/s/AKfycbwS6Hct9vxEl3IJLrsuYxRegcpIo2XCXZs-4VPSJco/exec', '_top'))
+        .withSuccessHandler(reload)
         .updateRoster(id);
     });
     $("body").on("click", ".toBtn", function () {
@@ -261,10 +231,55 @@
     });
   });
 
+
+  //startup
+  google.script.run
+    .withSuccessHandler(contactInfo)
+    .getLastId();
+
+  document.body.style.cursor = "wait";
+  google.script.run
+    .withSuccessHandler(showRosterTable)
+    .getTableData_roster();
+
+  document.body.style.cursor = "wait";
+  // google.script.run
+  //   .withSuccessHandler(showLog)
+  //   .getLogEntries([localStorage.getItem('lastId'), "loc01"]);
+  // removed above b/c getLogEntries is called at the end of focus()
+
+  // this retrieves information from the meetings sheet to display
+  document.body.style.cursor = "wait";
+  google.script.run
+    .withSuccessHandler(showCalData)
+    .getCalData_events();
+
+
   // named functions
   // calls function on server side to return data for this student
+
+  function focus(id) {
+    google.script.run
+      .withSuccessHandler()
+      .saveLastId(id);
+    localStorage.setItem('lastId', id);
+    contactInfo(id);
+    google.script.run
+      .withSuccessHandler(showLog)
+      .getLogEntries([id, "loc01"]);
+  }
+  function showNewStu(id) {
+    google.script.run
+      .withSuccessHandler()
+      .saveLastId(id);
+    localStorage.setItem('lastId', id);
+    google.script.run
+      .withSuccessHandler(showRosterTable)
+      .getTableData_roster();
+  }
+
   function contactInfo(id) {
-    sessionStorage.setItem('lastId', id);
+    localStorage.setItem('lastId', id);
     google.script.run
       .withSuccessHandler(showContactInfo)
       .getRecord(id);
@@ -272,8 +287,8 @@
   //   console.log('id = %s', id);
   //   $("#loc01tb").hide();
   //   var key = 'rec' + id;
-  //   if (sessionStorage[key] != null) {
-  //     showFocusRecord(JSON.parse(sessionStorage[key]));
+  //   if (localStorage[key] != null) {
+  //     showFocusRecord(JSON.parse(localStorage[key]));
   //   } else {
   //     google.script.run
   //       .withSuccessHandler(showFocusRecord)
@@ -317,8 +332,8 @@
     var id = $('#idNo').val();
     records.forEach(function (el, i) {
       const key = 'rec' + el[9];
-      sessionStorage[key] = JSON.stringify(el);
-      // console.log(sessionStorage[key]);
+      localStorage[key] = JSON.stringify(el);
+      // console.log(localStorage[key]);
     });
 
     // this isn't necessary b/c it just received id as a param from server
@@ -351,9 +366,9 @@
     var search = glLvl + '_' + glArea;
 
 
-    if (sessionStorage.getItem('goals' + search)) {
+    if (localStorage.getItem('goals' + search)) {
       // console.log('getting items from cache for ' + search);
-      showGoals(sessionStorage.getItem('goals' + search));
+      showGoals(localStorage.getItem('goals' + search));
     } else {
       google.script.run
         .withSuccessHandler(showGoals)
@@ -367,8 +382,8 @@
 
   function getAllLevSnipForTB() {
     var id = $("#idNo").val();
-    if (sessionStorage['lSnp' + $('#idNo').val()] != null) {
-      showTBsnippet(sessionStorage['lvlsSnp' + $('#idNo').val()]);
+    if (localStorage['lSnp' + $('#idNo').val()] != null) {
+      showTBsnippet(localStorage['lvlsSnp' + $('#idNo').val()]);
     } else {
       google.script.run
         .withSuccessHandler(showTBsnippet)
@@ -377,8 +392,8 @@
   }
   function getAllLevSnipForGoal() {
     var id = $("#idNo").val();
-    if (sessionStorage['lSnp' + $('#idNo').val()] != null) {
-      makeGoalSnip(sessionStorage['lvlsSnp' + $('#idNo').val()]);
+    if (localStorage['lSnp' + $('#idNo').val()] != null) {
+      makeGoalSnip(localStorage['lvlsSnp' + $('#idNo').val()]);
     } else {
       google.script.run
         .withSuccessHandler(makeGoalSnip)
@@ -390,10 +405,11 @@
   // that display data retrieved from a script run on the server
   function showContactInfo(record) {
     var [
-      nmJdob, idAeries, teacherEmail, u1_phone, u2_stuEmail, u3_Parent_1a_Email, u4_corr, u5_lang, u6_teacher, SEIS_ID, Last_Name, First_Name, Date_of_Birth, Case_Manager, Date_of_Last_Annual_IEP, Date_of_Last_Evaluation, Date_of_Initial_Parent_Consent, Parent_1_Mail_Address, Parent_1_Email, Parent_1_Home_Phone, Parent_1_Cell_Phone, Grade_Code, Student_Eligibility_Status, Disability_1, Disability_2, Parent_Guardian_1_Name, Parent_Guardian_2_Name, Date_of_Next_Annual_IEP, reading_group, notes
+      nmJdob, idAeries, teachemail, u1_phone, stuemail, u3_Parent_1a_Email, u4_corr, u5_lang, teachname, SEIS_ID, Last_Name, First_Name, Date_of_Birth, Case_Manager, Date_of_Last_Annual_IEP, Date_of_Last_Evaluation, Date_of_Initial_Parent_Consent, Parent_1_Mail_Address, Parent_1_Email, Parent_1_Home_Phone, Parent_1_Cell_Phone, Grade_Code, Student_Eligibility_Status, Disability_1, Disability_2, Parent_Guardian_1_Name, Parent_Guardian_2_Name, Date_of_Next_Annual_IEP, reading_group, notes
     ] = record;
+    console.log('record: %s', JSON.stringify(record));
     var key = SEIS_ID;
-    sessionStorage.key = JSON.stringify(record);
+    localStorage.key = JSON.stringify(record);
 
     $("#lang").val(u5_lang);
     $("#corr").val(u4_corr);
@@ -405,13 +421,13 @@
     $("#phone2").val(u1_phone);
     $("#pem").val(Parent_1_Email);
     $("#pem2").val(u3_Parent_1a_Email);
-    $("#tch").val(u6_teacher);
-    $("#tem").val(teacherEmail);
+    $("#tch").val(teachname);
+    $("#tem").val(teachemail);
     $("#idNo").val(SEIS_ID);
-    $("#stuem").val(u2_stuEmail);
+    $("#stuem").val(stuemail);
     $("#notes").val(notes);
 
-    google.script.run 
+    google.script.run
       .withSuccessHandler(showLog)
       .getLogEntries([SEIS_ID.toString(), 'loc01']);
   }
@@ -595,8 +611,8 @@
   function showLog(array) { // [entries, id]
     // input is an array containing one arrays and one string ('loc'): array contains all the log entries that correspond to that record
     var [logEntries, loc] = array;
-    console.log('the entries: %s', JSON.stringify(logEntries));
-    console.log('the locations: %s', loc);
+    // console.log('the entries: %s', JSON.stringify(logEntries));
+    // console.log('the locations: %s', loc);
 
     var list = $("#" + loc + "tb");
     list.empty();
@@ -642,7 +658,7 @@
 
     list.empty();
 
-    // array will be put in sessionStorage
+    // array will be put in localStorage
     // var array = [];
     // for (let j = 0; j < entries.length; j++) {
     //   let [theDate, theEvent] = entries[j];
@@ -662,8 +678,8 @@
     //     array.push([timeStamp, theEvent]);
     //   }
     // }
-    // stores array in sessionStorage for retrieval in case we want to write a pdf file
-    //   sessionStorage.setItem('logPrint', JSON.stringify(array));
+    // stores array in localStorage for retrieval in case we want to write a pdf file
+    //   localStorage.setItem('logPrint', JSON.stringify(array));
     // } else {
     // no log entries returned
     for (let i = 0; i < entries.length; i++) {
@@ -690,7 +706,7 @@
 
   function printSelectedLogEntries() {
     var stuName = $('#stuName').val();
-    var array = JSON.parse(sessionStorage.getItem('logPrint'));
+    var array = JSON.parse(localStorage.getItem('logPrint'));
     document.body.style.cursor = "wait";
     google.script.run
       .withSuccessHandler(showToast)
@@ -766,8 +782,8 @@
   function showLogUpdates(record) {
     //update the browser cache with saved data
     var key = 'rec' + record[9];
-    sessionStorage[key] = JSON.stringify(record);
-    // console.log(sessionStorage[key]);
+    localStorage[key] = JSON.stringify(record);
+    // console.log(localStorage[key]);
     // get contact logs
     $("#logEntry").val("");
     document.body.style.cursor = "default";
@@ -795,18 +811,19 @@
     for (let i = 0; i < data.length; i++) {
       const el = data[i];
       var [
-        nmJdob, idAeries, teacherEmail, u1_phone, u2_stuEmail, u3_Parent_1a_Email, u4_unused, u5_unused, u6_unused, SEIS_ID, Last_Name, First_Name, Date_of_Birth, Case_Manager, Date_of_Last_Annual_IEP, Date_of_Last_Evaluation, Date_of_Initial_Parent_Consent, Parent_1_Mail_Address, Parent_1_Email, Parent_1_Home_Phone, Parent_1_Cell_Phone, Grade_Code, Student_Eligibility_Status, Disability_1, Disability_2, Parent_Guardian_1_Name, Parent_Guardian_2_Name, Date_of_Next_Annual_IEP
+        nmJdob, idAeries, teachemail, u1_phone, stuemail, u3_Parent_1a_Email, u4_unused, u5_unused, u6_unused, SEIS_ID, Last_Name, First_Name, Date_of_Birth, Case_Manager, Date_of_Last_Annual_IEP, Date_of_Last_Evaluation, Date_of_Initial_Parent_Consent, Parent_1_Mail_Address, Parent_1_Email, Parent_1_Home_Phone, Parent_1_Cell_Phone, Grade_Code, Student_Eligibility_Status, Disability_1, Disability_2, Parent_Guardian_1_Name, Parent_Guardian_2_Name, Date_of_Next_Annual_IEP
       ] = el;
       list = $("#" + loc + "tb");
       if (!SEIS_ID) {
 
         alert(" has no id"); // lnCmafn + 
       } else {
+        // .toString().slice(0, 1) + "."
         list.append(
           '<tr><td class="setStudent" data-stuId=' +
           SEIS_ID +
           "> " +
-          Last_Name + ', ' + First_Name.toString().slice(0, 1) + "." +
+          Last_Name + ', ' + First_Name +
           "</td>" +
           '<td class="tableDate">' +
           moment(Date_of_Last_Annual_IEP).format('YYYY-MM-DD') +
@@ -948,30 +965,34 @@
   }
 
   function saveGoal(newReplace) {
-    var glEditLevel, glEditArea, glEditStnd, glEditStandard, glEditAnnual, glEditObj1, glEditObj2, glEditObj3, timestamp;
-    if (newReplace != -1) {
-      glEditId = parseInt($('#glEditId').val(), 10);
+    if (newReplace === -1) {
+      var glEditId = -1;
     } else {
-      glEditId = -1;
+      var glEditId = parseInt($('#glEditId').val(), 10);
     }
 
-    glEditLevel = parseInt($('#glEditLvl').val(), 10);
-    glEditArea = $('#glEditArea').val();
-    glEditStrand = $('#glEditStrand').val();
-    glEditStandard = $('#glEditStandard').val();
-    glEditAnnual = $('#glEditAnnual').val();
-    glEditObj1 = $('#glEditobj1').val();
-    glEditObj2 = $('#glEditobj2').val();
-    glEditObj3 = $('#glEditobj3').val();
-    timestamp = new Date();
+    var obj = {};
 
-    var data = [glEditId, glEditLevel, glEditArea, glEditStrand, glEditAnnual, glEditStandard, glEditObj1, glEditObj2, glEditObj3, timestamp];
+    obj.glEditId = glEditId;
+    obj.glEditLevel = parseInt($('#glEditLvl').val(), 10);
+    obj.glEditArea = $('#glEditArea').val().toString();
+    obj.glEditStrand = $('#glEditStrand').val().toString();
+    obj.glEditStandard = $('#glEditStandard').val().toString();
+    obj.glEditAnnual = $('#glEditAnnual').val().toString();
+    obj.glEditObj1 = $('#glEditobj1').val().toString();
+    obj.glEditObj2 = $('#glEditobj2').val().toString();
+    obj.glEditObj3 = $('#glEditobj3').val().toString();
+    obj.timestamp = new Date().toLocaleDateString();
+
     // console.log('data = %s', JSON.stringify(data));
+    console.log('data is %s', JSON.stringify(obj));
     google.script.run
       .withSuccessHandler(saveGoalSuccess)
-      .saveGoalSS(data);
+      .saveGoalSS(obj);
+
   }
-  function saveGoalSuccess() {
+  function saveGoalSuccess(value) {
+    console.log('returned: %s', value);
     findGoals();
   }
   function Goal(id, grdLvl, area, strand, annual, standard, objctv1, objctv2, objctv3, timestamp) {
@@ -1034,4 +1055,25 @@
     return jStat.normal.cdf(z, mean, sd);
   }
 
+  function openAddStudentModal() {
+    $('#addStuModal').modal({
+      focus: true
+    });
+  }
+  function addStu() {
+    var obj = {};
+    obj.StudentID = $("#StudentID").val();
+    obj.lastAnnual = $("#lastAnnual").val();
+    obj.lastEval = $("#lastEval").val();
+    obj.seisID = $("#seisID").val();
+
+
+    google.script.run
+      .withSuccessHandler(showNewStu)
+      .addStudentByIdFromRESstudentsServer(obj);
+  }
+  function reload(){
+    localStorage.clear();
+    window.open('https://script.google.com/a/macros/hemetusd.org/s/AKfycbyuLrQ4FFJ2B-wErlCVm4yg9YxldINmlUNE9K0HFCKj/dev', '_top')
+  }
 </script>

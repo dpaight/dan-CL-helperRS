@@ -1,16 +1,13 @@
-import { logging } from "googleapis/build/src/apis/logging";
-
 var ss = SpreadsheetApp.getActiveSpreadsheet();
 var roster = ss.getSheetByName('roster');
 var ss2 = SpreadsheetApp.openById("1Pe-unMy1vkj3joBvGru03YB1W3a35zNn_vXw9eF0KKk");
 var sp = CacheService.getScriptCache(); //PropertiesService.getScriptProperties();
 var fname = 'arguments.callee.toString().match(/function ([^\(]+)/)[1]';
-// import "/home/paight/devG/git/caseLog_dphusd/node_modules/@types/google-apps-script"
-// @ts-ignoren
+// @ts-ignore
 var moment = Moment.load();
-function sendLevelsForm(stuName, stuId, teacherEmail) {
-    Logger.log('stuName: %s, stuId: %s, teacherEmail: %s', stuName, stuId, teacherEmail);
-    // stuName = 'Wanda Wanderer', stuId = 'WandererWanda123456', teacherEmail = 'dpaight@hemetusd.org';
+function sendLevelsForm(stuName, stuId, teachemail) {
+    Logger.log('stuName: %s, stuId: %s, teachemail: %s', stuName, stuId, teachemail);
+    // stuName = 'Wanda Wanderer', stuId = 'WandererWanda123456', teachemail = 'dpaight@hemetusd.org';
     // 1PdCenM9sTAwTlb-TxmreJAPuMKYYpBgjeXK-7h0wdtg  
     var formId = '1PdCenM9sTAwTlb-TxmreJAPuMKYYpBgjeXK-7h0wdtg'; // 19FPRaVz5lWFrEV76dSweFtaKKLEBWoSn9GfZOORa2FE ; 1HFbt4rZV0uRPsnMe6T2wsgsxVoBC4jlAL54x4W_dQCI
     var form = FormApp.openById(formId);
@@ -25,20 +22,20 @@ function sendLevelsForm(stuName, stuId, teacherEmail) {
         formResponse.withItemResponse(itemResponse);
     }
     // var ui = SpreadsheetApp.getUi(), to;
-    // var cc = ui.alert("Do you want to also send this to the general ed teacher: " + teacherEmail + "?", ui.ButtonSet.YES_NO_CANCEL);
+    // var cc = ui.alert("Do you want to also send this to the general ed teacher: " + teachemail + "?", ui.ButtonSet.YES_NO_CANCEL);
     // if (cc == ui.Button.CANCEL) {
     //     return 'fail';
     // } else if (cc == ui.Button.NO) {
     //     to = 'dpaight@hemetusd.org';
     // } else {
-    //     to = 'dpaight@hemetusd.org, ' + teacherEmail;
+    //     to = 'dpaight@hemetusd.org, ' + teachemail;
     // }
     var levelsUrl = formResponse.toPrefilledUrl();
     try {
         MailApp.sendEmail({
-            to: teacherEmail,
+            to: teachemail,
             subject: stuName + "'s levels of performance",
-            htmlBody: "{" + teacherEmail + "}<br><br>" +
+            htmlBody: "{" + teachemail + "}<br><br>" +
                 "The IEP for " + stuName + " is coming up, and I need some information, please. " +
                 "The link below points to a Levels of Performance questionnaire in a Google form. I'll use the " +
                 "information you provide as data for the IEP. Thank you for your time.<br><br>" +
@@ -51,7 +48,7 @@ function sendLevelsForm(stuName, stuId, teacherEmail) {
         return 'fail';
     }
     var confirmationMsg = form.getConfirmationMessage() + "; " + formResponse.getEditResponseUrl();
-    saveLogEntry([stuId, "levels ques sent: " + teacherEmail]);
+    saveLogEntry([stuId, "levels ques sent: " + teachemail]);
     return stuId; // picked up by success handler (focus())
 }
 function saveLastId(id) {
@@ -61,7 +58,7 @@ function saveLastId(id) {
 }
 function doGet(e) {
     var t = HtmlService.createTemplateFromFile("caseLog");
-    t.version = "65";
+    t.version = "v18";
     return t.evaluate().setXFrameOptionsMode(HtmlService.XFrameOptionsMode.ALLOWALL);
 }
 function doPost(e) {
@@ -160,51 +157,71 @@ function openEvent(eventId) {
     var cal = CalendarApp.getCalendarById('hemetusd.k12.ca.us_mu0bm8h5amcsfvcvpmim3v1fag@group.calendar.google.com');
     // CalendarApp
 }
-
-
 /**
- * 
+ *
  * @param data array: [glEditId, glEditLevel, glEditArea, glEditStnd, glEditGl]
  * glEditId idNo or -1 for new id
  */
-function saveGoalSS(data) {
-    var [glEditId, glEditLevel, glEditArea, glEditStrand, glEditAnnual, glEditStandard, glEditObj1, glEditObj2, glEditObj3, timestamp] = data;
-    Logger.log('received data = %s', JSON.stringify(data));
+function saveGoalSS(obj) {
+    Logger.log('receive = %s', JSON.stringify(obj));
     var sheet = ss.getSheetByName('goals');
     var last = sheet.getRange('A1:A').getValues().filter(String).length;
-    var range = sheet.getRange(2, 1, last - 1, sheet.getLastColumn());
+    var range = sheet.getRange(1, 1, last, sheet.getLastColumn());
     var values = range.getValues();
+    var nextRow = last + 1;
+
+    var headings = values.shift();
     var max = 0;
-    if (glEditId != -1) {
+    Logger.log('the obj var = %s', JSON.stringify(obj));
+    var array0 = Object.values(obj);
+    var array = [
+        obj.glEditId,
+        obj.glEditLevel,
+        obj.glEditArea,
+        obj.glEditStrand,
+        obj.glEditAnnual,
+        obj.glEditStandard,
+        obj.glEditObj1,
+        obj.glEditObj2,
+        obj.glEditObj3,
+        obj.timestamp
+    ];
+
+
+
+    Logger.log('the array var = %s', JSON.stringify(array));
+    if (obj.glEditId != -1) {
         for (let i = 0; i < values.length; i++) {
             const eli = values[i];
-            var [glId, glLevel, glArea, glStrand, glGl, glStandard, glObj1, glObj2, glObj3, timestamp] = eli;
-            if (glId == glEditId) {
-                range = sheet.getRange(i + 2, 1, 1, eli.length);
-                range.setValues([data]);
+            var [glId,
+                glEditLevel,
+                glEditArea,
+                glEditStrand,
+                glEditAnnual,
+                glEditStandard,
+                glEditObj1,
+                glEditObj2,
+                glEditObj3,
+                timestamp] = eli;
+            if (glId == obj.glEditId) {
+                range = sheet.getRange(i + 2, 1, 1, array.length);
+                range.setValues([array]);
                 return "replaced";
             }
         }
-    } else {
-        var sorted = values.sort(function (a, b) {
-            max = Math.max(a[0], b[0], max);
-            if (a[0] > b[0]) {
-                return 1;
-            }
-            else if (a[0] < b[0]) {
-                return -1;
-            }
-            else {
-                return 0;
-            }
-        });
-        glEditId = max + 1;
-        range = sheet.getRange(last + 1, 1, 1, sheet.getLastColumn());
-        range.setValues([[glEditId, glEditLevel, glEditArea, glEditStrand, glEditAnnual, glEditStandard, glEditObj1, glEditObj2, glEditObj3, timestamp]]);
-        return glEditId;
+    }
+    else {
+
+        const arrayColumn = (arr, n) => arr.map(x => x[n]);
+        var idCol = arrayColumn(values, 0);
+        var newId = Math.max(...idCol) + 1;
+        Logger.log('idCol = %s; max value +1 = %s', JSON.stringify(idCol), newId);
+        array.splice(0, 1, newId);
+        range = sheet.getRange(nextRow, 1, 1, array.length);
+        range.setValues([array]);
+        return obj.glEditId;
     }
 }
-
 /**
  *
  * @param lvlArea [levels area, goal area, id]
@@ -230,7 +247,6 @@ function getGoalListItems(lvlArea = [2, "reading", "1010101"]) {
     // Logger.log(JSON.stringify(goals));
     return listItems;
 }
-
 function Goal(id, grdLvl, area, strand, annual, standard, objctv1, objctv2, objctv3) {
     this.id = id;
     this.lvl = grdLvl;
@@ -241,7 +257,6 @@ function Goal(id, grdLvl, area, strand, annual, standard, objctv1, objctv2, objc
     this.objective1 = objctv1;
     this.objective2 = objctv2;
     this.objective3 = objctv3;
-
     this.snip = function () {
         return '[' +
             '"area" = "' + this.area + '",' +
@@ -249,7 +264,7 @@ function Goal(id, grdLvl, area, strand, annual, standard, objctv1, objctv2, objc
             '"stnd" = "' + this.standard + '",' +
             '"gl" = "' + this.annual + '"' +
             ']';
-    }
+    };
     this.list = function () {
         return '<li class="goalList" glId="' + this.id + '">'
             + '["' + this.lvl + '"' + ', '
@@ -257,8 +272,7 @@ function Goal(id, grdLvl, area, strand, annual, standard, objctv1, objctv2, objc
             + '"' + this.annual + '"' + ', '
             + '"' + this.standard + '"' + ', '
             + '"' + this.id + '"]</li>';
-    }
-
+    };
 }
 /**
  *
@@ -275,7 +289,8 @@ function getGoal(gId = 47) {
         if (el[0] == gId) {
             var [id, grdLvl, area, strand, annual, standard, objctv1, objctv2, objctv3] = el;
             var goal = new Goal(id, grdLvl, area, strand, annual, standard, objctv1, objctv2, objctv3);
-        };
+        }
+        ;
         // return false;
     }
     return goal;
@@ -327,29 +342,26 @@ function getOneGoalForEditing(gId = 47) {
  */
 function updateRecord(data = ['1010101;', '9515995901;', 'dpaight@hemetusd.org;',
     '951555-6565;', 'silliussoddus@gmail.com;', 'jpaight@hemetusd.org;', 'testing']) {
-    data
-
+    data;
     var [id, phone, pem, phone2, pem2, tem, notes] = data;
-    // var SEIS_ID = data[0], Parent_1_Home_Phone = data[1], Parent_1_Email = data[2], u1_phone = data[3], u3_Parent_1a_Email = data[4], teacherEmail = data[5];
+    // var SEIS_ID = data[0], Parent_1_Home_Phone = data[1], Parent_1_Email = data[2], u1_phone = data[3], u3_Parent_1a_Email = data[4], teachemail = data[5];
     // data = data || ["145980", "(951) 305-1378", ""];
     var values = getAllRecords('roster');
     var hdngs = values[0].flat();
-    // nmJdob	idAeries	teacherEmail	u1_phone	u2_stuEmail	u3_Parent_1a_Email	u4_corr	u5_EL	u6_teacher	SEIS_ID	Last_Name	First_Name	Date_of_Birth	Case_Manager	Date_of_Last_Annual_IEP	Date_of_Last_Evaluation	Date_of_Initial_Parent_Consent	Parent_1_Mail_Address	Parent_1_Email	Parent_1_Home_Phone	Parent_1_Cell_Phone	Grade_Code	Student_Eligibility_Status	Disability_1	Disability_2	Parent_Guardian_1_Name	Parent_Guardian_2_Name	Date_of_Next_Annual_IEP	reading group	notes
-    Logger.log('seis index: ' + hdngs.indexOf('SEIS_ID'))
-    var SEIS_ID_idx = hdngs.indexOf('SEIS_ID');
+    // nmJdob	idAeries	teachemail	u1_phone	stuemail	u3_Parent_1a_Email	u4_corr	u5_EL	u6_teacher	SEIS_ID	Last_Name	First_Name	Date_of_Birth	Case_Manager	Date_of_Last_Annual_IEP	Date_of_Last_Evaluation	Date_of_Initial_Parent_Consent	Parent_1_Mail_Address	Parent_1_Email	Parent_1_Home_Phone	Parent_1_Cell_Phone	Grade_Code	Student_Eligibility_Status	Disability_1	Disability_2	Parent_Guardian_1_Name	Parent_Guardian_2_Name	Date_of_Next_Annual_IEP	reading group	notes
+    Logger.log('seis index: ' + hdngs.indexOf('seis_id'));
+    var seis_id_idx = hdngs.indexOf('seis_id');
     var u3_Parent_1a_Email_idx = hdngs.indexOf('u3_Parent_1a_Email`');
     var notes_idx = hdngs.indexOf('notes');
     var u1_phone_idx = hdngs.indexOf('u1_phone');
-    var teacherEmail_idx = hdngs.indexOf('teacherEmail');
-
-
+    var teachemail_idx = hdngs.indexOf('teachemail');
     for (var i = 0; i < values.length; i++) {
         var el = values[i];
-        if (id.toString() == el[SEIS_ID_idx].toString()) {
+        if (id.toString() == el[seis_id_idx].toString()) {
             // el.splice()
             el.splice(u1_phone_idx, 1, phone2);
             el.splice(u3_Parent_1a_Email_idx, 1, pem2);
-            el.splice(teacherEmail_idx, 1, tem);
+            el.splice(teachemail_idx, 1, tem);
             el.splice(notes_idx, 1, notes);
             var destRng = ss.getSheetByName('roster').getRange(i + 1, 1, 1, el.length);
             destRng.setValues([el]);
@@ -359,7 +371,6 @@ function updateRecord(data = ['1010101;', '9515995901;', 'dpaight@hemetusd.org;'
     return 'error: record not found';
 }
 function makeMatchVarFromRange(data) {
-
     var sheet = ss.getActiveSheet();
     var row = ss.getActiveCell().getRow();
     data = sheet.getRange(row, 11, 1, 3).getDisplayValues();
@@ -452,11 +463,9 @@ function getIndicesByHeading(array) {
 function createDraftEmail(buttonVal, paramsJSN) {
     Logger.log(paramsJSN);
     var params = JSON.parse(paramsJSN);
-
     var file = DriveApp.getFileById('1hRKDCRV0UB79E_V_KZKIF13gXpFPeW9u');
     var mt1 = file.getMimeType();
     var file2 = DriveApp.getFileById('1JbzZ12pxkRGTv_jSu8hccXMRheSJXso_');
-
     if (params.translate == '1') {
         params.bodySpan = LanguageApp.translate(params.body.toString(), 'en', 'es');
         params.subjSpan = LanguageApp.translate(params.subj.toString(), 'en', 'es');
@@ -465,7 +474,8 @@ function createDraftEmail(buttonVal, paramsJSN) {
     }
     if (buttonVal == 'send') {
         GmailApp.sendEmail(params.to, params.subj, params.body, { from: "dpaight@hemetusd.org" });
-    } else {
+    }
+    else {
         GmailApp.createDraft(params.to, params.subj, params.body, {
             // @ts-ignore
             // attachments: [file.getAs(MimeType.PDF), file2.getAs(MimeType.PDF)]
@@ -880,38 +890,29 @@ function removeOldMeetings() {
     }
 }
 //# sourceMappingURL=module.jsx.map
-
 function printSelectedLogEntries(stuName, array) {
     var destFile = SpreadsheetApp.openById('1sEkijMXT3j9uIJWPqExmREZ2M8U8pO1olxLo-WgsTtI');
     var destSheet = destFile.getSheets()[0];
-
-
     var sheet = ss.getSheetByName('logRespMerged');
     var last = findLastRow('logRespMerged', 1);
     var range = sheet.getRange('A2:F' + (last + 1).toString());
-
     var entries = range.getValues();
     var headings = [['Timestamp', 'Entries for ' + stuName]];
     var keepers = array;
-
     keepers = headings.concat(keepers);
     destSheet.clearContents();
     var destRange = destSheet.getRange(1, 1, keepers.length, 2);
     destRange.setValues(keepers);
     SpreadsheetApp.flush();
-
     var ssFile = DriveApp.getFileById('1sEkijMXT3j9uIJWPqExmREZ2M8U8pO1olxLo-WgsTtI');
-
     var file = DriveApp.createFile(ssFile.getBlob());
     var url = file.getUrl();
-
-
     try {
         var folder = DriveApp.getFolderById('1S7TEP1ixTjhHwZ0APcasGj0fqAaZhvqC');
         folder.createFile(file);
         // var fileUrl = file
-
-    } catch (error) {
+    }
+    catch (error) {
         Logger.log(error);
         return "failed " + error;
     }
@@ -919,7 +920,6 @@ function printSelectedLogEntries(stuName, array) {
         'msg': 'contact logs saved to ' + file.getName(),
         'url': url
     };
-
 }
 // Compiled using ts2gas 3.6.3 (TypeScript 3.9.7)
 // this returns table data to the success Handler on the client side
@@ -943,10 +943,9 @@ function getTableData_roster(id) {
     // Logger.log(JSON.stringify([loc, data, id]));
     return [loc, data, id];
 }
-
 // this returns contact log data to the client-side script
 // called by "    $("body").on("click", ".setStudent", function (event) {..."
-function getLogEntries(array) {  // [id, loc]
+function getLogEntries(array) {
     Logger.log('array = %s', JSON.stringify(array));
     var id = array[0];
     var loc = array[1];
@@ -1016,7 +1015,6 @@ function getCalData_events() {
             Logger.log('did nothing for %s', element[1]);
         }
         else {
-
             Logger.log('did SOMEthing for %s', element[1]);
             let thisDate = moment(element[2], 'YYYY-MM-DDTHH:mm:SS');
             element.splice(2, 1, moment(thisDate).format('YYYY-MM-DD HH:mm'));
@@ -1073,122 +1071,122 @@ function getRosterValues() {
 }
 // this retrieves data from a CSV file obtained from SEIS
 // also uses the current ramona students file to look up other values
-function updateRoster() {
-    // get current data
-    var roster = SpreadsheetApp.getActiveSpreadsheet().getSheetByName('roster');
-    var last = roster.getRange('a1:a').getValues().filter(String).length;
-    var rosterVals = roster.getRange(1, 1, last, roster.getLastColumn()).getDisplayValues();
-    var rosterHeadings = rosterVals.shift();
-    // get aeries data for school
-    var allPupilsSheet = ss2.getSheetByName('allPupils');
-    var last = allPupilsSheet.getRange('a1:a').getValues().filter(String).length;
-    var allPupilsArray = allPupilsSheet.getRange(1, 1, last, allPupilsSheet.getLastColumn()).getDisplayValues();
-    var allPupilsHeadings = allPupilsArray.shift();
-    // get seis data
-    var folder = DriveApp.getFolderById('1g1JGj5L6QIIsYG-CLQj9np3m4QgtClLF');
-    var files = folder.getFiles();
-    var fileIds = [];
-    // looking for .csv file
-    var found = false;
-    while (files.hasNext() && found == false) {
-        var file = files.next();
-        var fileName = file.getName();
-        var status; // '1' if parse function is successful
-        if (fileName.toString().search(/roster_seis.csv/) !== -1) {
-            found = true;
-            var sheetName = 'roster_seis';
-            var csvFile = file.getBlob().getDataAsString();
-            fileIds.push(file.getId());
-            var seisData = Utilities.parseCsv(csvFile);
-            var iObj = getIndicesByHeading(seisData[0]);
-            var seisDataHeadings = seisData.shift();
-        }
-    }
-    // find matching records and update with new seis data
-    // new seis data by rows
-    var newRecords = [];
-    for (var i = 0; i < seisData.length; i++) {
-        var elNew = seisData[i];
-        // generate the matching key
-        var dob = elNew[iObj['Date of Birth']];
-        var fn = elNew[iObj['First Name']];
-        var ln = elNew[iObj['Last Name']];
-        var nmJdob = makeMatchVar([ln.toString(), fn.toString(), dob.toString()]);
-        var found = false;
-        // roster table by rows
-        for (var j = 0; j < rosterVals.length; j++) {
-            var elRos = rosterVals[j];
-            if (elRos[0] == nmJdob) {
-                // update lookups in cols 1-9 (0-8)
-                // only ones are teacherEmail and corr
-                var currentTem = elRos[2];
-                var updatedTem = getFieldFromNmJdob(elRos[0], allPupilsArray, 27, 24);
-                if (currentTem != updatedTem) {
-                    rosterVals[j].splice(2, 1, updatedTem);
-                }
-                var currentCorr = elRos[6].toString();
-                var updatedCorr = getFieldFromNmJdob(elRos[0], allPupilsArray, 27, 23);
-                if (currentCorr != updatedCorr) {
-                    rosterVals[j].splice(6, 1, updatedCorr);
-                }
-                var langProf = elRos[7].toString();
-                var updatedLangProf = getFieldFromNmJdob(elRos[0], allPupilsArray, 27, 13);
-                if (langProf != updatedLangProf) {
-                    rosterVals[j].splice(7, 1, updatedLangProf);
-                }
-                // matched roster row by columns, starting at column 10 (index 9)
-                found = true;
-                var updated = [
-                    elNew[0], elNew[1], elNew[2], elNew[3], elNew[4], elNew[5], elNew[6], elNew[7], elNew[8], elNew[9], elNew[10],
-                    elNew[11], elNew[12], elNew[13], elNew[14], elNew[15], elNew[16], elNew[17], elNew[18]
-                ];
-                for (var k = 0; k < updated.length; k++) {
-                    rosterVals[j].splice(k + 9, 1, updated[k]);
-                }
-            }
-        }
-        if (found == false) {
-            newRecords.push([i, nmJdob]);
-        }
-        found = false;
-    }
-    var rows = [];
-    if (newRecords.length > 0) { // i should go 0,2,4...; nmJdob: 1,3,5...
-        for (var i = 0; i < newRecords.length; i++) {
-            nmJdob = newRecords[i][1]; //.toString();
-            var element = seisData[newRecords[i][0]];
-            var key, id, tem, u1, u2, u3, u4, u5, u6;
-            key = nmJdob;
-            id = getFieldFromNmJdob(nmJdob, allPupilsArray, 27, 0);
-            tem = getFieldFromNmJdob(nmJdob, allPupilsArray, 27, 24);
-            u1 = "";
-            u2 = getFieldFromNmJdob(nmJdob, allPupilsArray, 27, 16);
-            u3 = "";
-            u4 = "";
-            u5 = getFieldFromNmJdob(nmJdob, allPupilsArray, 27, 13);
-            ;
-            u6 = "";
-            rows.push([key, id.toString(), tem, u1, u2, u3, u4, u5, u6,
-                element[0], element[1], element[2], element[3], element[4], element[5], element[6], element[7], element[8], element[9],
-                element[10],
-                element[11], element[12], element[13], element[14], element[15], element[16], element[17], element[18]]);
-            rows[i].splice(0, 1, nmJdob);
-            rows[i].splice(1, 1, id);
-            rows[i].splice(2, 1, tem);
-            // rows[i].splice(3,1,nmJdob);
-            rows[i].splice(4, 1, u2);
-            // rows[i].splice(5,1,nmJdob);
-            // rows[i].splice(6,1,nmJdob);
-            // rows[i].splice(7,1,nmJdob);
-            // rows[i].splice(8,1,nmJdob);
-            //  id, tem, u1, u2, u3, u4, u5, u6);
-        }
-        rosterVals = rosterVals.concat(rows);
-    }
-    rosterVals.unshift(rosterHeadings);
-    var destRng = roster.getRange(1, 1, rosterVals.length, rosterVals[0].length);
-    destRng.setValues(rosterVals);
-}
+// function updateRoster() {
+//     // get current data
+//     var roster = SpreadsheetApp.getActiveSpreadsheet().getSheetByName('roster');
+//     var last = roster.getRange('a1:a').getValues().filter(String).length;
+//     var rosterVals = roster.getRange(1, 1, last, roster.getLastColumn()).getDisplayValues();
+//     var rosterHeadings = rosterVals.shift();
+//     // get aeries data for school
+//     var allPupilsSheet = ss2.getSheetByName('allPupils');
+//     var last = allPupilsSheet.getRange('a1:a').getValues().filter(String).length;
+//     var allPupilsArray = allPupilsSheet.getRange(1, 1, last, allPupilsSheet.getLastColumn()).getDisplayValues();
+//     var allPupilsHeadings = allPupilsArray.shift();
+//     // get seis data
+//     var folder = DriveApp.getFolderById('1g1JGj5L6QIIsYG-CLQj9np3m4QgtClLF');
+//     var files = folder.getFiles();
+//     var fileIds = [];
+//     // looking for .csv file
+//     var found = false;
+//     while (files.hasNext() && found == false) {
+//         var file = files.next();
+//         var fileName = file.getName();
+//         var status; // '1' if parse function is successful
+//         if (fileName.toString().search(/roster_seis.csv/) !== -1) {
+//             found = true;
+//             var sheetName = 'roster_seis';
+//             var csvFile = file.getBlob().getDataAsString();
+//             fileIds.push(file.getId());
+//             var seisData = Utilities.parseCsv(csvFile);
+//             var iObj = getIndicesByHeading(seisData[0]);
+//             var seisDataHeadings = seisData.shift();
+//         }
+//     }
+//     // find matching records and update with new seis data
+//     // new seis data by rows
+//     var newRecords = [];
+//     for (var i = 0; i < seisData.length; i++) {
+//         var elNew = seisData[i];
+//         // generate the matching key
+//         var dob = elNew[iObj['Date of Birth']];
+//         var fn = elNew[iObj['First Name']];
+//         var ln = elNew[iObj['Last Name']];
+//         var nmJdob = makeMatchVar([ln.toString(), fn.toString(), dob.toString()]);
+//         var found = false;
+//         // roster table by rows
+//         for (var j = 0; j < rosterVals.length; j++) {
+//             var elRos = rosterVals[j];
+//             if (elRos[0] == nmJdob) {
+//                 // update lookups in cols 1-9 (0-8)
+//                 // only ones are teachemail and corr
+//                 var currentTem = elRos[2];
+//                 var updatedTem = getFieldFromNmJdob(elRos[0], allPupilsArray, 27, 24);
+//                 if (currentTem != updatedTem) {
+//                     rosterVals[j].splice(2, 1, updatedTem);
+//                 }
+//                 var currentCorr = elRos[6].toString();
+//                 var updatedCorr = getFieldFromNmJdob(elRos[0], allPupilsArray, 27, 23);
+//                 if (currentCorr != updatedCorr) {
+//                     rosterVals[j].splice(6, 1, updatedCorr);
+//                 }
+//                 var langProf = elRos[7].toString();
+//                 var updatedLangProf = getFieldFromNmJdob(elRos[0], allPupilsArray, 27, 13);
+//                 if (langProf != updatedLangProf) {
+//                     rosterVals[j].splice(7, 1, updatedLangProf);
+//                 }
+//                 // matched roster row by columns, starting at column 10 (index 9)
+//                 found = true;
+//                 var updated = [
+//                     elNew[0], elNew[1], elNew[2], elNew[3], elNew[4], elNew[5], elNew[6], elNew[7], elNew[8], elNew[9], elNew[10],
+//                     elNew[11], elNew[12], elNew[13], elNew[14], elNew[15], elNew[16], elNew[17], elNew[18]
+//                 ];
+//                 for (var k = 0; k < updated.length; k++) {
+//                     rosterVals[j].splice(k + 9, 1, updated[k]);
+//                 }
+//             }
+//         }
+//         if (found == false) {
+//             newRecords.push([i, nmJdob]);
+//         }
+//         found = false;
+//     }
+//     var rows = [];
+//     if (newRecords.length > 0) { // i should go 0,2,4...; nmJdob: 1,3,5...
+//         for (var i = 0; i < newRecords.length; i++) {
+//             nmJdob = newRecords[i][1]; //.toString();
+//             var element = seisData[newRecords[i][0]];
+//             var key, id, tem, u1, u2, u3, u4, u5, u6;
+//             key = nmJdob;
+//             id = getFieldFromNmJdob(nmJdob, allPupilsArray, 27, 0);
+//             tem = getFieldFromNmJdob(nmJdob, allPupilsArray, 27, 24);
+//             u1 = "";
+//             u2 = getFieldFromNmJdob(nmJdob, allPupilsArray, 27, 16);
+//             u3 = "";
+//             u4 = "";
+//             u5 = getFieldFromNmJdob(nmJdob, allPupilsArray, 27, 13);
+//             ;
+//             u6 = "";
+//             rows.push([key, id.toString(), tem, u1, u2, u3, u4, u5, u6,
+//                 element[0], element[1], element[2], element[3], element[4], element[5], element[6], element[7], element[8], element[9],
+//                 element[10],
+//                 element[11], element[12], element[13], element[14], element[15], element[16], element[17], element[18]]);
+//             rows[i].splice(0, 1, nmJdob);
+//             rows[i].splice(1, 1, id);
+//             rows[i].splice(2, 1, tem);
+//             // rows[i].splice(3,1,nmJdob);
+//             rows[i].splice(4, 1, u2);
+//             // rows[i].splice(5,1,nmJdob);
+//             // rows[i].splice(6,1,nmJdob);
+//             // rows[i].splice(7,1,nmJdob);
+//             // rows[i].splice(8,1,nmJdob);
+//             //  id, tem, u1, u2, u3, u4, u5, u6);
+//         }
+//         rosterVals = rosterVals.concat(rows);
+//     }
+//     rosterVals.unshift(rosterHeadings);
+//     var destRng = roster.getRange(1, 1, rosterVals.length, rosterVals[0].length);
+//     destRng.setValues(rosterVals);
+// }
 function addTimTest() {
     var fileIdS, fileIdD, lastCol, last, destSheet, destR;
     var filesS = ['1SKGEJsXdRcjvGUGT-C6n39JQkINVa_iOiXIYYToEv24', '1enI0CF5MHtkZ1CTRC2xQDSa8EVxTTQvuMlR38_JdgJo'];
@@ -1275,20 +1273,18 @@ function levData(id = '1010101') {
     }
     return '["baseln"="for baseline data, refer to the appropriate section on the Levels of Performance page"]';
 }
-
-function getPresentLevelsAsTextBlazeListItem(seisId = '1010101',
-    areas = ['reading', 'writing', 'math', 'lang', 'motor', 'bhvr', 'health', 'wrkHbts', 'prefs']) {
+function getPresentLevelsAsTextBlazeListItem(seisId = '1010101', areas = ['reading', 'writing', 'math', 'lang', 'motor', 'bhvr', 'health', 'wrkHbts', 'prefs']) {
     var lvlsRecord = levData(seisId);
     if (lvlsRecord.toString().search(/baseln/) != -1) {
         return lvlsRecord;
-    } else {
+    }
+    else {
         var list = new LevelsPerformance(lvlsRecord);
         var wholeSnip = list.getSnip(areas);
         // Logger.log(wholeSnip);
         return wholeSnip;
     }
 }
-
 function LevelsPerformance(el) {
     this['lvls'] = {};
     this['lvls'].bhvr1play = (el[25].length > 0) ?
@@ -1317,13 +1313,12 @@ function LevelsPerformance(el) {
         'teacher observation: ' + el[7].toString().replace(/"/g, "'") :
         '';
     this['lvls'].read2Found = el[8].toString().replace(/"/g, "'");
-
     if (el[9].toString().length > 0) {
         this['lvls'].read3HighFreq = el[9].toString().replace(/"/g, "'");
-    } else {
+    }
+    else {
         this['lvls'].read3HighFreq = '';
     }
-
     if (el[10].toString().length > 0) {
         this['lvls'].read4Comp = (el[10].length > 0) ?
             'comprehension level (GE) = ' + el[10].toString().replace(/"/g, "'") :
@@ -1342,12 +1337,9 @@ function LevelsPerformance(el) {
     this['lvls'].writ2eMech = el[13].toString().replace(/"/g, "'");
     this['lvls'].writ3eContent = el[14].toString().replace(/"/g, "'");
     this['lvls'].writ4eOther = el[15].toString().replace(/"/g, "'");
-
-
     this.getSnip = function (snipAreas) {
         // initialize the string vars for making snip lists
         // snipAreas are those collections of questionnaire answers, collections that Tblaze uses to fill forms
-
         // convert object to an array object named 'ary'
         this['lvlsAry'] = [];
         for (const key in this.lvls) {
@@ -1357,51 +1349,41 @@ function LevelsPerformance(el) {
             }
         }
         // Logger.log('this.lvlsAry is %s', JSON.stringify(this.lvlsAry));
-
         // Logger.log('the length of this.lvlsAry is ' + this.lvlsAry.length);
-
-
         var wholeSnip = '';
         // wholeSnip is a set of snipAreas:  {["snipArea"="content of snip", "snipArea"="content of snip"]}
         var partSnip = '';
         // a partSnip is a single snipArea
-
         // iterate through list of areas on which to make items in a snip list
         for (let i = 0; i < snipAreas.length; i++) {
             const element = snipAreas[i];
             var partialSnipArea = element.toString().slice(0, 4);
-
             if (i > 0) {
                 partSnip += ', ';
             }
-
             partSnip += '"' + element + '"=' + '"'; // opening " for value
-
             for (let j = 0; j < this.lvlsAry.length; j++) {
                 const kyval = this.lvlsAry[j];
                 var partialKey = kyval[0].toString().slice(0, 4);
                 if (partialSnipArea == partialKey && kyval[1].toString().length > 0) {
                     partSnip += kyval[1] + '; '; // ; separator for items within area
                 }
-
             }
             partSnip += '"'; // closing " for value
             if (partSnip.length > 2) {
                 wholeSnip += partSnip;
-            } else {
-                wholeSnip += '"' + snipAreas[i] + '"=""'
+            }
+            else {
+                wholeSnip += '"' + snipAreas[i] + '"=""';
             }
             partSnip = '';
         }
         wholeSnip = '[' + wholeSnip + ']';
-
         return wholeSnip;
-    }
-
+    };
     this.getSnip_old = function (snipAreas) {
         // initialize the string vars for making snip lists
         // snipAreas are those collections of questionnaire answers, collections that Tblaze uses to fill forms
-
         // convert object to an array object named 'ary'
         this['lvlsAry'] = [];
         for (const key in this.lvls) {
@@ -1411,18 +1393,14 @@ function LevelsPerformance(el) {
             }
         }
         // Logger.log('this.lvlsAry is %s', JSON.stringify(this.lvlsAry));
-
         // Logger.log('the length of this.lvlsAry is ' + this.lvlsAry.length);
-
         var wholeSnip = '[';
         // wholeSnip is a set of snipAreas:  {["snipArea"="content of snip", "snipArea"="content of snip"]}
         var partSnip = '';
         // a partSnip is a single snipArea
-
         // iterate through list of areas on which to make items in a snip list
         for (let i = 0; i < snipAreas.length; i++) {
             const element = snipAreas[i];
-
             var partialSnipArea = element.toString().slice(0, 4);
             var counter = 0;
             for (const key in this.lvls) {
@@ -1437,7 +1415,7 @@ function LevelsPerformance(el) {
                     }
                     if (counter >= 26) {
                         partSnip = partSnip.toString().replace(/"/, "'");
-                        partSnip = '"' + element + '"="' + partSnip + '"'
+                        partSnip = '"' + element + '"="' + partSnip + '"';
                         // now we have "area"="value of area"
                         wholeSnip = (wholeSnip == '[') ?
                             // if this is the firs addition to wholeSnip, omit the comma
@@ -1448,45 +1426,229 @@ function LevelsPerformance(el) {
                 }
             }
         }
-
         if (wholeSnip) {
             wholeSnip = wholeSnip.toString().replace(/,$/, '');
             wholeSnip += ']';
-            wholeSnip = wholeSnip.toString().replace(/[; ]+/g, '; ')
-
+            wholeSnip = wholeSnip.toString().replace(/[; ]+/g, '; ');
         }
         // Logger.log('wholeSnip = %s; snipAreas = %s', wholeSnip, JSON.stringify(snipAreas));
         // Logger.log('partSnip = %s; wholeSnip = %s; i = %s; snipArea = %s', partSnip, wholeSnip, i, snipAreas[i]);
         return wholeSnip;
-    }
-
+    };
     this.getSnipGoal = function (snipAreas) {
         // initialize the string vars for making snip lists
         // snipAreas are those collections of questionnaire answers, collections that Tblaze uses to fill forms
-
-
         // wholeSnip is a set of snipAreas:  {["snipArea"="content of snip", "snipArea"="content of snip"]}
         var partSnip = this.getSnip(snipAreas);
         partSnip = partSnip.toString().replace(/"snipAreas[0]="/, '"baseln"=');
         partSnip = partSnip.toString().replace(/\]/, '');
-
         // a partSnip is a single snipArea
-
         // iterate through list of areas on which to make items in a snip list
         var wholeSnip = partSnip + ']';
         // now we have "baseln"="value of area"
         if (wholeSnip) {
             wholeSnip = wholeSnip.toString().replace(/,$/, '');
-            wholeSnip.toString().replace(/[; ]+/g, '; ')
-
+            wholeSnip.toString().replace(/[; ]+/g, '; ');
         }
         // Logger.log('wholeSnip = %s; snipAreas = %s', wholeSnip, JSON.stringify(snipAreas));
         // Logger.log('partSnip = %s; wholeSnip = %s; i = %s; snipArea = %s', partSnip, wholeSnip, i, snipAreas[i]);
         return wholeSnip;
+    };
+}
+;
+function addStudentByIdFromRESstudentsServer(obj: any) {
+    var sheet = ss2.getSheetByName('allPupils');
+    var last = sheet.getRange('A1:A').getValues().filter(String).length;
+    var lastCol = sheet.getLastColumn();
+    var range = sheet.getRange(1, 1, last, lastCol);
+    var values = range.getValues();
+    var headings = values.shift();
+    var stuId = obj.StudentID;
+    var lastAnnual = obj.lastAnnual;
+    var lastEval = obj.lastEval;
+    var seisID = obj.seisID;
+    for (let i = 0; i < values.length; i++) {
+        const el = values[i];
+        if (stuId == el[0]) {
+            var stuToAdd = el;
+            break;
+        }
     }
-};
+    var [StudentID, StudentNo, LastName, FirstName, Sex, Grade, Birthdate, Parentguardian, MailingAddress, City, State,
+        Zipcode, TchrNum, LangFlu, RptgLng, StateStudentID, StuEmail, User10, User11, EnterDate, ParentEdLvl,
+        PrimaryPhone, FamilyKey, CorrLng, teachEmail, teachName, sdcrsp, nmJdob, LastName_FirstName_StudentID,
+        LastName_FirstName_dob_Birthdate, LastName_FirstName, FirstName_LastName, Parentguardian, PrimaryPhone] = stuToAdd;
+    var caseManager = Session.getActiveUser().getEmail().toString().match(/^[A-z0-9]+/)[0];
+
+    var newRosterRecord = [nmJdob, StudentID, teachEmail, PrimaryPhone, StuEmail, "parentEmail", CorrLng, LangFlu, teachName,
+        seisID, LastName, FirstName, Birthdate, caseManager, lastAnnual, lastEval, "", MailingAddress, PrimaryPhone, PrimaryPhone, Grade, "", "", "",
+        Parentguardian, "", "", "", "", ""];
+
+    var roster = ss.getSheetByName('roster');
+    var last = roster.getRange('A1:A').getValues().filter(String).length;
+    var destRange = roster.getRange(last + 1, 1, 1, newRosterRecord.length);
+
+    destRange.setValues([newRosterRecord]);
+
+    return seisID;
+
+    //  [nmJdob, idAeries, teachemail, u1_phone, stuemail, u3_Parent_1a_Email, u4_corr, u5_EL, u6_teacher,
+    //     SEIS_ID, Last_Name, First_Name, Date_of_Birth, Case_Manager, Date_of_Last_Annual_IEP, Date_of_Last_Evaluation,
+    //     Date_of_Initial_Parent_Consent, Parent_1_Mail_Address, Parent_1_Email, Parent_1_Home_Phone, Parent_1_Cell_Phone,
+    //     Grade_Code, Student_Eligibility_Status, Disability_1, Disability_2, Parent_Guardian_1_Name, Parent_Guardian_2_Name,
+    //     Date_of_Next_Annual_IEP, readingGroup, notes, meet]
+
+}
 
 
+function getRecordIndex(nmJdob, allPupilsArray) {
+    for (let p = 0; p < allPupilsArray.length; p++) {
+        const pel = allPupilsArray[p];
+        if (nmJdob.toLowerCase() == pel[28].toLowerCase()) {
+            return p;
+        }
+    }
+}
 
-//# sourceMappingURL=module.jsx.map
+function matchRosterFieldsToSeisAndAllPupils(rosH, seisH, alpH) {
+    var fieldMatches = {};
+    for (let i = 0; i < rosH.length; i++) {
+        var thisFieldName = rosH[i];
+        var thisFieldIndexes = fieldMatches[thisFieldName] = [];
+        thisFieldIndexes.push(i);
+        thisFieldIndexes.push(seisH.indexOf(thisFieldName));
+        thisFieldIndexes.push(alpH.indexOf(thisFieldName));
+    }
 
+    Logger.log('fieldMatches = %s', JSON.stringify(fieldMatches));
+    return fieldMatches;
+}
+
+// function updateRoster_test() {
+//     // get current data
+//     var roster = SpreadsheetApp.getActiveSpreadsheet().getSheetByName('roster_test');
+//     var last = roster.getRange('a1:a').getValues().filter(String).length;
+//     var rosterVals = roster.getRange(1, 1, last, roster.getLastColumn()).getDisplayValues();
+//     var rosterHeadings = rosterVals.shift().map(x => x.toString().replace(/[ -\/]/g, "_").toLowerCase());
+//     // get aeries data for school
+//     var allPupilsSheet = ss2.getSheetByName('allPupils');
+//     var last = allPupilsSheet.getRange('a1:a').getValues().filter(String).length;
+//     var allPupilsArray = allPupilsSheet.getRange(1, 1, last, allPupilsSheet.getLastColumn()).getDisplayValues();
+//     var allPupilsHeadings = allPupilsArray.shift().map(x => x.toString().replace(/[ -\/]/g, "_").toLowerCase());
+//     // get seis data
+//     var folder = DriveApp.getFolderById('1g1JGj5L6QIIsYG-CLQj9np3m4QgtClLF');
+//     var files = folder.getFiles();
+//     var fileIds = [];
+//     // looking for .csv file
+//     var found = false;
+//     while (files.hasNext() && found == false) {
+//         var file = files.next();
+//         var fileName = file.getName();
+//         var status; // '1' if parse function is successful
+//         if (fileName.toString().search(/roster_seis.csv/) !== -1) {
+//             found = true;
+//             var sheetName = 'roster_seis';
+//             var csvFile = file.getBlob().getDataAsString();
+//             fileIds.push(file.getId());
+//             var seisData = Utilities.parseCsv(csvFile);
+//             var iObj = getIndicesByHeading(seisData[0]);
+//             Logger.log('iObj = %s', JSON.stringify(iObj));
+//         }
+//     }
+//     seisData = addMatchVarColOne(seisData);
+//     var seisDataHeadings = seisData.shift().map(x => x.toString().replace(/[ -\/]/g, "_").toLowerCase());
+
+//     var indexes = matchRosterFieldsToSeisAndAllPupils(rosterHeadings, seisDataHeadings, allPupilsHeadings);
+//     // find matching records and update with new seis data
+//     // new seis data by rows
+//     var newRecords = [];
+//     for (var i = 0; i < seisData.length; i++) {
+//         var elNew = seisData[i];
+//         // generate the matching key
+//         var dob = elNew[iObj['Date of Birth']];
+//         var fn = elNew[iObj['First Name']];
+//         var ln = elNew[iObj['Last Name']];
+//         var found = false;
+//         // roster table by rows
+//         var newValue;
+//         for (var j = 0; j < rosterVals.length; j++) {
+//             var elRos = rosterVals[j];
+//             var nmJdob = elRos[0];
+//             var apRi = getRecordIndex('nmJdob', allPupilsArray);
+//             if (elRos[0] == 'nmJdob') {
+//                 found = true;
+//                 // iterate the columns in this record to update from either
+//                 //  seis or allPupils
+//                 for (let c = 0; c < elRos.length; c++) {
+//                     var fieldName = rosterHeadings[c];
+//                     var thisFieldCols = indexes[fieldName];
+//                     //  checking seis
+//                     if (thisFieldCols[1] != -1) {
+//                         newValue = seisData[i][thisFieldCols[1]];
+//                         rosterVals[j].splice(c, 1, newValue);
+//                     }
+//                     else if (thisFieldCols[2] != -1) {
+//                         newValue = allPupilsArray[apRi][thisFieldCols[2]];
+//                         rosterVals[j].splice(c, 1, newValue);
+//                     }
+//                 }
+//             }
+//         }
+//         if (found == false) {
+//             // make a new record
+//             var row = [];
+//             for (let c = 0; c < elRos.length; c++) {
+//                 var fieldName = rosterHeadings[c];
+//                 var thisFieldCols = indexes[fieldName];
+//                 //  checking seis
+//                 if (thisFieldCols[1] != -1) {
+//                     newValue = seisData[i][thisFieldCols[1]];
+//                     row.push(newValue);
+//                 }
+//                 else if (thisFieldCols[2] != -1) {
+//                     newValue = allPupilsArray[apRi][thisFieldCols[2]];
+//                     row.push(newValue);
+//                 }
+//                 else {
+//                     row.push('');
+//                 }
+//             }
+//             newRecords.push(row);
+//         }
+//     }
+//     var joined = rosterVals.concat(newRecords); //
+//     var sorted = joined.sort((a, b) => {
+//         if (a[0] < b[0]) {
+//             return -1;
+//         }
+//         else if (a[0] == b[0]) {
+//             return 0;
+//         }
+//         else {
+//             return 1;
+//         }
+//     });
+//     var allData = [rosterHeadings].concat(sorted);
+//     var destRng = roster.getRange(1, 1, allData.length, allData[0].length);
+//     roster.clearContents();
+//     destRng.setValues(allData);
+// }
+
+
+// function makeOneNewRecord(nmJdob, rosterHeadings, seisData, seisDataHeadings,
+//     allPupilsArray, allPupilsHeadings) {
+//     var newRows = rosterHeadings;
+//     for (let i = 0; i < newRecords.length; i++) {
+//         var nmJdob = newRecords[i][1];
+//         var seisDataIndex = newRecords[i][0];
+//         for (let j = 0; j < rosterHeadings.length; j++) {
+//             const rhedel = rosterHeadings[j];
+//             if (seisDataHeadings.indexOf(rhedel) != -1) {
+//                 // get the data from seisData for this field
+
+//             }
+//         }
+//     }
+
+
+// }

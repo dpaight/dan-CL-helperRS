@@ -1,15 +1,17 @@
 {
-  "timeZone": "America/New_York",
+  "timeZone": "America/Los_Angeles",
   "dependencies": {
-    "libraries": [{
-      "userSymbol": "Moment",
-      "libraryId": "15hgNOjKHUG4UtyZl9clqBbl23sDvWMS8pfDJOyIapZk5RBqwL3i-rlCo",
-      "version": "9"
-    }]
+    "libraries": [
+      {
+        "userSymbol": "Moment",
+        "libraryId": "15hgNOjKHUG4UtyZl9clqBbl23sDvWMS8pfDJOyIapZk5RBqwL3i-rlCo",
+        "version": "9"
+      }
+    ]
   },
   "webapp": {
-    "access": "MYSELF",
-    "executeAs": "USER_DEPLOYING"
+    "executeAs": "USER_DEPLOYING",
+    "access": "MYSELF"
   },
   "exceptionLogging": "STACKDRIVER",
   "runtimeVersion": "V8"
