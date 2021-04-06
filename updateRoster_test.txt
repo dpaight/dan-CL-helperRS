@@ -1,6 +1,5 @@
 // Compiled using ts2gas 3.6.4 (TypeScript 4.1.3)
 // Compiled using ts2gas 3.6.4 (TypeScript 4.1.3)
-// Compiled using ts2gas 3.6.4 (TypeScript 4.1.3)
 function updateRoster() {
     // get current data
     var roster = SpreadsheetApp.getActiveSpreadsheet().getSheetByName('roster');
@@ -147,6 +146,5 @@ function addMatchVarColOne(array) {
     // console.log(JSON.stringify(array));
     return [headings].concat(seisDataMod);
 }
-//# sourceMappingURL=module.jsx.map
 //# sourceMappingURL=module.jsx.map
 //# sourceMappingURL=module.jsx.map

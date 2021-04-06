@@ -1,3 +1,4 @@
+// Compiled using ts2gas 3.6.4 (TypeScript 4.1.3)
 var ss = SpreadsheetApp.getActiveSpreadsheet();
 var roster = ss.getSheetByName('roster');
 var ss2 = SpreadsheetApp.openById("1Pe-unMy1vkj3joBvGru03YB1W3a35zNn_vXw9eF0KKk");
@@ -67,12 +68,12 @@ function doPost(e) {
     var body = JSON.parse(e.postData.contents);
     //Adding a new row with content from the request body
     sheet.appendRow([body.id,
-    body.date_created,
-    body.first_name,
-    body.shipping.address,
-    body.shipping.phone,
-    body.billing.phone,
-    body.billing.postcode
+        body.date_created,
+        body.first_name,
+        body.shipping.address,
+        body.shipping.phone,
+        body.billing.phone,
+        body.billing.postcode
     ]);
 }
 // gets the last id stored in a script properties
@@ -169,7 +170,6 @@ function saveGoalSS(obj) {
     var range = sheet.getRange(1, 1, last, sheet.getLastColumn());
     var values = range.getValues();
     var nextRow = last + 1;
-
     var headings = values.shift();
     var max = 0;
     Logger.log('the obj var = %s', JSON.stringify(obj));
@@ -186,23 +186,11 @@ function saveGoalSS(obj) {
         obj.glEditObj3,
         obj.timestamp
     ];
-
-
-
     Logger.log('the array var = %s', JSON.stringify(array));
     if (obj.glEditId != -1) {
         for (let i = 0; i < values.length; i++) {
             const eli = values[i];
-            var [glId,
-                glEditLevel,
-                glEditArea,
-                glEditStrand,
-                glEditAnnual,
-                glEditStandard,
-                glEditObj1,
-                glEditObj2,
-                glEditObj3,
-                timestamp] = eli;
+            var [glId, glEditLevel, glEditArea, glEditStrand, glEditAnnual, glEditStandard, glEditObj1, glEditObj2, glEditObj3, timestamp] = eli;
             if (glId == obj.glEditId) {
                 range = sheet.getRange(i + 2, 1, 1, array.length);
                 range.setValues([array]);
@@ -211,7 +199,6 @@ function saveGoalSS(obj) {
         }
     }
     else {
-
         const arrayColumn = (arr, n) => arr.map(x => x[n]);
         var idCol = arrayColumn(values, 0);
         var newId = Math.max(...idCol) + 1;
@@ -477,8 +464,8 @@ function createDraftEmail(buttonVal, paramsJSN) {
     }
     else {
         GmailApp.createDraft(params.to, params.subj, params.body, {
-            // @ts-ignore
-            // attachments: [file.getAs(MimeType.PDF), file2.getAs(MimeType.PDF)]
+        // @ts-ignore
+        // attachments: [file.getAs(MimeType.PDF), file2.getAs(MimeType.PDF)]
         });
     }
     return params.body.toString();
@@ -1456,7 +1443,7 @@ function LevelsPerformance(el) {
     };
 }
 ;
-function addStudentByIdFromRESstudentsServer(obj: any) {
+function addStudentByIdFromRESstudentsServer(obj) {
     var sheet = ss2.getSheetByName('allPupils');
     var last = sheet.getRange('A1:A').getValues().filter(String).length;
     var lastCol = sheet.getLastColumn();
@@ -1474,33 +1461,22 @@ function addStudentByIdFromRESstudentsServer(obj: any) {
             break;
         }
     }
-    var [StudentID, StudentNo, LastName, FirstName, Sex, Grade, Birthdate, Parentguardian, MailingAddress, City, State,
-        Zipcode, TchrNum, LangFlu, RptgLng, StateStudentID, StuEmail, User10, User11, EnterDate, ParentEdLvl,
-        PrimaryPhone, FamilyKey, CorrLng, teachEmail, teachName, sdcrsp, nmJdob, LastName_FirstName_StudentID,
-        LastName_FirstName_dob_Birthdate, LastName_FirstName, FirstName_LastName, Parentguardian, PrimaryPhone] = stuToAdd;
+    var [StudentID, StudentNo, LastName, FirstName, Sex, Grade, Birthdate, Parentguardian, MailingAddress, City, State, Zipcode, TchrNum, LangFlu, RptgLng, StateStudentID, StuEmail, User10, User11, EnterDate, ParentEdLvl, PrimaryPhone, FamilyKey, CorrLng, teachEmail, teachName, sdcrsp, nmJdob, LastName_FirstName_StudentID, LastName_FirstName_dob_Birthdate, LastName_FirstName, FirstName_LastName, Parentguardian, PrimaryPhone] = stuToAdd;
     var caseManager = Session.getActiveUser().getEmail().toString().match(/^[A-z0-9]+/)[0];
-
     var newRosterRecord = [nmJdob, StudentID, teachEmail, PrimaryPhone, StuEmail, "parentEmail", CorrLng, LangFlu, teachName,
         seisID, LastName, FirstName, Birthdate, caseManager, lastAnnual, lastEval, "", MailingAddress, PrimaryPhone, PrimaryPhone, Grade, "", "", "",
         Parentguardian, "", "", "", "", ""];
-
     var roster = ss.getSheetByName('roster');
     var last = roster.getRange('A1:A').getValues().filter(String).length;
     var destRange = roster.getRange(last + 1, 1, 1, newRosterRecord.length);
-
     destRange.setValues([newRosterRecord]);
-
     return seisID;
-
     //  [nmJdob, idAeries, teachemail, u1_phone, stuemail, u3_Parent_1a_Email, u4_corr, u5_EL, u6_teacher,
     //     SEIS_ID, Last_Name, First_Name, Date_of_Birth, Case_Manager, Date_of_Last_Annual_IEP, Date_of_Last_Evaluation,
     //     Date_of_Initial_Parent_Consent, Parent_1_Mail_Address, Parent_1_Email, Parent_1_Home_Phone, Parent_1_Cell_Phone,
     //     Grade_Code, Student_Eligibility_Status, Disability_1, Disability_2, Parent_Guardian_1_Name, Parent_Guardian_2_Name,
     //     Date_of_Next_Annual_IEP, readingGroup, notes, meet]
-
 }
-
-
 function getRecordIndex(nmJdob, allPupilsArray) {
     for (let p = 0; p < allPupilsArray.length; p++) {
         const pel = allPupilsArray[p];
@@ -1509,7 +1485,6 @@ function getRecordIndex(nmJdob, allPupilsArray) {
         }
     }
 }
-
 function matchRosterFieldsToSeisAndAllPupils(rosH, seisH, alpH) {
     var fieldMatches = {};
     for (let i = 0; i < rosH.length; i++) {
@@ -1519,11 +1494,9 @@ function matchRosterFieldsToSeisAndAllPupils(rosH, seisH, alpH) {
         thisFieldIndexes.push(seisH.indexOf(thisFieldName));
         thisFieldIndexes.push(alpH.indexOf(thisFieldName));
     }
-
     Logger.log('fieldMatches = %s', JSON.stringify(fieldMatches));
     return fieldMatches;
 }
-
 // function updateRoster_test() {
 //     // get current data
 //     var roster = SpreadsheetApp.getActiveSpreadsheet().getSheetByName('roster_test');
@@ -1557,7 +1530,6 @@ function matchRosterFieldsToSeisAndAllPupils(rosH, seisH, alpH) {
 //     }
 //     seisData = addMatchVarColOne(seisData);
 //     var seisDataHeadings = seisData.shift().map(x => x.toString().replace(/[ -\/]/g, "_").toLowerCase());
-
 //     var indexes = matchRosterFieldsToSeisAndAllPupils(rosterHeadings, seisDataHeadings, allPupilsHeadings);
 //     // find matching records and update with new seis data
 //     // new seis data by rows
@@ -1633,8 +1605,6 @@ function matchRosterFieldsToSeisAndAllPupils(rosH, seisH, alpH) {
 //     roster.clearContents();
 //     destRng.setValues(allData);
 // }
-
-
 // function makeOneNewRecord(nmJdob, rosterHeadings, seisData, seisDataHeadings,
 //     allPupilsArray, allPupilsHeadings) {
 //     var newRows = rosterHeadings;
@@ -1645,10 +1615,8 @@ function matchRosterFieldsToSeisAndAllPupils(rosH, seisH, alpH) {
 //             const rhedel = rosterHeadings[j];
 //             if (seisDataHeadings.indexOf(rhedel) != -1) {
 //                 // get the data from seisData for this field
-
 //             }
 //         }
 //     }
-
-
 // }
+//# sourceMappingURL=module.jsx.map
