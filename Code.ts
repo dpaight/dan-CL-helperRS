@@ -1497,6 +1497,7 @@ function matchRosterFieldsToSeisAndAllPupils(rosH, seisH, alpH) {
     Logger.log('fieldMatches = %s', JSON.stringify(fieldMatches));
     return fieldMatches;
 }
+
 // function updateRoster_test() {
 //     // get current data
 //     var roster = SpreadsheetApp.getActiveSpreadsheet().getSheetByName('roster_test');
