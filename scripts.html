@@ -426,10 +426,6 @@
     $("#idNo").val(SEIS_ID);
     $("#stuem").val(stuemail);
     $("#notes").val(notes);
-
-    google.script.run
-      .withSuccessHandler(showLog)
-      .getLogEntries([SEIS_ID.toString(), 'loc01']);
   }
   function calRefresh() {
     document.body.style.cursor = "wait";
