@@ -59,7 +59,7 @@ function saveLastId(id) {
 }
 function doGet(e) {
     var t = HtmlService.createTemplateFromFile("caseLog");
-    t.version = "v18";
+    t.version = "v22";
     return t.evaluate().setXFrameOptionsMode(HtmlService.XFrameOptionsMode.ALLOWALL);
 }
 function doPost(e) {
@@ -68,12 +68,12 @@ function doPost(e) {
     var body = JSON.parse(e.postData.contents);
     //Adding a new row with content from the request body
     sheet.appendRow([body.id,
-        body.date_created,
-        body.first_name,
-        body.shipping.address,
-        body.shipping.phone,
-        body.billing.phone,
-        body.billing.postcode
+    body.date_created,
+    body.first_name,
+    body.shipping.address,
+    body.shipping.phone,
+    body.billing.phone,
+    body.billing.postcode
     ]);
 }
 // gets the last id stored in a script properties
@@ -464,8 +464,8 @@ function createDraftEmail(buttonVal, paramsJSN) {
     }
     else {
         GmailApp.createDraft(params.to, params.subj, params.body, {
-        // @ts-ignore
-        // attachments: [file.getAs(MimeType.PDF), file2.getAs(MimeType.PDF)]
+            // @ts-ignore
+            // attachments: [file.getAs(MimeType.PDF), file2.getAs(MimeType.PDF)]
         });
     }
     return params.body.toString();
@@ -1477,10 +1477,11 @@ function addStudentByIdFromRESstudentsServer(obj) {
     //     Grade_Code, Student_Eligibility_Status, Disability_1, Disability_2, Parent_Guardian_1_Name, Parent_Guardian_2_Name,
     //     Date_of_Next_Annual_IEP, readingGroup, notes, meet]
 }
-function getRecordIndex(nmJdob, allPupilsArray) {
+function getRecordIndex(nmJdob, allPupilsArray, allPupilsHeadings) {
+    var index = allPupilsHeadings.indexOf("nmjdob");
     for (let p = 0; p < allPupilsArray.length; p++) {
         const pel = allPupilsArray[p];
-        if (nmJdob.toLowerCase() == pel[28].toLowerCase()) {
+        if (nmJdob.toLowerCase() == pel[index].toLowerCase()) {
             return p;
         }
     }
@@ -1546,7 +1547,7 @@ function updateRoster() {
         var newValue;
         for (var j = 0; j < rosterVals.length; j++) {
             // this gets the row number for the matching record in allPupils
-            var apRi = getRecordIndex(seisNmjdob, allPupilsArray);
+            var apRi = getRecordIndex(seisNmjdob, allPupilsArray, allPupilsHeadings);
             var elRos = rosterVals[j];
             var nmJdob = elRos[0];
             if (elRos[0] == seisNmjdob) {
