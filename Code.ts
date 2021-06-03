@@ -59,7 +59,7 @@ function saveLastId(id) {
 }
 function doGet(e) {
     var t = HtmlService.createTemplateFromFile("caseLog");
-    t.version = "v22";
+    t.version = "v23";
     return t.evaluate().setXFrameOptionsMode(HtmlService.XFrameOptionsMode.ALLOWALL);
 }
 function doPost(e) {
@@ -335,7 +335,7 @@ function updateRecord(data = ['1010101;', '9515995901;', 'dpaight@hemetusd.org;'
     // data = data || ["145980", "(951) 305-1378", ""];
     var values = getAllRecords('roster');
     var hdngs = values[0].flat();
-    // nmJdob	idAeries	teachemail	u1_phone	stuemail	u3_Parent_1a_Email	u4_corr	u5_EL	u6_teacher	SEIS_ID	Last_Name	First_Name	Date_of_Birth	Case_Manager	Date_of_Last_Annual_IEP	Date_of_Last_Evaluation	Date_of_Initial_Parent_Consent	Parent_1_Mail_Address	Parent_1_Email	Parent_1_Home_Phone	Parent_1_Cell_Phone	Grade_Code	Student_Eligibility_Status	Disability_1	Disability_2	Parent_Guardian_1_Name	Parent_Guardian_2_Name	Date_of_Next_Annual_IEP	reading group	notes
+    // nmJdob	idAeries	teachemail	u1_phone	stuemail	u3_Parent_1a_Email	corrlng	langFlu	u6_teacher	SEIS_ID	Last_Name	First_Name	Date_of_Birth	Case_Manager	Date_of_Last_Annual_IEP	Date_of_Last_Evaluation	Date_of_Initial_Parent_Consent	Parent_1_Mail_Address	Parent_1_Email	Parent_1_Home_Phone	Parent_1_Cell_Phone	Grade_Code	Student_Eligibility_Status	Disability_1	Disability_2	Parent_Guardian_1_Name	Parent_Guardian_2_Name	Date_of_Next_Annual_IEP	reading group	notes
     Logger.log('seis index: ' + hdngs.indexOf('seis_id'));
     var seis_id_idx = hdngs.indexOf('seis_id');
     var u3_Parent_1a_Email_idx = hdngs.indexOf('u3_Parent_1a_Email`');
@@ -442,7 +442,8 @@ function doFilter(key, keyIndex, array) {
 function getIndicesByHeading(array) {
     var headingsObj = {};
     array.forEach(function (el, i, array) {
-        headingsObj[el.toString()] = i;
+        let elConv = el.toString().toLowerCase().replace(/[ /]/g, "_");
+        headingsObj[elConv] = i;
     });
     // MailApp.sendEmail("dpaight@hemetusd.org","log", JSON.stringify(headingsObj));
     return headingsObj;
@@ -908,6 +909,7 @@ function printSelectedLogEntries(stuName, array) {
         'url': url
     };
 }
+
 // Compiled using ts2gas 3.6.3 (TypeScript 3.9.7)
 // this returns table data to the success Handler on the client side
 function getTableData_roster(id) {
@@ -1444,12 +1446,17 @@ function LevelsPerformance(el) {
 }
 ;
 function addStudentByIdFromRESstudentsServer(obj) {
+    obj = { "first": "", "last": "", "StudentID": "135262", "lastAnnual": "", "lastEval": "", "seisID": "135262" }
+
     var sheet = ss2.getSheetByName('allPupils');
     var last = sheet.getRange('A1:A').getValues().filter(String).length;
     var lastCol = sheet.getLastColumn();
     var range = sheet.getRange(1, 1, last, lastCol);
     var values = range.getValues();
     var headings = values.shift();
+
+    var iObj = getIndicesByHeading(headings);
+
     var stuId = obj.StudentID;
     var lastAnnual = obj.lastAnnual;
     var lastEval = obj.lastEval;
@@ -1461,17 +1468,22 @@ function addStudentByIdFromRESstudentsServer(obj) {
             break;
         }
     }
-    var [StudentID, StudentNo, LastName, FirstName, Sex, Grade, Birthdate, Parentguardian, MailingAddress, City, State, Zipcode, TchrNum, LangFlu, RptgLng, StateStudentID, StuEmail, User10, User11, EnterDate, ParentEdLvl, PrimaryPhone, FamilyKey, CorrLng, teachEmail, teachName, sdcrsp, nmJdob, LastName_FirstName_StudentID, LastName_FirstName_dob_Birthdate, LastName_FirstName, FirstName_LastName, Parentguardian, PrimaryPhone] = stuToAdd;
-    var caseManager = Session.getActiveUser().getEmail().toString().match(/^[A-z0-9]+/)[0];
-    var newRosterRecord = [nmJdob, StudentID, teachEmail, PrimaryPhone, StuEmail, "parentEmail", CorrLng, LangFlu, teachName,
-        seisID, LastName, FirstName, Birthdate, caseManager, lastAnnual, lastEval, "", MailingAddress, PrimaryPhone, PrimaryPhone, Grade, "", "", "",
-        Parentguardian, "", "", "", "", ""];
+
+    var rosterHeadings = ss.getSheetByName('roster').getRange(1, 1, 1, 29).getValues().flat();
+
+    var newRosterRecord = [[]];
+    for (let i = 0; i < rosterHeadings.length; i++) {
+        const el = rosterHeadings[i].toString().toLowerCase();
+        var index = parseInt(iObj[el])
+        newRosterRecord[0].push(stuToAdd[index]);
+    }
+    Logger.log(JSON.stringify(newRosterRecord));
     var roster = ss.getSheetByName('roster');
     var last = roster.getRange('A1:A').getValues().filter(String).length;
     var destRange = roster.getRange(last + 1, 1, 1, newRosterRecord.length);
     destRange.setValues([newRosterRecord]);
     return seisID;
-    //  [nmJdob, idAeries, teachemail, u1_phone, stuemail, u3_Parent_1a_Email, u4_corr, u5_EL, u6_teacher,
+    //  [nmJdob, idAeries, teachemail, u1_phone, stuemail, u3_Parent_1a_Email, corrlng, langFlu, u6_teacher,
     //     SEIS_ID, Last_Name, First_Name, Date_of_Birth, Case_Manager, Date_of_Last_Annual_IEP, Date_of_Last_Evaluation,
     //     Date_of_Initial_Parent_Consent, Parent_1_Mail_Address, Parent_1_Email, Parent_1_Home_Phone, Parent_1_Cell_Phone,
     //     Grade_Code, Student_Eligibility_Status, Disability_1, Disability_2, Parent_Guardian_1_Name, Parent_Guardian_2_Name,
@@ -1767,3 +1779,50 @@ function addMatchVarColOne(array) {
 //     }
 // }
 //# sourceMappingURL=module.jsx.map
+
+function foldersFromNames() {
+    var filing = DriveApp.getFolderById('1BzxwX_YY2zMladftX-AvhOmdkPv99TWf');
+    var sheet = ss.getSheetByName('roster');
+    var last = findLastRow('roster', 1);
+    var range = sheet.getRange('A2:A22');
+    var entries = range.getValues().flat();
+    var root = DriveApp.getRootFolder();
+    var folder = filing.createFolder('the Folder');
+
+    for (let i = 0; i < entries.length; i++) {
+        const element = entries[i];
+        folder.createFolder(element);
+    }
+}
+function fileInFolders() {
+    var sheet = ss.getSheetByName('roster');
+    var last = findLastRow('roster', 1);
+    var range = sheet.getRange('K2:K' + last);
+    // these are last names -- something that will be in both the file name and its destination folder name
+    var entries = range.getValues().flat();
+    // this is the parent folder of the folders and files 
+    var filing = DriveApp.getFolderById('1BzxwX_YY2zMladftX-AvhOmdkPv99TWf');
+    // these are the folders into which docs will be filed
+    var folders = filing.getFolders();
+    // these are the files 
+    while (folders.hasNext()) {
+      var folder = folders.next();
+      var folderName = folder.getName();
+      var files = filing.getFiles();
+      for (let i = 0; i < entries.length; i++) {
+        var elLn = new RegExp(entries[i], "gi");
+        if (folderName.search(elLn) != -1) {
+          files = filing.getFiles();
+          while (files.hasNext()) {
+            var file = files.next();
+            var fileName = file.getName();
+  
+            if (fileName.search(elLn) != -1) {
+              folder.addFile(file);
+              filing.removeFile(file);
+            }
+          }
+        }
+      }
+    }
+  }

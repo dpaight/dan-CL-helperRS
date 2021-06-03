@@ -405,14 +405,14 @@
   // that display data retrieved from a script run on the server
   function showContactInfo(record) {
     var [
-      nmJdob, idAeries, teachemail, u1_phone, stuemail, u3_Parent_1a_Email, u4_corr, u5_lang, teachname, SEIS_ID, Last_Name, First_Name, Date_of_Birth, Case_Manager, Date_of_Last_Annual_IEP, Date_of_Last_Evaluation, Date_of_Initial_Parent_Consent, Parent_1_Mail_Address, Parent_1_Email, Parent_1_Home_Phone, Parent_1_Cell_Phone, Grade_Code, Student_Eligibility_Status, Disability_1, Disability_2, Parent_Guardian_1_Name, Parent_Guardian_2_Name, Date_of_Next_Annual_IEP, reading_group, notes
+      nmJdob, idAeries, teachemail, u1_phone, stuemail, u3_Parent_1a_Email, corrlng, u5_lang, teachname, SEIS_ID, Last_Name, First_Name, Date_of_Birth, Case_Manager, Date_of_Last_Annual_IEP, Date_of_Last_Evaluation, Date_of_Initial_Parent_Consent, Parent_1_Mail_Address, Parent_1_Email, Parent_1_Home_Phone, Parent_1_Cell_Phone, Grade_Code, Student_Eligibility_Status, Disability_1, Disability_2, Parent_Guardian_1_Name, Parent_Guardian_2_Name, Date_of_Next_Annual_IEP, reading_group, notes
     ] = record;
     console.log('record: %s', JSON.stringify(record));
     var key = SEIS_ID;
     localStorage.key = JSON.stringify(record);
 
     $("#lang").val(u5_lang);
-    $("#corr").val(u4_corr);
+    $("#corr").val(corrlng);
     $("#stuName").val(First_Name + ' ' + Last_Name);
     $("#nameNav").text(First_Name + ' ' + Last_Name);
     $("#dob").val(Date_of_Birth);
@@ -1058,11 +1058,14 @@
   }
   function addStu() {
     var obj = {};
+    obj.first = $("#addFn").val();
+    obj.last = $("#addLn").val();
     obj.StudentID = $("#StudentID").val();
     obj.lastAnnual = $("#lastAnnual").val();
     obj.lastEval = $("#lastEval").val();
     obj.seisID = $("#seisID").val();
 
+    console.log(JSON.stringify(obj));
 
     google.script.run
       .withSuccessHandler(showNewStu)
