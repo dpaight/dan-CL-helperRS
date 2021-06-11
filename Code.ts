@@ -1,7 +1,7 @@
 // Compiled using ts2gas 3.6.4 (TypeScript 4.1.3)
 var ss = SpreadsheetApp.getActiveSpreadsheet();
 var roster = ss.getSheetByName('roster');
-var ss2 = SpreadsheetApp.openById("1Pe-unMy1vkj3joBvGru03YB1W3a35zNn_vXw9eF0KKk");
+var ss2 = SpreadsheetApp.openById("1HoulMp8RlpCxvN4qf10TbxW1vzxzTjbA8xKhFjRdZY8");
 var sp = CacheService.getScriptCache(); //PropertiesService.getScriptProperties();
 var fname = 'arguments.callee.toString().match(/function ([^\(]+)/)[1]';
 // @ts-ignore
@@ -10,7 +10,7 @@ function sendLevelsForm(stuName, stuId, teachemail) {
     Logger.log('stuName: %s, stuId: %s, teachemail: %s', stuName, stuId, teachemail);
     // stuName = 'Wanda Wanderer', stuId = 'WandererWanda123456', teachemail = 'dpaight@hemetusd.org';
     // 1PdCenM9sTAwTlb-TxmreJAPuMKYYpBgjeXK-7h0wdtg  
-    var formId = '1PdCenM9sTAwTlb-TxmreJAPuMKYYpBgjeXK-7h0wdtg'; // 19FPRaVz5lWFrEV76dSweFtaKKLEBWoSn9GfZOORa2FE ; 1HFbt4rZV0uRPsnMe6T2wsgsxVoBC4jlAL54x4W_dQCI
+    var formId = '1PdCenM9sTAwTlb-TxmreJAPuMKYYpBgjeXK-7h0wdtg';
     var form = FormApp.openById(formId);
     var respArray = [stuName, stuId];
     var formResponse = form.createResponse();
@@ -1179,7 +1179,7 @@ function getRosterValues() {
 function addTimTest() {
     var fileIdS, fileIdD, lastCol, last, destSheet, destR;
     var filesS = ['1SKGEJsXdRcjvGUGT-C6n39JQkINVa_iOiXIYYToEv24', '1enI0CF5MHtkZ1CTRC2xQDSa8EVxTTQvuMlR38_JdgJo'];
-    var filesD = ['1Pe-unMy1vkj3joBvGru03YB1W3a35zNn_vXw9eF0KKk', '1P8Pa_174aEJbHXE0ZtmUTaTS4SN-o901dacT-Hsknf4'];
+    var filesD = ['1HoulMp8RlpCxvN4qf10TbxW1vzxzTjbA8xKhFjRdZY8', '1P8Pa_174aEJbHXE0ZtmUTaTS4SN-o901dacT-Hsknf4'];
     var lastCols = [25, 28];
     for (let i = 0; i < 2; i++) {
         fileIdS = filesS[i]; // test record
@@ -1522,7 +1522,7 @@ function updateRoster() {
     var allPupilsArray = allPupilsSheet.getRange(1, 1, last, allPupilsSheet.getLastColumn()).getDisplayValues();
     var allPupilsHeadings = allPupilsArray.shift().map(x => x.toString().replace(/[ -\/]/g, "_").toLowerCase());
     // get seis data
-    var folder = DriveApp.getFolderById('1g1JGj5L6QIIsYG-CLQj9np3m4QgtClLF');
+    var folder = DriveApp.getFolderById('1-gZV54ZzShjlmfu91rBmdD7G-XK6Z7bK');
     var files = folder.getFiles();
     var fileIds = [];
     // looking for .csv file
@@ -1656,142 +1656,19 @@ function addMatchVarColOne(array) {
     // console.log(JSON.stringify(array));
     return [headings].concat(seisDataMod);
 }
-// function updateRoster_test() {
-//     // get current data
-//     var roster = SpreadsheetApp.getActiveSpreadsheet().getSheetByName('roster_test');
-//     var last = roster.getRange('a1:a').getValues().filter(String).length;
-//     var rosterVals = roster.getRange(1, 1, last, roster.getLastColumn()).getDisplayValues();
-//     var rosterHeadings = rosterVals.shift().map(x => x.toString().replace(/[ -\/]/g, "_").toLowerCase());
-//     // get aeries data for school
-//     var allPupilsSheet = ss2.getSheetByName('allPupils');
-//     var last = allPupilsSheet.getRange('a1:a').getValues().filter(String).length;
-//     var allPupilsArray = allPupilsSheet.getRange(1, 1, last, allPupilsSheet.getLastColumn()).getDisplayValues();
-//     var allPupilsHeadings = allPupilsArray.shift().map(x => x.toString().replace(/[ -\/]/g, "_").toLowerCase());
-//     // get seis data
-//     var folder = DriveApp.getFolderById('1g1JGj5L6QIIsYG-CLQj9np3m4QgtClLF');
-//     var files = folder.getFiles();
-//     var fileIds = [];
-//     // looking for .csv file
-//     var found = false;
-//     while (files.hasNext() && found == false) {
-//         var file = files.next();
-//         var fileName = file.getName();
-//         var status; // '1' if parse function is successful
-//         if (fileName.toString().search(/roster_seis.csv/) !== -1) {
-//             found = true;
-//             var sheetName = 'roster_seis';
-//             var csvFile = file.getBlob().getDataAsString();
-//             fileIds.push(file.getId());
-//             var seisData = Utilities.parseCsv(csvFile);
-//             var iObj = getIndicesByHeading(seisData[0]);
-//             Logger.log('iObj = %s', JSON.stringify(iObj));
-//         }
-//     }
-//     seisData = addMatchVarColOne(seisData);
-//     var seisDataHeadings = seisData.shift().map(x => x.toString().replace(/[ -\/]/g, "_").toLowerCase());
-//     var indexes = matchRosterFieldsToSeisAndAllPupils(rosterHeadings, seisDataHeadings, allPupilsHeadings);
-//     // find matching records and update with new seis data
-//     // new seis data by rows
-//     var newRecords = [];
-//     for (var i = 0; i < seisData.length; i++) {
-//         var elNew = seisData[i];
-//         // generate the matching key
-//         var dob = elNew[iObj['Date of Birth']];
-//         var fn = elNew[iObj['First Name']];
-//         var ln = elNew[iObj['Last Name']];
-//         var found = false;
-//         // roster table by rows
-//         var newValue;
-//         for (var j = 0; j < rosterVals.length; j++) {
-//             var elRos = rosterVals[j];
-//             var nmJdob = elRos[0];
-//             var apRi = getRecordIndex('nmJdob', allPupilsArray);
-//             if (elRos[0] == 'nmJdob') {
-//                 found = true;
-//                 // iterate the columns in this record to update from either
-//                 //  seis or allPupils
-//                 for (let c = 0; c < elRos.length; c++) {
-//                     var fieldName = rosterHeadings[c];
-//                     var thisFieldCols = indexes[fieldName];
-//                     //  checking seis
-//                     if (thisFieldCols[1] != -1) {
-//                         newValue = seisData[i][thisFieldCols[1]];
-//                         rosterVals[j].splice(c, 1, newValue);
-//                     }
-//                     else if (thisFieldCols[2] != -1) {
-//                         newValue = allPupilsArray[apRi][thisFieldCols[2]];
-//                         rosterVals[j].splice(c, 1, newValue);
-//                     }
-//                 }
-//             }
-//         }
-//         if (found == false) {
-//             // make a new record
-//             var row = [];
-//             for (let c = 0; c < elRos.length; c++) {
-//                 var fieldName = rosterHeadings[c];
-//                 var thisFieldCols = indexes[fieldName];
-//                 //  checking seis
-//                 if (thisFieldCols[1] != -1) {
-//                     newValue = seisData[i][thisFieldCols[1]];
-//                     row.push(newValue);
-//                 }
-//                 else if (thisFieldCols[2] != -1) {
-//                     newValue = allPupilsArray[apRi][thisFieldCols[2]];
-//                     row.push(newValue);
-//                 }
-//                 else {
-//                     row.push('');
-//                 }
-//             }
-//             newRecords.push(row);
-//         }
-//     }
-//     var joined = rosterVals.concat(newRecords); //
-//     var sorted = joined.sort((a, b) => {
-//         if (a[0] < b[0]) {
-//             return -1;
-//         }
-//         else if (a[0] == b[0]) {
-//             return 0;
-//         }
-//         else {
-//             return 1;
-//         }
-//     });
-//     var allData = [rosterHeadings].concat(sorted);
-//     var destRng = roster.getRange(1, 1, allData.length, allData[0].length);
-//     roster.clearContents();
-//     destRng.setValues(allData);
-// }
-// function makeOneNewRecord(nmJdob, rosterHeadings, seisData, seisDataHeadings,
-//     allPupilsArray, allPupilsHeadings) {
-//     var newRows = rosterHeadings;
-//     for (let i = 0; i < newRecords.length; i++) {
-//         var nmJdob = newRecords[i][1];
-//         var seisDataIndex = newRecords[i][0];
-//         for (let j = 0; j < rosterHeadings.length; j++) {
-//             const rhedel = rosterHeadings[j];
-//             if (seisDataHeadings.indexOf(rhedel) != -1) {
-//                 // get the data from seisData for this field
-//             }
-//         }
-//     }
-// }
-//# sourceMappingURL=module.jsx.map
 
 function foldersFromNames() {
-    var filing = DriveApp.getFolderById('1BzxwX_YY2zMladftX-AvhOmdkPv99TWf');
+    var filing = DriveApp.getFolderById('0B3J9971qOaVIUUlCWXRCbTNjcUE');
     var sheet = ss.getSheetByName('roster');
     var last = findLastRow('roster', 1);
     var range = sheet.getRange('A2:A22');
     var entries = range.getValues().flat();
-    var root = DriveApp.getRootFolder();
-    var folder = filing.createFolder('the Folder');
+
 
     for (let i = 0; i < entries.length; i++) {
         const element = entries[i];
-        folder.createFolder(element);
+
+        filing.createFolder(element);
     }
 }
 function fileInFolders() {
@@ -1801,7 +1678,7 @@ function fileInFolders() {
     // these are last names -- something that will be in both the file name and its destination folder name
     var entries = range.getValues().flat();
     // this is the parent folder of the folders and files 
-    var filing = DriveApp.getFolderById('1BzxwX_YY2zMladftX-AvhOmdkPv99TWf');
+    var filing = DriveApp.getFolderById('0B3J9971qOaVIUUlCWXRCbTNjcUE');
     // these are the folders into which docs will be filed
     var folders = filing.getFolders();
     // these are the files 
