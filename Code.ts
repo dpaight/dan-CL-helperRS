@@ -59,7 +59,7 @@ function saveLastId(id) {
 }
 function doGet(e) {
     var t = HtmlService.createTemplateFromFile("caseLog");
-    t.version = "v23";
+    t.version = "v24";
     return t.evaluate().setXFrameOptionsMode(HtmlService.XFrameOptionsMode.ALLOWALL);
 }
 function doPost(e) {
@@ -80,9 +80,7 @@ function doPost(e) {
 function getLastId() {
     var scriptProp = PropertiesService.getScriptProperties();
     if (scriptProp
-        .getProperty('lastId') != null &&
-        scriptProp
-            .getProperty('lastId').toString().length == 7) {
+        .getProperty('lastId') != null) {
         var id = scriptProp.getProperty('lastId');
     }
     else {
