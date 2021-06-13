@@ -69,12 +69,12 @@ function doPost(e) {
     var body = JSON.parse(e.postData.contents);
     //Adding a new row with content from the request body
     sheet.appendRow([body.id,
-        body.date_created,
-        body.first_name,
-        body.shipping.address,
-        body.shipping.phone,
-        body.billing.phone,
-        body.billing.postcode
+    body.date_created,
+    body.first_name,
+    body.shipping.address,
+    body.shipping.phone,
+    body.billing.phone,
+    body.billing.postcode
     ]);
 }
 // gets the last id stored in a script properties
@@ -464,8 +464,8 @@ function createDraftEmail(buttonVal, paramsJSN) {
     }
     else {
         GmailApp.createDraft(params.to, params.subj, params.body, {
-        // @ts-ignore
-        // attachments: [file.getAs(MimeType.PDF), file2.getAs(MimeType.PDF)]
+            // @ts-ignore
+            // attachments: [file.getAs(MimeType.PDF), file2.getAs(MimeType.PDF)]
         });
     }
     return params.body.toString();
@@ -1709,151 +1709,158 @@ function scanForTasks() {
     var taskListId = taskList[0].id;
     var tasks = getTasks(taskListId);
     var nextYear = (moment().month() < 5) ?
-      moment((moment().year()).toString() + '-08-01', 'YYYY-MM-DD') :
-      moment((moment().year() + 1).toString() + '-08-01', 'YYYY-MM-DD');
+        moment((moment().year()).toString() + '-08-01', 'YYYY-MM-DD') :
+        moment((moment().year() + 1).toString() + '-08-01', 'YYYY-MM-DD');
     Logger.log('nextYear is %s', moment(nextYear).format('YYYY-MM-DD'));
     for (let i = 0; i < values.length; i++) {
-      var el = values[i];
-      var anl = moment(el[iObj['date_of_last_annual_iep']], 'YYYY-MM-DD');
-      var tri = moment(el[iObj['date_of_last_evaluation']], 'YYYY-MM-DD');
-      var nxtAnl = moment(anl).add(1, 'y');
-      var nxtTri = moment(tri).add(3, 'y');
-      Logger.log('Anl is %s; Tri is %s', moment(anl).format('YYYY-MM-DD'), moment(tri).format('YYYY-MM-DD'));
-      Logger.log('nxtAnl is %s; nxtTri is %s', moment(nxtAnl).format('YYYY-MM-DD'), moment(nxtTri).format('YYYY-MM-DD'));
-      var fn = el[iObj['first_name']];
-      var ln = el[iObj['last_name']];
-      var id = el[iObj['seis_id']];
-      var nmjdob = el[iObj['nmjdob']];
-      var langflu = el[iObj['langflu']];
-      var key = nmjdob;
-      if (taskNotesVals.indexOf(key + id) > -1) {
-        // do nothing
-      }
-      else {
-        var title = 'sched meet: ' + fn + ' ' + ln + '; anl: ' + moment(nxtAnl).format('YYYY-MM-DD') + '; tri: ' +
-          '; ' + moment(nxtTri).format('YYYY-MM-DD') + ' [' + key + '] ';
-        if (langflu == '3') {
-          title += '; arrange for interpreter if needed; ';
+        var el = values[i];
+        var anl = moment(el[iObj['date_of_last_annual_iep']], 'YYYY-MM-DD');
+        var tri = moment(el[iObj['date_of_last_evaluation']], 'YYYY-MM-DD');
+        var nxtAnl = moment(anl).add(1, 'y');
+        var nxtTri = moment(tri).add(3, 'y');
+        Logger.log('Anl is %s; Tri is %s', moment(anl).format('YYYY-MM-DD'), moment(tri).format('YYYY-MM-DD'));
+        Logger.log('nxtAnl is %s; nxtTri is %s', moment(nxtAnl).format('YYYY-MM-DD'), moment(nxtTri).format('YYYY-MM-DD'));
+        var fn = el[iObj['first_name']];
+        var ln = el[iObj['last_name']];
+        var id = el[iObj['seis_id']];
+        var nmjdob = el[iObj['nmjdob']];
+        var langflu = el[iObj['langflu']];
+        var key = nmjdob;
+        if (taskNotesVals.indexOf(key + id) > -1) {
+            // do nothing
         }
-        if (moment(nxtAnl).isBefore(moment(nxtTri))) {
-          var due = moment(nxtAnl).subtract(40, 'd').format('YYYY-MM-DD') + 'T00:00:00.000Z';
-          title += 'annual review; ';
+        else {
+            var title = 'sched meet: ' + fn + ' ' + ln + '; anl: ' + moment(nxtAnl).format('YYYY-MM-DD') + '; tri: ' +
+                '; ' + moment(nxtTri).format('YYYY-MM-DD') + ' [' + key + '] ';
+            if (langflu == '3') {
+                title += '; arrange for interpreter if needed; ';
+            }
+            if (moment(nxtAnl).isBefore(moment(nxtTri))) {
+                var due = moment(nxtAnl).subtract(40, 'd').format('YYYY-MM-DD') + 'T00:00:00.000Z';
+                title += 'annual review; ';
+            }
+            if (moment(nxtTri).isBefore(moment(nextYear))) {
+                var due = moment(nxtTri).subtract(70, 'd').format('YYYY-MM-DD') + 'T00:00:00.000Z';
+                title += 'triennial review is due; ';
+            }
+            var task = {
+                'title': title,
+                'notes': key + id,
+                'due': due
+            };
+            try {
+                var newTask = Tasks.Tasks.insert(task, taskListId);
+                //@ts-ignore
+                var newTaskId = newTask.getId();
+                array.push(newTask);
+            }
+            catch (error) {
+                Logger.log('error: %s', error);
+            }
         }
-        if (moment(nxtTri).isBefore(moment(nextYear))) {
-          var due = moment(nxtTri).subtract(70, 'd').format('YYYY-MM-DD') + 'T00:00:00.000Z';
-          title += 'triennial review is due; ';
-        }
-        var task = {
-          'title': title,
-          'notes': key + id,
-          'due': due
-        };
-        try {
-          var newTask = Tasks.Tasks.insert(task, taskListId);
-          var newTaskId = newTask.getId();
-          array.push(newTask);
-        }
-        catch (error) {
-          Logger.log('error: %s', error);
-        }
-      }
     }
     Logger.log(JSON.stringify(array));
     var last = taskSheet.getRange('A1:A').getValues().filter(String).length;
     last = (last < 2) ? 1 : last;
     var taskArray = [];
     if (array.length > 0) {
-  
-      for (let i = 0; i < array.length; i++) {
-        const el = array[i];
-        taskArray.push([el.id, el.title, el.due, el.notes]);
-      }
-      var range = taskSheet.getRange(last + 1, 1, taskArray.length, taskArray[0].length);
-      range.setValues(taskArray);
+
+        for (let i = 0; i < array.length; i++) {
+            const el = array[i];
+            taskArray.push([el.id, el.title, el.due, el.notes]);
+        }
+        var range = taskSheet.getRange(last + 1, 1, taskArray.length, taskArray[0].length);
+        range.setValues(taskArray);
     }
-  }
-  /**
-   * Returns the ID and name of every task list in the user's account.
-   * @return {Array.<Object>} The task list data.
-   */
-  function getTaskLists() {
+}
+/**
+ * Returns the ID and name of every task list in the user's account.
+ * @return {Array.<Object>} The task list data.
+ */
+function getTaskLists() {
+    //@ts-ignore
     var taskLists = Tasks.Tasklists.list().getItems();
     if (!taskLists) {
-      return [];
+        return [];
     }
     return taskLists.map(function (taskList) {
-      Logger.log(JSON.stringify({
-        id: taskList.getId(),
-        name: taskList.getTitle()
-      }));
-      return {
-        id: taskList.getId(),
-        name: taskList.getTitle()
-      };
+        Logger.log(JSON.stringify({
+            id: taskList.getId(),
+            name: taskList.getTitle()
+        }));
+        return {
+            id: taskList.getId(),
+            name: taskList.getTitle()
+        };
     });
-  }
-  /**
-   * Returns information about the tasks within a given task list.
-   * @param {String} taskListId The ID of the task list.
-   * @return {Array.<Object>} The task data.
-   */
-  function getTasks(taskListId) {
+}
+/**
+ * Returns information about the tasks within a given task list.
+ * @param {String} taskListId The ID of the task list.
+ * @return {Array.<Object>} The task data.
+ */
+function getTasks(taskListId) {
+          //@ts-ignore
+
     var tasks = Tasks.Tasks.list(taskListId).getItems();
     if (!tasks) {
-      return [];
+        return [];
     }
     return tasks.map(function (task) {
-      return {
-        id: task.getId(),
-        title: task.getTitle(),
-        notes: task.getNotes(),
-        due: task.getDue(),
-        completed: Boolean(task.getCompleted())
-      };
+        return {
+            id: task.getId(),
+            title: task.getTitle(),
+            notes: task.getNotes(),
+            due: task.getDue(),
+            completed: Boolean(task.getCompleted())
+        };
     }).filter(function (task) {
-      return task.title;
+        return task.title;
     });
-  }
-  /**
-   * Sets the completed status of a given task.
-   * @param {String} taskListId The ID of the task list.
-   * @param {String} taskId The ID of the task.
-   * @param {Boolean} completed True if the task should be marked as complete, false otherwise.
-   */
-  function setCompleted(taskListId, taskId, completed) {
+}
+/**
+ * Sets the completed status of a given task.
+ * @param {String} taskListId The ID of the task list.
+ * @param {String} taskId The ID of the task.
+ * @param {Boolean} completed True if the task should be marked as complete, false otherwise.
+ */
+function setCompleted(taskListId, taskId, completed) {
     var task = Tasks.newTask();
     if (completed) {
-      task.setStatus('completed');
+          //@ts-ignore
+
+        task.setStatus('completed');
     }
     else {
-      task.setStatus('needsAction');
-      task.setCompleted(null);
+          //@ts-ignore
+          task.setStatus('needsAction');
+          //@ts-ignore
+          task.setCompleted(null);
     }
     Tasks.Tasks.patch(task, taskListId, taskId);
-  }
-  /**
-   * Adds a new task to the task list.
-   * @param {String} taskListId The ID of the task list.
-   * @param {String} title The title of the new task.
-   */
-  function getTasksB(taskListId) {
+}
+/**
+ * Adds a new task to the task list.
+ * @param {String} taskListId The ID of the task list.
+ * @param {String} title The title of the new task.
+ */
+function getTasksB(taskListId) {
     taskListId = "MDU5NzU5MzE5MTQxNzk5NDEzODU6MDow";
-    var tasks = Tasks.Tasks.list(taskListId).getItems();
+          //@ts-ignore
+          var tasks = Tasks.Tasks.list(taskListId).getItems();
     if (!tasks) {
-      return [];
+        return [];
     }
     Logger.log(JSON.stringify(tasks));
     Logger.log(JSON.stringify(tasks));
-  }
-  function addTask0(taskListId) {
+}
+function addTask0(taskListId) {
     taskListId = 'MDU5NzU5MzE5MTQxNzk5NDEzODU6MDow';
     var task = {
-      title: 'Pick up dry cleaning',
-      notes: 'Remember to get this done!'
+        title: 'Pick up dry cleaning',
+        notes: 'Remember to get this done!'
     };
-    task = Tasks.Tasks.insert(task, taskListId);
-    Logger.log('Task with ID "%s" was created.', task.id);
-  }
+}
   //# sourceMappingURL=module.jsx.map
   //# sourceMappingURL=module.jsx.map
 //# sourceMappingURL=module.jsx.map
