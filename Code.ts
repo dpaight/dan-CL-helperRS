@@ -60,7 +60,7 @@ function saveLastId(id) {
 }
 function doGet(e) {
     var t = HtmlService.createTemplateFromFile("caseLog");
-    t.version = "v24";
+    t.version = "v25";
     return t.evaluate().setXFrameOptionsMode(HtmlService.XFrameOptionsMode.ALLOWALL);
 }
 function doPost(e) {
@@ -1800,7 +1800,7 @@ function getTaskLists() {
  * @return {Array.<Object>} The task data.
  */
 function getTasks(taskListId) {
-          //@ts-ignore
+    //@ts-ignore
 
     var tasks = Tasks.Tasks.list(taskListId).getItems();
     if (!tasks) {
@@ -1827,15 +1827,15 @@ function getTasks(taskListId) {
 function setCompleted(taskListId, taskId, completed) {
     var task = Tasks.newTask();
     if (completed) {
-          //@ts-ignore
+        //@ts-ignore
 
         task.setStatus('completed');
     }
     else {
-          //@ts-ignore
-          task.setStatus('needsAction');
-          //@ts-ignore
-          task.setCompleted(null);
+        //@ts-ignore
+        task.setStatus('needsAction');
+        //@ts-ignore
+        task.setCompleted(null);
     }
     Tasks.Tasks.patch(task, taskListId, taskId);
 }
@@ -1846,8 +1846,8 @@ function setCompleted(taskListId, taskId, completed) {
  */
 function getTasksB(taskListId) {
     taskListId = "MDU5NzU5MzE5MTQxNzk5NDEzODU6MDow";
-          //@ts-ignore
-          var tasks = Tasks.Tasks.list(taskListId).getItems();
+    //@ts-ignore
+    var tasks = Tasks.Tasks.list(taskListId).getItems();
     if (!tasks) {
         return [];
     }
@@ -1862,6 +1862,3 @@ function addTask0(taskListId) {
     };
 }
   //# sourceMappingURL=module.jsx.map
-  //# sourceMappingURL=module.jsx.map
-//# sourceMappingURL=module.jsx.map
-//# sourceMappingURL=module.jsx.map
