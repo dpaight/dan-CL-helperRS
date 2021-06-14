@@ -1,4 +1,5 @@
 // Compiled using ts2gas 3.6.4 (TypeScript 4.2.4)
+// Compiled using ts2gas 3.6.4 (TypeScript 4.2.4)
 // Compiled using ts2gas 3.6.4 (TypeScript 4.1.3)
 var ss = SpreadsheetApp.getActiveSpreadsheet();
 var roster = ss.getSheetByName('roster');
@@ -69,12 +70,12 @@ function doPost(e) {
     var body = JSON.parse(e.postData.contents);
     //Adding a new row with content from the request body
     sheet.appendRow([body.id,
-    body.date_created,
-    body.first_name,
-    body.shipping.address,
-    body.shipping.phone,
-    body.billing.phone,
-    body.billing.postcode
+        body.date_created,
+        body.first_name,
+        body.shipping.address,
+        body.shipping.phone,
+        body.billing.phone,
+        body.billing.postcode
     ]);
 }
 // gets the last id stored in a script properties
@@ -464,8 +465,8 @@ function createDraftEmail(buttonVal, paramsJSN) {
     }
     else {
         GmailApp.createDraft(params.to, params.subj, params.body, {
-            // @ts-ignore
-            // attachments: [file.getAs(MimeType.PDF), file2.getAs(MimeType.PDF)]
+        // @ts-ignore
+        // attachments: [file.getAs(MimeType.PDF), file2.getAs(MimeType.PDF)]
         });
     }
     return params.body.toString();
@@ -1691,7 +1692,6 @@ function fileInFolders() {
         }
     }
 }
-
 // Compiled using ts2gas 3.6.4 (TypeScript 4.2.4)
 // Compiled using ts2gas 3.6.4 (TypeScript 4.2.4)
 function scanForTasks() {
@@ -1730,11 +1730,10 @@ function scanForTasks() {
             // do nothing
         }
         else {
-            var title = 'sched meet: ' + fn + ' ' + ln + '; anl: ' + moment(nxtAnl).format('YYYY-MM-DD') + '; tri: ' +
-                '; ' + moment(nxtTri).format('YYYY-MM-DD') + ' [' + key + '] ';
-            if (langflu == '3') {
-                title += '; arrange for interpreter if needed; ';
-            }
+            var title = 'sched meet: ' + fn + ' ' + ln + '; \nanl: ' + moment(nxtAnl).format('YYYY-MM-DD') + '; \ntri: ' +
+                '; ' + moment(nxtTri).format('YYYY-MM-DD') +
+                '\n--send Levels questionnaire' +
+                '\n--do informal assessments' + '\n[' + key + '] ';
             if (moment(nxtAnl).isBefore(moment(nxtTri))) {
                 var due = moment(nxtAnl).subtract(40, 'd').format('YYYY-MM-DD') + 'T00:00:00.000Z';
                 title += 'annual review; ';
@@ -1742,6 +1741,10 @@ function scanForTasks() {
             if (moment(nxtTri).isBefore(moment(nextYear))) {
                 var due = moment(nxtTri).subtract(70, 'd').format('YYYY-MM-DD') + 'T00:00:00.000Z';
                 title += 'triennial review is due; ';
+            }
+            if (langflu.toString().search(/3/g) !== -1) {
+                title += '\narrange for interpreter if needed; ';
+                due = moment(due).subtract(7, 'd').format('YYYY-MM-DD') + 'T00:00:00.000Z';;
             }
             var task = {
                 'title': title,
@@ -1764,7 +1767,6 @@ function scanForTasks() {
     last = (last < 2) ? 1 : last;
     var taskArray = [];
     if (array.length > 0) {
-
         for (let i = 0; i < array.length; i++) {
             const el = array[i];
             taskArray.push([el.id, el.title, el.due, el.notes]);
@@ -1801,7 +1803,6 @@ function getTaskLists() {
  */
 function getTasks(taskListId) {
     //@ts-ignore
-
     var tasks = Tasks.Tasks.list(taskListId).getItems();
     if (!tasks) {
         return [];
@@ -1828,7 +1829,6 @@ function setCompleted(taskListId, taskId, completed) {
     var task = Tasks.newTask();
     if (completed) {
         //@ts-ignore
-
         task.setStatus('completed');
     }
     else {
@@ -1861,4 +1861,5 @@ function addTask0(taskListId) {
         notes: 'Remember to get this done!'
     };
 }
-  //# sourceMappingURL=module.jsx.map
+//# sourceMappingURL=module.jsx.map
+//# sourceMappingURL=module.jsx.map
