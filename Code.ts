@@ -60,6 +60,7 @@ function saveLastId(id) {
     return id;
 }
 function doGet(e) {
+    ss.getSheetByName('roster').sort(1);
     var t = HtmlService.createTemplateFromFile("caseLog");
     t.version = "v25";
     return t.evaluate().setXFrameOptionsMode(HtmlService.XFrameOptionsMode.ALLOWALL);
@@ -70,25 +71,29 @@ function doPost(e) {
     var body = JSON.parse(e.postData.contents);
     //Adding a new row with content from the request body
     sheet.appendRow([body.id,
-        body.date_created,
-        body.first_name,
-        body.shipping.address,
-        body.shipping.phone,
-        body.billing.phone,
-        body.billing.postcode
+    body.date_created,
+    body.first_name,
+    body.shipping.address,
+    body.shipping.phone,
+    body.billing.phone,
+    body.billing.postcode
     ]);
 }
 // gets the last id stored in a script properties
 function getLastId() {
-    var scriptProp = PropertiesService.getScriptProperties();
-    if (scriptProp
-        .getProperty('lastId').toString().search(/[0-9]+7/g) != -1) {
-        var id = scriptProp.getProperty('lastId');
+    var scriptProp = PropertiesService.getScriptProperties()
+    var savedId = scriptProp.getProperty('lastId').toString();
+    var last = ss.getSheetByName('roster').getRange('J2:J').getValues().filter(String).length;
+    var idList = ss.getSheetByName('roster').getRange('J2:J' + (last + 1)).getValues().flat();
+    if (
+        (savedId.search(/[0-9]{7}/g) != -1) &&
+        (idList.indexOf(savedId) != -1)) {
+        var id = savedId;
         Logger.log('id is %s', id);
     }
     else {
         // if nothing is there, it gets the id of the First Student in the list on the spreadsheet
-        var id = ss.getSheetByName('roster').getRange('J2').getDisplayValue().toString();
+        id = idList[0].toString();
         scriptProp.setProperty('lastId', id);
         Logger.log('id is %s', id);
     }
@@ -467,8 +472,8 @@ function createDraftEmail(buttonVal, paramsJSN) {
     }
     else {
         GmailApp.createDraft(params.to, params.subj, params.body, {
-        // @ts-ignore
-        // attachments: [file.getAs(MimeType.PDF), file2.getAs(MimeType.PDF)]
+            // @ts-ignore
+            // attachments: [file.getAs(MimeType.PDF), file2.getAs(MimeType.PDF)]
         });
     }
     return params.body.toString();
