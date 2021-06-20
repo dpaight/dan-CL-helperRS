@@ -1,5 +1,5 @@
 <script>
-  // The code in this function runs when the page is loaded.
+  // The code in this function runs when the page is aoaded.
   $(document).ready(function () {
     // var id = google.script.run.getLastId();
     $("#ready").hide();
@@ -279,12 +279,13 @@
   }
 
   function contactInfo(id) {
+
+    console.log('id = %s', id);
     localStorage.setItem('lastId', id);
     google.script.run
       .withSuccessHandler(showContactInfo)
       .getRecord(id);
   }
-  //   console.log('id = %s', id);
   //   $("#loc01tb").hide();
   //   var key = 'rec' + id;
   //   if (localStorage[key] != null) {
@@ -1071,7 +1072,7 @@
       .withSuccessHandler(showNewStu)
       .addStudentByIdFromRESstudentsServer(obj);
   }
-  function reload(){
+  function reload() {
     localStorage.clear();
     window.open('https://script.google.com/a/macros/hemetusd.org/s/AKfycbyuLrQ4FFJ2B-wErlCVm4yg9YxldINmlUNE9K0HFCKj/dev', '_top')
   }

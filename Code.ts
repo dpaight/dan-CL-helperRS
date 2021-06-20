@@ -82,13 +82,15 @@ function doPost(e) {
 function getLastId() {
     var scriptProp = PropertiesService.getScriptProperties();
     if (scriptProp
-        .getProperty('lastId') != null) {
+        .getProperty('lastId').toString().search(/[0-9]+7/g) != -1) {
         var id = scriptProp.getProperty('lastId');
+        Logger.log('id is %s', id);
     }
     else {
         // if nothing is there, it gets the id of the First Student in the list on the spreadsheet
-        id = ss.getSheetByName('roster').getRange('J2').getDisplayValue().toString();
+        var id = ss.getSheetByName('roster').getRange('J2').getDisplayValue().toString();
         scriptProp.setProperty('lastId', id);
+        Logger.log('id is %s', id);
     }
     return id;
 }
