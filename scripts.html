@@ -1,6 +1,55 @@
 <script>
   // The code in this function runs when the page is aoaded.
   $(document).ready(function () {
+
+    //startup
+    startup();
+
+    function startup() {
+      var id = getPointer();
+      if (id == undefined) {
+        google.script.run
+          .withSuccessHandler(setPointerAndStart)
+          .getFirstPointer();
+      } else {
+        contactInfo(id);
+        console.log('current id at startup is %s', id);
+
+        document.body.style.cursor = "wait";
+        google.script.run
+          .withSuccessHandler(showRosterTable)
+          .getTableData_roster(id);
+
+        document.body.style.cursor = "wait";
+
+        // this retrieves information from the meetings sheet to display
+        document.body.style.cursor = "wait";
+        google.script.run
+          .withSuccessHandler(showCalData)
+          .getCalData_events();
+      }
+      function setPointerAndStart(id) {
+        localStorage.setItem('lastId', id);
+        startup();
+        // contactInfo(id);
+        // console.log('current id at startup is %s', id);
+
+        // document.body.style.cursor = "wait";
+        // google.script.run
+        //   .withSuccessHandler(showRosterTable)
+        //   .getTableData_roster(id);
+
+        // document.body.style.cursor = "wait";
+
+        // // this retrieves information from the meetings sheet to display
+        // document.body.style.cursor = "wait";
+        // google.script.run
+        //   .withSuccessHandler(showCalData)
+        //   .getCalData_events();
+      }
+    }
+
+
     // var id = google.script.run.getLastId();
     $("#ready").hide();
 
@@ -64,7 +113,7 @@
         $(this).val("");
         $(this).attr("title", "");
       } else {
-        var id = $('#idNo').val();
+        var id = $('#seis_id').val();
         var gId = $(this).val();
         google.script.run
           .withSuccessHandler(showTBsnippetGl)
@@ -106,7 +155,7 @@
     // modals
     $("body").on("show.bs.modal", function () {
       // alert('event');
-      var addresses = ($("#tem").val() + ',' + $("#pem").val() + ',' + $("#pem2").val()).replace(/,$/, "");
+      var addresses = ($("#teachemail").val() + ',' + $("#Parent_1_Email").val() + ',' + $("#u3_Parent_1a_Email").val()).replace(/,$/, "");
       var subject = $("#stuName").val();
       // console.log(addresses);
       $("#emailRecipients").val(addresses);
@@ -157,29 +206,50 @@
         .withSuccessHandler(showCalData)
         .getCalData_events();
     });
+
+    //save changes to spreadsheet
+    $("body").on("change", ".spr", function (event) {
+      var id = $("#seis_id").val();
+      var field = $(this).attr("id");
+      var value = $(this).val();
+      console.log('id = %s, field = %s, value = %s', id, field, value);
+      google.script.run
+        .withSuccessHandler(updateLocalStorage) // works with returned values: id, index, value
+        .saveField([id, field, value]);
+
+    });
+    function updateLocalStorage(array) {
+      var [id, index, value] = array;
+      var cachedRecord = JSON.parse(localStorage.getItem('rec' + id));
+      cachedRecord.splice(index, 1, value);
+      localStorage.setItem('rec' + id, JSON.stringify(cachedRecord));
+    }
+
     // save all data in changeable fields in the  spreadsheet
     $("body").on("click", ".saveEntryBtn", function (event) {
       event.preventDefault();
       document.body.style.cursor = "wait";
       var entry = $("#logEntry").val();
-      var id = $("#idNo").val();
-      var phone = $("#phone").val();
-      var pem = $("#pem").val();
-      var phone2 = $("#phone2").val();
-      var pem2 = $("#pem2").val();
-      var tem = $("#tem").val();
+      var id = $("#seis_id").val();
+      var Parent_1_Home_Phone = $("#Parent_1_Home_Phone").val();
+      var Parent_1_Email = $("#Parent_1_Email").val();
+      var u1_phone = $("#u1_phone").val();
+      var u3_Parent_1a_Email = $("#u3_Parent_1a_Email").val();
+      var teachemail = $("#teachemail").val();
       var notes = $("#notes").val();
-
-      // console.log('vars = %s;  %s;  %s;  %s;  %s;  %s;  %s;  ', id, phone, pem, phone2, pem2, tem, notes);
+      var record = 'rec' + id;
+      console.log('record = %s', JSON.stringify(record));
+      store(record);
       google.script.run
         .withSuccessHandler(showLogUpdates)
-        .updateRecord([id, phone, pem, phone2, pem2, tem, notes]);
+        .updateRecord([id, Parent_1_Home_Phone, pem, u1_phone, pem2, tem, notes]);
       if (entry.length > 0) {
         $("html,body").css("cursor", "wait");
         google.script.run
           .withSuccessHandler(focus)
           .saveLogEntry([id, entry]);
       }
+      document.body.style.cursor = "default";
     });
     // turn the color of the button back to green without doing anything
     $("body").on("click", "#cancelEntryBtn", function (event) {
@@ -208,7 +278,7 @@
     // retrieves data from a seis generated csv file (seis search report)
     $("body").on("click", "#seis_roster", function () {
       document.body.style.cursor = "wait";
-      var id = $("#idNo").val();
+      var id = $("#seis_id").val();
       google.script.run
         .withSuccessHandler(reload)
         .updateRoster(id);
@@ -217,11 +287,11 @@
       $("#toModal").modal("hide");
       if ($(this).val() !== "Cancel") {
         if ($(this).val() == "Yes") {
-          var tem = $("#tem").val() + ", dpaight@hemetusd.org";
+          var tem = $("#teachemail").val() + ", dpaight@hemetusd.org";
         } else {
           var tem = "dpaight@hemetusd.org";
         }
-        var id = $("#idNo").val();
+        var id = $("#seis_id").val();
         var stuName = $("#stuName").val();
         // console.log("sendPFLQToTchr() fired; running server script with params: " + stuName + "; " + id + "; " + tem);
         google.script.run
@@ -232,37 +302,12 @@
   });
 
 
-  //startup
-  google.script.run
-    .withSuccessHandler(contactInfo)
-    .getLastId();
-
-  document.body.style.cursor = "wait";
-  google.script.run
-    .withSuccessHandler(showRosterTable)
-    .getTableData_roster();
-
-  document.body.style.cursor = "wait";
-  // google.script.run
-  //   .withSuccessHandler(showLog)
-  //   .getLogEntries([localStorage.getItem('lastId'), "loc01"]);
-  // removed above b/c getLogEntries is called at the end of focus()
-
-  // this retrieves information from the meetings sheet to display
-  document.body.style.cursor = "wait";
-  google.script.run
-    .withSuccessHandler(showCalData)
-    .getCalData_events();
-
 
   // named functions
   // calls function on server side to return data for this student
 
   function focus(id) {
-    google.script.run
-      .withSuccessHandler()
-      .saveLastId(id);
-    localStorage.setItem('lastId', id);
+    setPointer(id);
     contactInfo(id);
     google.script.run
       .withSuccessHandler(showLog)
@@ -278,13 +323,18 @@
       .getTableData_roster();
   }
 
-  function contactInfo(id) {
+  function contactInfo(id = getPointer()) {
 
     console.log('id = %s', id);
     localStorage.setItem('lastId', id);
-    google.script.run
-      .withSuccessHandler(showContactInfo)
-      .getRecord(id);
+
+    if (localStorage.getItem('rec' + id)) {
+      showContactInfo(JSON.parse(localStorage.getItem('rec' + id)));
+    } else {
+      google.script.run
+        .withSuccessHandler(showContactInfo)
+        .getRecord(id);
+    }
   }
   //   $("#loc01tb").hide();
   //   var key = 'rec' + id;
@@ -324,13 +374,13 @@
 
 
   function store(records) {
-    if ($('#idNo').val() == null) {
+    if ($('#seis_id').val() == null) {
       setTimeout(
         function () {
           store(records);
         }, 500);
     }
-    var id = $('#idNo').val();
+    var id = $('#seis_id').val();
     records.forEach(function (el, i) {
       const key = 'rec' + el[9];
       localStorage[key] = JSON.stringify(el);
@@ -359,7 +409,7 @@
     var glArea = $("#glArea").children("option:selected").val();
     var glAreaElid = $("#glArea").children("option:selected").attr('id');
 
-    var id = $("#idNo").val();
+    var id = $("#seis_id").val();
     // console.log("data passed to goal search: %s, %s, %s", glLvl, glArea, id);
 
     localStorage.setItem('glLvl', glLvl);
@@ -382,9 +432,9 @@
 
 
   function getAllLevSnipForTB() {
-    var id = $("#idNo").val();
-    if (localStorage['lSnp' + $('#idNo').val()] != null) {
-      showTBsnippet(localStorage['lvlsSnp' + $('#idNo').val()]);
+    var id = $("#seis_id").val();
+    if (localStorage['lSnp' + $('#seis_id').val()] != null) {
+      showTBsnippet(localStorage['lvlsSnp' + $('#seis_id').val()]);
     } else {
       google.script.run
         .withSuccessHandler(showTBsnippet)
@@ -392,9 +442,9 @@
     }
   }
   function getAllLevSnipForGoal() {
-    var id = $("#idNo").val();
-    if (localStorage['lSnp' + $('#idNo').val()] != null) {
-      makeGoalSnip(localStorage['lvlsSnp' + $('#idNo').val()]);
+    var id = $("#seis_id").val();
+    if (localStorage['lSnp' + $('#seis_id').val()] != null) {
+      makeGoalSnip(localStorage['lvlsSnp' + $('#seis_id').val()]);
     } else {
       google.script.run
         .withSuccessHandler(makeGoalSnip)
@@ -406,26 +456,26 @@
   // that display data retrieved from a script run on the server
   function showContactInfo(record) {
     var [
-      nmJdob, idAeries, teachemail, u1_phone, stuemail, u3_Parent_1a_Email, corrlng, u5_lang, teachname, SEIS_ID, Last_Name, First_Name, Date_of_Birth, Case_Manager, Date_of_Last_Annual_IEP, Date_of_Last_Evaluation, Date_of_Initial_Parent_Consent, Parent_1_Mail_Address, Parent_1_Email, Parent_1_Home_Phone, Parent_1_Cell_Phone, Grade_Code, Student_Eligibility_Status, Disability_1, Disability_2, Parent_Guardian_1_Name, Parent_Guardian_2_Name, Date_of_Next_Annual_IEP, reading_group, notes
+      nmjdob, idaeries, teachemail, u1_phone, stuemail, u3_parent_1a_email, corrlng, u5_lang, teachname, seis_id, last_name, first_name, date_of_birth, case_manager, date_of_last_annual_iep, date_of_last_evaluation, date_of_initial_parent_consent, parent_1_mail_address, parent_1_email, parent_1_home_phone, parent_1_cell_phone, grade_code, student_eligibility_status, disability_1, disability_2, parent_guardian_1_name, parent_guardian_2_name, date_of_next_annual_iep, reading_group, notes
     ] = record;
     console.log('record: %s', JSON.stringify(record));
-    var key = SEIS_ID;
+    var key = seis_id;
     localStorage.key = JSON.stringify(record);
 
-    $("#lang").val(u5_lang);
-    $("#corr").val(corrlng);
-    $("#stuName").val(First_Name + ' ' + Last_Name);
-    $("#nameNav").text(First_Name + ' ' + Last_Name);
-    $("#dob").val(Date_of_Birth);
-    $("#parentsCopy").val(Parent_Guardian_1_Name);
-    $("#phone").val(Parent_1_Home_Phone);
-    $("#phone2").val(u1_phone);
-    $("#pem").val(Parent_1_Email);
-    $("#pem2").val(u3_Parent_1a_Email);
-    $("#tch").val(teachname);
-    $("#tem").val(teachemail);
-    $("#idNo").val(SEIS_ID);
-    $("#stuem").val(stuemail);
+    $("#langflu").val(u5_lang);
+    $("#corrlng").val(corrlng);
+    $("#stuname").val(first_name + ' ' + last_name);
+    $("#namenav").text(first_name + ' ' + last_name);
+    $("#dob").val(date_of_birth);
+    $("#parentscopy").val(parent_guardian_1_name);
+    $("#parent_1_home_phone").val(parent_1_home_phone);
+    $("#u1_phone").val(u1_phone);
+    $("#parent_1_email").val(parent_1_email);
+    $("#u3_parent_1a_email").val(u3_parent_1a_email);
+    $("#teachname").val(teachname);
+    $("#teachemail").val(teachemail);
+    $("#seis_id").val(seis_id);
+    $("#stuemail").val(stuemail);
     $("#notes").val(notes);
   }
   function calRefresh() {
@@ -439,7 +489,7 @@
 
   function sndEm(buttonVal) {
     var params = {};
-    var corrLang = $('#corr').val().toString();
+    var corrLang = $('#corrlng').val().toString();
     if (corrLang == '1' || corrLang == '01') {
       params['translate'] = true;
     } else {
@@ -455,7 +505,7 @@
   }
   function sndMassEm(buttonVal) {
     var params = {};
-    var corrLang = $('#corr').val().toString();
+    var corrLang = $('#corrlng').val().toString();
     if (corrLang == '1' || corrLang == '01') {
       params['translate'] = true;
     } else {
@@ -489,9 +539,9 @@
   //     focus: true
   //   });
   //   if (addressee == 'pem') {
-  //     $('#emailRecipients').val($('#pem').val() + ', ' + $('#pem2').val());
+  //     $('#emailRecipients').val($('#Parent_1_Email').val() + ', ' + $('#u3_Parent_1a_Email').val());
   //   } else if (addressee == 'tem') {
-  //     $('#emailRecipients').val($('#tem').val());
+  //     $('#emailRecipients').val($('#teachemail').val());
   //   }
   //   $('#emailSubject').val($('#stuName').val());
   //   $('#emailBody').val('\n\n--\n' +
@@ -618,7 +668,7 @@
     var stuName = First_Name + ' ' + Last_Name;
     for (var i = 0; i < logEntries.length; i++) {
       var [
-        Timestamp, email, studentMC, log_entry, empty, SEIS_ID, Last_Name, First_Name, First_Name, Student_ID
+        Timestamp, email, studentMC, log_entry, empty, seis_id, Last_Name, First_Name, First_Name, Student_ID
       ] = logEntries[i];
       var dateStamp = moment(Timestamp).format('YYYY-MM-DD');
       var tmStamp = moment(Timestamp).format('HH:mm')
@@ -692,7 +742,7 @@
         "</tr>"
       );
     }
-    $("#corr[value='01']", function () {
+    $("#corrlng[value='01']", function () {
       $(this).css("background-color", "#ff0000")
     });
 
@@ -724,7 +774,7 @@
   //   var stuName = First_Name + ' ' + Last_Name;
   //   for (var i = 0; i < logEntries.length; i++) {
   //     var [
-  //       Timestamp, email, studentMC, log_entry, empty, SEIS_ID, Last_Name, First_Name, First_Name, Student_ID
+  //       Timestamp, email, studentMC, log_entry, empty, seis_id, Last_Name, First_Name, First_Name, Student_ID
   //     ] = logEntries[i];
 
   //     entries.push([Timestamp, log_entry]);
@@ -808,17 +858,17 @@
     for (let i = 0; i < data.length; i++) {
       const el = data[i];
       var [
-        nmJdob, idAeries, teachemail, u1_phone, stuemail, u3_Parent_1a_Email, u4_unused, u5_unused, u6_unused, SEIS_ID, Last_Name, First_Name, Date_of_Birth, Case_Manager, Date_of_Last_Annual_IEP, Date_of_Last_Evaluation, Date_of_Initial_Parent_Consent, Parent_1_Mail_Address, Parent_1_Email, Parent_1_Home_Phone, Parent_1_Cell_Phone, Grade_Code, Student_Eligibility_Status, Disability_1, Disability_2, Parent_Guardian_1_Name, Parent_Guardian_2_Name, Date_of_Next_Annual_IEP
+        nmJdob, idAeries, teachemail, u1_phone, stuemail, u3_Parent_1a_Email, u4_unused, u5_unused, u6_unused, seis_id, Last_Name, First_Name, Date_of_Birth, Case_Manager, Date_of_Last_Annual_IEP, Date_of_Last_Evaluation, Date_of_Initial_Parent_Consent, Parent_1_Mail_Address, Parent_1_Email, Parent_1_Home_Phone, Parent_1_Cell_Phone, Grade_Code, Student_Eligibility_Status, Disability_1, Disability_2, Parent_Guardian_1_Name, Parent_Guardian_2_Name, Date_of_Next_Annual_IEP
       ] = el;
       list = $("#" + loc + "tb");
-      if (!SEIS_ID) {
+      if (!seis_id) {
 
         alert(" has no id"); // lnCmafn + 
       } else {
         // .toString().slice(0, 1) + "."
         list.append(
           '<tr><td class="setStudent" data-stuId=' +
-          SEIS_ID +
+          seis_id +
           "> " +
           Last_Name + ', ' + First_Name +
           "</td>" +
@@ -834,10 +884,11 @@
     }
     store(data);
 
-    google.script.run
-      .withSuccessHandler(focus)
-      .getLastId();
-
+    // google.script.run
+    //   .withSuccessHandler(focus)
+    //   .getLastId();
+    var id = getPointer();
+    focus(id);
   }
 
   // bindSetStudentClick();
@@ -879,7 +930,7 @@
     document.body.style.cursor = "default";
   }
   function showTBsnippet(snippet) {
-    // console.log('session storage item: ' + lvlsSnp + $('#idNo'));
+    // console.log('session storage item: ' + lvlsSnp + $('#seis_id'));
     $("#tbSnippetCopy").text(snippet);
     $("#tbSnippetCopy").select();
     document.execCommand('copy');
@@ -890,7 +941,7 @@
 
 
   function snipInfo() {
-    var id = $("#idNo").val();
+    var id = $("#seis_id").val();
     google.script.run
       .withSuccessHandler(appendSnips)
       .getPresentLevelsAsTextBlazeListItem(id);
@@ -898,19 +949,19 @@
 
   function appendSnips(levelsSnip) {
     var snip = "[";
-    snip += '"corr"="' + $("#corr").val() + '"';
+    snip += '"corrlng"="' + $("#corrlng").val() + '"';
     snip += ',"nm"="' + $("#stuName").val() + '"';
     snip += ',"fn"="' + $("#stuName").val().toString().replace(/([A-Z]{1}[a-z]+) ([A-Z]{1}[A-z]+)/, "$1") + '"';
     snip += ',"ln"="' + $("#stuName").val().toString().replace(/([A-Z]{1}[a-z]+) ([A-Z]{1}[A-z]+)/, "$2") + '"';
     snip += ',"dob"="' + $("#dob").val() + '"';
     snip += ',"par"="' + $("#parentsCopy").val() + '"';
-    snip += ',"ph1"="' + $("#phone").val() + '"';
-    snip += ',"ph2"="' + $("#phone2").val() + '"';
-    snip += ',"pem1"="' + $("#pem").val() + '"';
-    snip += ',"pem2"="' + $("#pem2").val() + '"';
-    snip += ',"tem"="' + $("#tem").val() + '"';
-    snip += ',"tch"="' + $("#tch").val() + '"';
-    snip += ',"sid"="' + $("#idNo").val() + '"';
+    snip += ',"ph1"="' + $("#Parent_1_Home_Phone").val() + '"';
+    snip += ',"ph2"="' + $("#u1_phone").val() + '"';
+    snip += ',"pem1"="' + $("#Parent_1_Email").val() + '"';
+    snip += ',"pem2"="' + $("#u3_Parent_1a_Email").val() + '"';
+    snip += ',"tem"="' + $("#teachemail").val() + '"';
+    snip += ',"tch"="' + $("#teachname").val() + '"';
+    snip += ',"sid"="' + $("#seis_id").val() + '"';
     snip += ',"id"="' + $("#stuem").val().toString().replace(/[A-z]{2}(\d{6}).*/, "$1") + '"';
     snip += ',"sem"="' + $("#stuem").val() + '"';
     snip += "]";
@@ -1075,5 +1126,12 @@
   function reload() {
     localStorage.clear();
     window.open('https://script.google.com/a/macros/hemetusd.org/s/AKfycbyuLrQ4FFJ2B-wErlCVm4yg9YxldINmlUNE9K0HFCKj/dev', '_top')
+  }
+
+  function getPointer() {
+    return localStorage.getItem('lastId');
+  }
+  function setPointer(id) {
+    localStorage.setItem('lastId', id);
   }
 </script>

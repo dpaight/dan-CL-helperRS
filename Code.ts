@@ -62,7 +62,7 @@ function saveLastId(id) {
 function doGet(e) {
     ss.getSheetByName('roster').sort(1);
     var t = HtmlService.createTemplateFromFile("caseLog");
-    t.version = "v25";
+    t.version = "v26";
     return t.evaluate().setXFrameOptionsMode(HtmlService.XFrameOptionsMode.ALLOWALL);
 }
 function doPost(e) {
@@ -168,7 +168,7 @@ function openEvent(eventId) {
 /**
  *
  * @param data array: [glEditId, glEditLevel, glEditArea, glEditStnd, glEditGl]
- * glEditId idNo or -1 for new id
+ * glEditId seis_id or -1 for new id
  */
 function saveGoalSS(obj) {
     Logger.log('receive = %s', JSON.stringify(obj));
@@ -222,7 +222,7 @@ function saveGoalSS(obj) {
  * @returns [search term in form 'gradeLevel_area', found goals for display in goal picker
  */
 function getGoalListItems(lvlArea = [2, "reading", "1010101"]) {
-    var [glLvl, glArea, SEIS_ID] = lvlArea;
+    var [glLvl, glArea, seis_id] = lvlArea;
     var goals = [];
     var sheet = ss.getSheetByName('goals');
     var last = sheet.getRange('A1:A').getValues().filter(String).length;
@@ -305,12 +305,12 @@ function getOneGoalForEditing(gId = 47) {
 }
 // /**
 //  *
-//  * @param SEIS_ID
+//  * @param seis_id
 //  * @returns string formatted for text blaze for levels of performance page
 //  */
-// function getLevels(SEIS_ID) {
-//     if (SEIS_ID === void 0) {
-//         SEIS_ID = getLastId();
+// function getLevels(seis_id) {
+//     if (seis_id === void 0) {
+//         seis_id = getLastId();
 //     }
 //     var sheet = ss.getSheetByName('lop_mirror');
 //     var last = sheet.getRange('A1:A').getValues().filter(String).length;
@@ -323,7 +323,7 @@ function getOneGoalForEditing(gId = 47) {
 //     var allLevelsSnippet = "not found";
 //     for (var i = 0; i < lvVals.length; i++) {
 //         var el = lvVals[i];
-//         if (el[3].toString() == SEIS_ID.toString()) {
+//         if (el[3].toString() == seis_id.toString()) {
 //             allLevelsSnippet = el[snipCol];
 //             break;
 //         }
@@ -338,11 +338,11 @@ function updateRecord(data = ['1010101;', '9515995901;', 'dpaight@hemetusd.org;'
     '951555-6565;', 'silliussoddus@gmail.com;', 'jpaight@hemetusd.org;', 'testing']) {
     data;
     var [id, phone, pem, phone2, pem2, tem, notes] = data;
-    // var SEIS_ID = data[0], Parent_1_Home_Phone = data[1], Parent_1_Email = data[2], u1_phone = data[3], u3_Parent_1a_Email = data[4], teachemail = data[5];
+    // var seis_id = data[0], Parent_1_Home_Phone = data[1], Parent_1_Email = data[2], u1_phone = data[3], u3_Parent_1a_Email = data[4], teachemail = data[5];
     // data = data || ["145980", "(951) 305-1378", ""];
     var values = getAllRecords('roster');
     var hdngs = values[0].flat();
-    // nmJdob	idAeries	teachemail	u1_phone	stuemail	u3_Parent_1a_Email	corrlng	langFlu	u6_teacher	SEIS_ID	Last_Name	First_Name	Date_of_Birth	Case_Manager	Date_of_Last_Annual_IEP	Date_of_Last_Evaluation	Date_of_Initial_Parent_Consent	Parent_1_Mail_Address	Parent_1_Email	Parent_1_Home_Phone	Parent_1_Cell_Phone	Grade_Code	Student_Eligibility_Status	Disability_1	Disability_2	Parent_Guardian_1_Name	Parent_Guardian_2_Name	Date_of_Next_Annual_IEP	reading group	notes
+    // nmJdob	idAeries	teachemail	u1_phone	stuemail	u3_Parent_1a_Email	corrlng	langFlu	u6_teacher	seis_id	Last_Name	First_Name	Date_of_Birth	Case_Manager	Date_of_Last_Annual_IEP	Date_of_Last_Evaluation	Date_of_Initial_Parent_Consent	Parent_1_Mail_Address	Parent_1_Email	Parent_1_Home_Phone	Parent_1_Cell_Phone	Grade_Code	Student_Eligibility_Status	Disability_1	Disability_2	Parent_Guardian_1_Name	Parent_Guardian_2_Name	Date_of_Next_Annual_IEP	reading group	notes
     Logger.log('seis index: ' + hdngs.indexOf('seis_id'));
     var seis_id_idx = hdngs.indexOf('seis_id');
     var u3_Parent_1a_Email_idx = hdngs.indexOf('u3_Parent_1a_Email`');
@@ -363,6 +363,27 @@ function updateRecord(data = ['1010101;', '9515995901;', 'dpaight@hemetusd.org;'
         }
     }
     return 'error: record not found';
+}
+
+function saveField(array) {
+    var [id, field, value] = array;
+    Logger.log(JSON.stringify(array));
+    var sheet = ss.getSheetByName('roster');
+    var last = sheet.getRange('A1:A').getValues().filter(String).length;
+    var range = sheet.getRange(1, 1, last, sheet.getLastColumn());
+    var values = range.getDisplayValues();
+
+    var headings = values[0].flat();
+    var index = headings.indexOf(field);
+    var seisIdIndex = headings.indexOf('seis_id');
+    var ids = sheet.getRange(1, (seisIdIndex + 1), last, 1).getDisplayValues().flat();
+    var recordIndex = ids.indexOf(id.toString());
+    Logger.log('ids: %s, recordIndex: %s, index (column): %s', JSON.stringify(ids), recordIndex, (index + 1));
+
+    var cell = sheet.getRange((recordIndex + 1), (index + 1), 1, 1);
+    cell.setValue(value);
+    Logger.log('return: %s, %s, %s', id, (index + 1), value);
+    return [id, index, value];
 }
 function makeMatchVarFromRange(data) {
     var sheet = ss.getActiveSheet();
@@ -406,7 +427,7 @@ function getFieldFromNmJdob(nmJdob, array, matchIndex, targetIndex) {
 }
 /**
  *
- * @param id {string} SEIS_ID
+ * @param id {string} seis_id
  * @param array {array} default 'roster'
  * @returns the entire record having the id number
  */
@@ -420,7 +441,6 @@ function getRecord_noCache(id) {
             break;
         }
     }
-    saveLastId(id);
     return found;
 }
 /**
@@ -920,7 +940,7 @@ function printSelectedLogEntries(stuName, array) {
 // this returns table data to the success Handler on the client side
 function getTableData_roster(id) {
     if (id === void 0) {
-        id = getLastId();
+        throw 'id was not defined at \'getTableData_roster\'';
     }
     var loc = 'loc00';
     var sheetName = 'roster';
@@ -1031,27 +1051,18 @@ function getCalData_events() {
 }
 function getRecord(id) {
     var key = 'rec' + id;
-    // if (id === void 0) { id = getLastId().toString(); }
-    if (sp.get(key) != null && sp.get(key) != undefined) {
-        var found = JSON.parse(sp.get(key));
-        Logger.log("found cached record " + JSON.stringify(found));
-    }
-    else {
-        // record was not cached; search for it
-        var array = getAllRecords('roster');
-        for (var i = 0; i < array.length; i++) {
-            Logger.log('after else ran ' + i);
-            var el = array[i];
-            sp.put('rec' + el[9], JSON.stringify(el));
-            // cache all records along the way
-            if (id == el[9]) {
-                found = el;
-                break;
-            }
+
+    // record was not cached; search for it
+    var array = getAllRecords('roster');
+    for (var i = 0; i < array.length; i++) {
+        var el = array[i];
+        sp.put('rec' + el[9], JSON.stringify(el));
+        // cache all records along the way
+        if (id == el[9]) {
+            var found = el;
+            return found;
         }
     }
-    saveLastId(id);
-    return found;
 }
 /**
  * @returns array with all records from 'roster'
@@ -1485,7 +1496,7 @@ function addStudentByIdFromRESstudentsServer(obj) {
     destRange.setValues([newRosterRecord]);
     return seisID;
     //  [nmJdob, idAeries, teachemail, u1_phone, stuemail, u3_Parent_1a_Email, corrlng, langFlu, u6_teacher,
-    //     SEIS_ID, Last_Name, First_Name, Date_of_Birth, Case_Manager, Date_of_Last_Annual_IEP, Date_of_Last_Evaluation,
+    //     seis_id, Last_Name, First_Name, Date_of_Birth, Case_Manager, Date_of_Last_Annual_IEP, Date_of_Last_Evaluation,
     //     Date_of_Initial_Parent_Consent, Parent_1_Mail_Address, Parent_1_Email, Parent_1_Home_Phone, Parent_1_Cell_Phone,
     //     Grade_Code, Student_Eligibility_Status, Disability_1, Disability_2, Parent_Guardian_1_Name, Parent_Guardian_2_Name,
     //     Date_of_Next_Annual_IEP, readingGroup, notes, meet]
@@ -1867,6 +1878,13 @@ function addTask0(taskListId) {
         title: 'Pick up dry cleaning',
         notes: 'Remember to get this done!'
     };
+}
+
+function getFirstPointer() {
+    var last = ss.getSheetByName('roster').getRange('A1:A').getValues().filter(String).length;
+    var idList = ss.getSheetByName('roster').getRange('J2:J' + (last + 1)).getDisplayValues().flat();
+    Logger.log(JSON.stringify(idList[0]));
+    return idList[0];
 }
 //# sourceMappingURL=module.jsx.map
 //# sourceMappingURL=module.jsx.map

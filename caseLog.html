@@ -113,7 +113,7 @@
                   <div class="input-group-prepend">
                     <span class="input-group-text   col-12" id="stuName-pre">Name</span>
                   </div>
-                  <input type="text" class="form-control" id="stuName" style="font-size: large; font-weight: bold;"
+                  <input type="text" class="form-control" id="stuname" style="font-size: large; font-weight: bold;"
                     value="" readonly>
                 </div>
 
@@ -121,22 +121,22 @@
                   <div class="input-group-prepend">
                     <span class="input-group-text  " id="stuName-pre">CrLng</span>
                   </div>
-                  <input type="text" class="form-control col-1" id="corr" value="">
+                  <input type="text" class="form-control col-1 spr" id="corrlng" value="">
                   <div class="input-group-prepend">
                     <span class="input-group-text  " id="lang-pre">Lang</span>
                   </div>
-                  <input type="text" class="form-control col-1" id="lang" value="" readonly>
+                  <input type="text" class="form-control col-1 spr" id="langflu" value="" readonly>
                   <div class="input-group-prepend">
-                    <span class="input-group-text  " id="dob-pre">DOB </span>
+                    <span class="input-group-text" id="dob-pre">DOB </span>
                   </div>
-                  <input type="text" class="form-control" id="dob" read-only value="" readonly>
+                  <input type="text" class="form-control spr" id="dob" read-only value="" readonly>
                 </div>
 
                 <div class="input-group input-group-sm m-1 col-12 mb-3">
                   <div class="input-group-prepend">
                     <span class="input-group-text" id="tch-pre">Teacher</span>
                   </div>
-                  <input type="text" class="form-control" id="tch" read-only value="" readonly>
+                  <input type="text" class="form-control spr" id="teachname" read-only value="" readonly>
                 </div>
 
 
@@ -144,7 +144,7 @@
                   <div class="input-group-prepend">
                     <span class="input-group-text" id="tem-pre">EM</span>
                   </div>
-                  <input type="text" class="form-control editable" id="tem" value="">
+                  <input type="text" class="form-control editable spr" id="teachemail" value="">
                 </div>
 
               </div>
@@ -152,9 +152,9 @@
               <div class="form-row align-items-center">
                 <div class="input-group input-group-sm m-1 mb-3">
                   <div class="input-group-prepend">
-                    <span class="input-group-text  " id="idNo-pre">ID(SEIS) </span>
+                    <span class="input-group-text  " id="seis_id-pre">ID(SEIS) </span>
                   </div>
-                  <input type="text" class="form-control" id="idNo" value="">
+                  <input type="text" class="form-control spr" id="seis_id" value="">
                 </div>
               </div>
               <div class="form-row align-items-center">
@@ -162,26 +162,26 @@
                   <div class="input-group-prepend">
                     <span class="input-group-text  " id="stuem-pre">EM</span>
                   </div>
-                  <input type="text" class="form-control" id="stuem" value="" readonly>
+                  <input type="text" class="form-control spr" id="stuemail" value="" readonly>
                 </div>
                 <div class="input-group input-group-sm m-1 col-12 mb-3">
                   <div class="input-group-prepend">
                     <span class="input-group-text" id="parents-pre">Parents </span>
                   </div>
-                  <input type="text" class="form-control" id="parentsCopy" value="" name="clickCopy">
+                  <input type="text" class="form-control spr" id="parentscopy" value="" name="clickCopy">
                 </div>
 
               </div>
               <div class="form-row align-items-center">
                 <div class="input-group input-group-sm m-1 col-12 mb-3">
                   <div class="input-group-prepend">
-                    <span class="input-group-text  " id="phone-pre">PH1</span>
+                    <span class="input-group-text  " id="Parent_1_Home_Phone-pre">PH1</span>
                   </div>
-                  <input type="text" class="form-control editable" id="phone" value="">
+                  <input type="text" class="form-control editable spr" id="parent_1_home_phone" value="">
                   <div class="input-group-prepend">
                     <span class="input-group-text  " id="phone-pre2">PH2 </span>
                   </div>
-                  <input type="text" class="form-control editable" id="phone2" value="">
+                  <input type="text" class="form-control editable spr" id="u1_phone" value="">
                 </div>
               </div>
 
@@ -191,24 +191,24 @@
                   <div class="input-group-prepend">
                     <span class="input-group-text" id="mai-pre">EM1</span>
                   </div>
-                  <input type="text" class="form-control editable" id="pem" value="">
+                  <input type="text" class="form-control editable spr" id="parent_1_email" value="">
 
                   <div class="input-group-prepend">
                     <span class="input-group-text" id="mail2-pre">EM2</span>
                   </div>
-                  <input type="text" class="form-control editable" id="pem2" value="">
+                  <input type="text" class="form-control editable spr" id="u3_parent_1a_email" value="">
                 </div>
               </div>
 
               <div id="logEntryButtons" class="svChngs centered w-40% btn-group input-group input-group">
-                <button id="saveEntry" class="btn btn-sm btn-success my-1 saveEntryBtn">SAVE</button>
+                <!-- <button id="saveEntry" class="btn btn-sm btn-success my-1 saveEntryBtn">SAVE</button> -->
                 <button id="snipThis" class="btn btn-sm btn-primary my-1 snipThis">SNIP</button>
               </div>
             </form>
           </div>
           <div class="card-footer p-1">
             <p style="font-size: medium; margin: 5px;">Notes</p>
-            <textarea name="notes" id="notes" cols="40" rows="6"
+            <textarea name="notes" class="spr" id="notes" cols="40" rows="6"
               style="margin-top: 0px; width: 100%; height: 130px"></textarea>
             <button class="btn btn-sm btn-success" onclick="openAddStudentModal()" style="font-weight: bold;">+
               STUDENT</button>
@@ -253,7 +253,7 @@
               <button id="cancelEntry_2" class="btn btn-sm btn-secondary svChngs cancelEntryBtn">CANCEL</button>
               <button id="printEntry" class="btn btn-sm btn-primary svChngs printEntryBtn"
                 onclick="openLogPrintDialog()">PRINT</button>
-              <!-- ($('#idNo').val(), 'printedLogs') -->
+              <!-- ($('#seis_id').val(), 'printedLogs') -->
             </div>
           </span>
           <!-- <p class="my-0">header text R2C1</p> -->
@@ -686,7 +686,7 @@
             <div class="modal-footer">
               <button type="button" class="btn btn-sm btn-secondary" data-dismiss="modal">CANCEL</button>
               <button id="printEntry" class="btn btn-sm btn-primary svChngs printEntryBtn"
-                onclick="printLogs($('#idNo').val(), 'printedLogs')">GET ENTRIES</button>
+                onclick="printLogs($('#seis_id').val(), 'printedLogs')">GET ENTRIES</button>
               <button type="button" class="btn btn-sm btn-success" data-dismiss="modal"
                 onclick="printSelectedLogEntries()">MAKE PDF</button>
 
