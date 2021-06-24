@@ -1,5 +1,8 @@
 // Compiled using ts2gas 3.6.4 (TypeScript 4.2.4)
 // Compiled using ts2gas 3.6.4 (TypeScript 4.2.4)
+
+import { logging } from "googleapis/build/src/apis/logging";
+
 // Compiled using ts2gas 3.6.4 (TypeScript 4.1.3)
 var ss = SpreadsheetApp.getActiveSpreadsheet();
 var roster = ss.getSheetByName('roster');
@@ -54,15 +57,15 @@ function sendLevelsForm(stuName, stuId, teachemail) {
     saveLogEntry([stuId, "levels ques sent: " + teachemail]);
     return stuId; // picked up by success handler (focus())
 }
-function saveLastId(id) {
-    PropertiesService.getScriptProperties()
-        .setProperty('lastId', id.toString());
-    return id;
-}
+// function saveLastId(id) {
+//     PropertiesService.getScriptProperties()
+//         .setProperty('lastId', id.toString());
+//     return id;
+// }
 function doGet(e) {
     ss.getSheetByName('roster').sort(1);
     var t = HtmlService.createTemplateFromFile("caseLog");
-    t.version = "v26";
+    t.version = "v27";
     return t.evaluate().setXFrameOptionsMode(HtmlService.XFrameOptionsMode.ALLOWALL);
 }
 function doPost(e) {
@@ -80,25 +83,25 @@ function doPost(e) {
     ]);
 }
 // gets the last id stored in a script properties
-function getLastId() {
-    var scriptProp = PropertiesService.getScriptProperties()
-    var savedId = scriptProp.getProperty('lastId').toString();
-    var last = ss.getSheetByName('roster').getRange('J2:J').getValues().filter(String).length;
-    var idList = ss.getSheetByName('roster').getRange('J2:J' + (last + 1)).getValues().flat();
-    if (
-        (savedId.search(/[0-9]{7}/g) != -1) &&
-        (idList.indexOf(savedId) != -1)) {
-        var id = savedId;
-        Logger.log('id is %s', id);
-    }
-    else {
-        // if nothing is there, it gets the id of the First Student in the list on the spreadsheet
-        id = idList[0].toString();
-        scriptProp.setProperty('lastId', id);
-        Logger.log('id is %s', id);
-    }
-    return id;
-}
+// function getLastId() {
+//     var scriptProp = PropertiesService.getScriptProperties()
+//     var savedId = scriptProp.getProperty('lastId').toString();
+//     var last = ss.getSheetByName('roster').getRange('J2:J').getValues().filter(String).length;
+//     var idList = ss.getSheetByName('roster').getRange('J2:J' + (last + 1)).getValues().flat();
+//     if (
+//         (savedId.search(/[0-9]{7}/g) != -1) &&
+//         (idList.indexOf(savedId) != -1)) {
+//         var id = savedId;
+//         Logger.log('id is %s', id);
+//     }
+//     else {
+//         // if nothing is there, it gets the id of the First Student in the list on the spreadsheet
+//         id = idList[0].toString();
+//         scriptProp.setProperty('lastId', id);
+//         Logger.log('id is %s', id);
+//     }
+//     return id;
+// }
 // script and CSS files have to be stored in HTML files for Google app script
 function include(filename) {
     return HtmlService.createHtmlOutputFromFile(filename)
@@ -132,7 +135,8 @@ function saveLogEntry(input) {
     var range = logResp.getRange(colAlen + 1, 1, 1, row[0].length);
     range.setValues(row);
     SpreadsheetApp.flush();
-    return id;
+    Logger.log('id is %s and row is %s', id, JSON.stringify(row));
+    return [id, row[0]];
 }
 /**
  *
@@ -960,14 +964,14 @@ function getTableData_roster(id) {
 }
 // this returns contact log data to the client-side script
 // called by "    $("body").on("click", ".setStudent", function (event) {..."
-function getLogEntries(array) {
+function getLogEntries_old(array) {
     Logger.log('array = %s', JSON.stringify(array));
     var id = array[0];
     var loc = array[1];
     SpreadsheetApp.flush();
-    if (id === void 0) {
-        id = getLastId();
-    }
+    // if (id === void 0) {
+    //     id = getLastId();
+    // }
     // lt_logLogTimeStart(eval(fname));
     var d1 = new Date();
     // lt_logLogTimeStart(eval(fname));    
@@ -987,6 +991,7 @@ function getLogEntries(array) {
     });
     return [logEntriesFilt, loc];
 }
+
 /**
  *
  * @param sheetName
@@ -1214,9 +1219,9 @@ function addTimTest() {
     }
 }
 function makeLevelsShortcut(id) {
-    if (id === void 0) {
-        id = getLastId();
-    }
+    // if (id === void 0) {
+    //     id = getLastId();
+    // }
     var sheet, range, values, last;
     sheet = ss.getSheetByName('levels');
     last = sheet.getRange('A1:A').getValues().filter(String).length;
@@ -1885,6 +1890,38 @@ function getFirstPointer() {
     var idList = ss.getSheetByName('roster').getRange('J2:J' + (last + 1)).getDisplayValues().flat();
     Logger.log(JSON.stringify(idList[0]));
     return idList[0];
+}
+
+function getLogEntries() {
+    var sheet = ss.getSheetByName('roster');
+    var last = sheet.getRange('A1:A').getValues().filter(String).length;
+    var range = sheet.getRange(2, 10, last - 1, 1);
+    var ids = range.getDisplayValues().flat();
+
+    var allRecords = [];
+    var logs = ss.getSheetByName('logRespMerged').getRange('A2:J').getDisplayValues();
+    for (let i = 0; i < ids.length; i++) {
+        var el = ids[i];
+        var stuRecord = [];
+        var count = 0;
+        for (let j = logs.length - 1; j > -1; j--) {
+            var log = logs[j];
+            if (log[5] == el) {
+                stuRecord.push(log);
+                count++;
+                if (count > 9) { break; }
+            }
+        }
+        allRecords.push([el, stuRecord]);
+    }
+    Logger.log(JSON.stringify(allRecords));
+    Logger.log('length = %s', allRecords.length);
+    Logger.log('next length is %s', allRecords[0].length);
+    Logger.log('next length is %s', allRecords[0][0].length);
+
+    return allRecords;
+
+    // Logger.log('objArray = %s', JSON.stringify(objArray));
 }
 //# sourceMappingURL=module.jsx.map
 //# sourceMappingURL=module.jsx.map

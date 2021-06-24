@@ -216,48 +216,26 @@
         </div>
       </div>
 
-      <div class="card col-sm p-1 m-2 rosterList">
-        <div class="card-header">
-        </div>
-        <div class="card-body p-0 m-1">
-
-          <div class="table m-0 p-0" style="height: 650px;">
-            <table id="rosterList" class="table table">
-              <div class="thead sticky-top">
-                <thead id="loc00th" class="thead sticky-top">
-                  <!-- insert headings for due dates table -->
-                </thead>
-              </div>
-              <tbody id="loc00tb">
-                <!-- insert names and dates -->
-              </tbody>
-            </table>
-          </div>
-        </div>
-        <div class="card-footer">
-        </div>
-      </div>
-
       <div class="card col-sm p-1 m-2 contactCaseLog">
         <div class='card-header'>
+          <h6 style="color: #555555; margin-right: 5px;">New Log Entry:</h6>
           <textarea id="logEntry" class="editable m-1" style="width: 100%;" name="logEntry"></textarea>
+          <div id="logEntryButtons_2" class="input-group input-group svChngs">
+            <span style="display: inline-flex; vertical-align: top;">
+  
+              <div class="btn-group" role="group">
+                <button id="saveEntry_2" class="btn btn-sm btn-success  svChngs saveEntryBtn">SAVE</button>
+                <button id="cancelEntry_2" class="btn btn-sm btn-secondary svChngs cancelEntryBtn">CANCEL</button>
+                <button id="printEntry" class="btn btn-sm btn-primary svChngs printEntryBtn"
+                  onclick="openLogPrintDialog()">PRINT</button>
+                <!-- ($('#seis_id').val(), 'printedLogs') -->
+              </div>
+            </span>
+            <!-- <p class="my-0">header text R2C1</p> -->
+          </div>
         </div>
 
 
-        <div id="logEntryButtons_2" class="input-group input-group svChngs">
-          <h6 style="color: #555555; margin-right: 5px;">New Entry:</h6>
-          <span style="display: inline-flex; vertical-align: top;">
-
-            <div class="btn-group" role="group">
-              <button id="saveEntry_2" class="btn btn-sm btn-success  svChngs saveEntryBtn">SAVE</button>
-              <button id="cancelEntry_2" class="btn btn-sm btn-secondary svChngs cancelEntryBtn">CANCEL</button>
-              <button id="printEntry" class="btn btn-sm btn-primary svChngs printEntryBtn"
-                onclick="openLogPrintDialog()">PRINT</button>
-              <!-- ($('#seis_id').val(), 'printedLogs') -->
-            </div>
-          </span>
-          <!-- <p class="my-0">header text R2C1</p> -->
-        </div>
 
         <div class="card-body p-0 m-0 ">
           <div class="table " style="margin-top: 0; padding: 0; height: 425px;">
@@ -284,6 +262,28 @@
               <!-- this is where upcoming events are inserted -->
             </ul>
           </div>
+        </div>
+      </div>
+
+      <div class="card col-sm p-1 m-2 rosterList">
+        <div class="card-header">
+        </div>
+        <div class="card-body p-0 m-1">
+
+          <div class="table m-0 p-0" style="height: 650px;">
+            <table id="rosterList" class="table table">
+              <div class="thead sticky-top">
+                <thead id="loc00th" class="thead sticky-top">
+                  <!-- insert headings for due dates table -->
+                </thead>
+              </div>
+              <tbody id="loc00tb">
+                <!-- insert names and dates -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+        <div class="card-footer">
         </div>
       </div>
 
@@ -525,14 +525,12 @@
               <div class="form-row align-items-center p-2" style="display: inline-flexbox;">
 
                 <div class='input-group input-group-sm m-1 col-5'>
-                  <div class='input-group-prepend'><span class='input-group-text' name='addFn'
-                      id='addFnPre'>First: </span></div><input type='text' class='form-control' name='addFn'
-                    id='addFn'>
+                  <div class='input-group-prepend'><span class='input-group-text' name='addFn' id='addFnPre'>First:
+                    </span></div><input type='text' class='form-control' name='addFn' id='addFn'>
                 </div>
                 <div class='input-group input-group-sm m-1 col-5'>
-                  <div class='input-group-prepend'><span class='input-group-text' name='addLn'
-                      id='addLnPre'>Last: </span></div><input type='text' class='form-control' name='addLn'
-                    id='addLn'>
+                  <div class='input-group-prepend'><span class='input-group-text' name='addLn' id='addLnPre'>Last:
+                    </span></div><input type='text' class='form-control' name='addLn' id='addLn'>
                 </div>
                 <div class='input-group input-group-sm m-1 col-5'>
                   <div class='input-group-prepend'><span class='input-group-text' name='StudentID'

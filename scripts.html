@@ -11,8 +11,9 @@
         google.script.run
           .withSuccessHandler(setPointerAndStart)
           .getFirstPointer();
+
       } else {
-        contactInfo(id);
+        // contactInfo(id);
         console.log('current id at startup is %s', id);
 
         document.body.style.cursor = "wait";
@@ -20,35 +21,14 @@
           .withSuccessHandler(showRosterTable)
           .getTableData_roster(id);
 
-        document.body.style.cursor = "wait";
-
-        // this retrieves information from the meetings sheet to display
-        document.body.style.cursor = "wait";
-        google.script.run
-          .withSuccessHandler(showCalData)
-          .getCalData_events();
-      }
-      function setPointerAndStart(id) {
-        localStorage.setItem('lastId', id);
-        startup();
-        // contactInfo(id);
-        // console.log('current id at startup is %s', id);
-
-        // document.body.style.cursor = "wait";
-        // google.script.run
-        //   .withSuccessHandler(showRosterTable)
-        //   .getTableData_roster(id);
-
-        // document.body.style.cursor = "wait";
-
-        // // this retrieves information from the meetings sheet to display
-        // document.body.style.cursor = "wait";
-        // google.script.run
-        //   .withSuccessHandler(showCalData)
-        //   .getCalData_events();
+        focus(id);
       }
     }
 
+    function setPointerAndStart(id) {
+      localStorage.setItem('lastId', id);
+      startup();
+    }
 
     // var id = google.script.run.getLastId();
     $("#ready").hide();
@@ -58,15 +38,6 @@
     // loading data into the cards
     // this gets the data to be displayed for the student in focus, but not the log entries yet
     document.body.style.cursor = "wait";
-
-    // $('.toast').hide();
-    // var gSmL = localStorage.getItem('glLvl');
-    // var gSmA = localStorage.getItem('glArea');
-    // get saved search options for goals
-    // if (localStorage.getItem('glLvl') && localStorage.getItem('glArea')) {
-    // $("select option[value=" + gSmL + "]").attr('selected', 'selected');
-    // $("select option[value=" + gSmA + "]").attr('selected', 'selected');
-    // }
 
     // click student name in roster table switches to that student for both contact info and
     // log entries
@@ -231,25 +202,15 @@
       document.body.style.cursor = "wait";
       var entry = $("#logEntry").val();
       var id = $("#seis_id").val();
-      var Parent_1_Home_Phone = $("#Parent_1_Home_Phone").val();
-      var Parent_1_Email = $("#Parent_1_Email").val();
-      var u1_phone = $("#u1_phone").val();
-      var u3_Parent_1a_Email = $("#u3_Parent_1a_Email").val();
-      var teachemail = $("#teachemail").val();
-      var notes = $("#notes").val();
-      var record = 'rec' + id;
-      console.log('record = %s', JSON.stringify(record));
-      store(record);
-      google.script.run
-        .withSuccessHandler(showLogUpdates)
-        .updateRecord([id, Parent_1_Home_Phone, pem, u1_phone, pem2, tem, notes]);
       if (entry.length > 0) {
         $("html,body").css("cursor", "wait");
+        console.log('id and entry are %s and %s', id, entry);
         google.script.run
-          .withSuccessHandler(focus)
+          .withSuccessHandler(updateLogEntryCache)
           .saveLogEntry([id, entry]);
       }
       document.body.style.cursor = "default";
+      $("#logEntry").val('');
     });
     // turn the color of the button back to green without doing anything
     $("body").on("click", "#cancelEntryBtn", function (event) {
@@ -306,30 +267,46 @@
   // named functions
   // calls function on server side to return data for this student
 
-  function focus(id) {
+  function focus(id = getPointer()) {
     setPointer(id);
     contactInfo(id);
-    google.script.run
-      .withSuccessHandler(showLog)
-      .getLogEntries([id, "loc01"]);
+    if (localStorage.getItem("reclog" + id) != null) {
+      var logs = JSON.parse(localStorage.getItem("reclog" + id));
+      console.log('the log entries are: %s', JSON.stringify(logs));
+      showLog(logs);
+    } else {
+      google.script.run
+        .withSuccessHandler(logsToCache)
+        .getLogEntries();
+    }
   }
-  function showNewStu(id) {
-    google.script.run
-      .withSuccessHandler()
-      .saveLastId(id);
-    localStorage.setItem('lastId', id);
-    google.script.run
-      .withSuccessHandler(showRosterTable)
-      .getTableData_roster();
+
+  function logsToCache(allRecords) {
+    for (let i = 0; i < allRecords.length; i++) {
+      const elAll = allRecords[i];
+      // these records have id numbers at 0; within each id number item lies a 2-d array with contact log entries      
+      var key = 'reclog' + elAll[0];
+      var val = JSON.stringify(elAll[1]);
+      localStorage.setItem(key, val);
+    }
   }
+  // for (let i = 0; i < obs.length; i++) {
+  //   const element = obs[i];
+  //   localStorage.setItem(key, element);
+
+  // }
+  // if (Object.hasOwnProperty.call(obj, key)) {
+  //     const element = obj[key];
+  //   }
+  // }
 
   function contactInfo(id = getPointer()) {
 
-    console.log('id = %s', id);
-    localStorage.setItem('lastId', id);
+    console.log("id = %s", id);
+    localStorage.setItem("lastId", id);
 
-    if (localStorage.getItem('rec' + id)) {
-      showContactInfo(JSON.parse(localStorage.getItem('rec' + id)));
+    if (localStorage.getItem("rec" + id)) {
+      showContactInfo(JSON.parse(localStorage.getItem("rec" + id)));
     } else {
       google.script.run
         .withSuccessHandler(showContactInfo)
@@ -337,7 +314,7 @@
     }
   }
   //   $("#loc01tb").hide();
-  //   var key = 'rec' + id;
+  //   var key = "rec' + id;
   //   if (localStorage[key] != null) {
   //     showFocusRecord(JSON.parse(localStorage[key]));
   //   } else {
@@ -388,18 +365,18 @@
     });
 
     // this isn't necessary b/c it just received id as a param from server
-    google.script.run
-      .saveLastId(id);
+    // google.script.run
+    //   .saveLastId(id);
 
-    var loc = 'loc01';
-    printLogs(id, loc);
+    // var loc = 'loc01';
+    // printLogs(id, loc);
     document.body.style.cursor = "default";
   }
-  function printLogs(id, loc) {
-    google.script.run
-      .withSuccessHandler(showLog)
-      .getLogEntries([id, loc]);
-  }
+  // function printLogs(id, loc) {
+  //   google.script.run
+  //     .withSuccessHandler(showLog)
+  //     .getLogEntries([id, loc]);
+  // }
 
   // search the goal bank for goals of a given level and area
   function findGoals() {
@@ -655,89 +632,25 @@
     $('#printLogStuName').html('<h4>' + $('#stuName').val() + '</h4>');
 
   }
-  function showLog(array) { // [entries, id]
+  function showLog(logEntries) { // [entries, id]
     // input is an array containing one arrays and one string ('loc'): array contains all the log entries that correspond to that record
-    var [logEntries, loc] = array;
-    // console.log('the entries: %s', JSON.stringify(logEntries));
-    // console.log('the locations: %s', loc);
+    console.log('in "showLog" the log entries are: %s', JSON.stringify(logEntries));
 
-    var list = $("#" + loc + "tb");
+    var list = $("#loc01" + "tb");
     list.empty();
 
-    var entries = [];
     var stuName = First_Name + ' ' + Last_Name;
     for (var i = 0; i < logEntries.length; i++) {
+      var el = logEntries[i];
       var [
         Timestamp, email, studentMC, log_entry, empty, seis_id, Last_Name, First_Name, First_Name, Student_ID
-      ] = logEntries[i];
-      var dateStamp = moment(Timestamp).format('YYYY-MM-DD');
-      var tmStamp = moment(Timestamp).format('HH:mm')
-      entries.push([dateStamp, tmStamp, log_entry]);
-    }
-
-    // if (entries.length > 0) {
-    var dateStart = moment().subtract(1, 'y');
-    var dateEnd = moment(new Date());
-    if (loc == 'printedLogs') {
-      // return only items within the defined date range in the printLog dialog.val();
-      $('#logModal').modal({
-        focus: true
-      });
-      var bDt = moment($('#stDtEdit').val()).format('YYYY-MM-DD');
-      var eDt = moment($('#endDtEdit').val()).format('YYYY-MM-DD');
-
-      // console.log('begin %s; end %s', JSON.stringify(bDt), JSON.stringify(eDt));
-
-      dateStart = (bDt == 'Invalid date') ?
-        moment().subtract(1, 'y') :
-        moment(bDt).subtract(1, 'd');
-
-
-      dateEnd = (eDt == 'Invalid date') ?
-        moment() :
-        moment($('#endDtEdit').val()).format('YYYY-MM-DD');
-
-      $('#stDtEdit').attr('value', moment(dateStart).subtract(1, 'd').format('YYYY-MM-DD'));
-      $('#endDtEdit').attr('value', moment(dateEnd).add(1, 'd').format('YYYY-MM-DD'));
-
-      $('#printLogStuName').html('<h4>' + $('#stuName').val() + '</h4>');
-    }
-
-    list.empty();
-
-    // array will be put in localStorage
-    // var array = [];
-    // for (let j = 0; j < entries.length; j++) {
-    //   let [theDate, theEvent] = entries[j];
-    //   // console.log('this log date is %s; start is: %s; end is: %s', JSON.stringify(theDate), JSON.stringify(dateStart), JSON.stringify(dateEnd));
-    //   if (moment(theDate).isAfter(dateStart) && moment(theDate).isBefore(dateEnd)) {
-    //     var timeStamp = moment(theDate).format("YYYY-MM-DD") + '\n' +
-    //       moment(theDate).format("HH:mm");
-    //     var timeStampDt = moment(theDate).format("YYYY-MM-DD");
-    //     var timeStampTm = moment(theDate).format("HH:mm");
-
-    //     list.append(
-    //       "<tr>" +
-    //       "<td class='tableDateL'>" + timeStampDt + '<br>' + timeStampTm + "</td>" +
-    //       "<td>" + theEvent.toString() + "</td>" +
-    //       "</tr>"
-    //     );
-    //     array.push([timeStamp, theEvent]);
-    //   }
-    // }
-    // stores array in localStorage for retrieval in case we want to write a pdf file
-    //   localStorage.setItem('logPrint', JSON.stringify(array));
-    // } else {
-    // no log entries returned
-    for (let i = 0; i < entries.length; i++) {
-      const el = entries[i];
-
+      ] = el;
       list.append(
         '<tr><td class="tableDate">' +
-        el[0] + '<br>' + el[1] +
+        moment(el[0]).format("YYYY-MM-DD") +
         "</td>" +
         "<td>" +
-        el[2].toString() +
+        el[3].toString() +
         "</td>" +
         "</tr>"
       );
@@ -746,10 +659,36 @@
       $(this).css("background-color", "#ff0000")
     });
 
-    $("#" + loc + "tb").show();
+    $("#" + 'loc01' + "tb").show();
 
     document.body.style.cursor = "default";
+
   }
+
+  // array will be put in localStorage
+  // var array = [];
+  // for (let j = 0; j < entries.length; j++) {
+  //   let [theDate, theEvent] = entries[j];
+  //   // console.log('this log date is %s; start is: %s; end is: %s', JSON.stringify(theDate), JSON.stringify(dateStart), JSON.stringify(dateEnd));
+  //   if (moment(theDate).isAfter(dateStart) && moment(theDate).isBefore(dateEnd)) {
+  //     var timeStamp = moment(theDate).format("YYYY-MM-DD") + '\n' +
+  //       moment(theDate).format("HH:mm");
+  //     var timeStampDt = moment(theDate).format("YYYY-MM-DD");
+  //     var timeStampTm = moment(theDate).format("HH:mm");
+
+  //     list.append(
+  //       "<tr>" +
+  //       "<td class='tableDateL'>" + timeStampDt + '<br>' + timeStampTm + "</td>" +
+  //       "<td>" + theEvent.toString() + "</td>" +
+  //       "</tr>"
+  //     );
+  //     array.push([timeStamp, theEvent]);
+  //   }
+  // }
+  // stores array in localStorage for retrieval in case we want to write a pdf file
+  //   localStorage.setItem('logPrint', JSON.stringify(array));
+  // } else {
+  // no log entries returned
 
   function printSelectedLogEntries() {
     var stuName = $('#stuName').val();
@@ -887,8 +826,8 @@
     // google.script.run
     //   .withSuccessHandler(focus)
     //   .getLastId();
-    var id = getPointer();
-    focus(id);
+    // var id = getPointer();
+    // focus(id);
   }
 
   // bindSetStudentClick();
@@ -1079,15 +1018,15 @@
   }
 
 
-  function printLogs(id, loc) {
-    // console.log('upon start: id = %s; loc = %s', id, loc);
-    document.body.style.cursor = "wait";
-    var stuId, stuName;
-    stuName = $("#stuName").val();
-    google.script.run
-      .withSuccessHandler(showLog)
-      .getLogEntries([id, loc]);
-  }
+  // function printLogs(id, loc) {
+  //   // console.log('upon start: id = %s; loc = %s', id, loc);
+  //   document.body.style.cursor = "wait";
+  //   var stuId, stuName;
+  //   stuName = $("#stuName").val();
+  //   google.script.run
+  //     .withSuccessHandler(showLog)
+  //     .getLogEntries([id, loc]);
+  // }
   function successMsg(msgAndUrlJSON) {
     var object = JSON.parse(msgAndUrlJSON);
     var msg = object.msg;
@@ -1133,5 +1072,12 @@
   }
   function setPointer(id) {
     localStorage.setItem('lastId', id);
+  }
+
+  function updateLogEntryCache(array) {
+    var [id, row] = array;
+    var logs = JSON.parse(localStorage.getItem('reclog' + id));
+    logs.unshift(row);
+    showLog(logs);
   }
 </script>
