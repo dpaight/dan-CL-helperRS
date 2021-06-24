@@ -65,7 +65,7 @@ function sendLevelsForm(stuName, stuId, teachemail) {
 function doGet(e) {
     ss.getSheetByName('roster').sort(1);
     var t = HtmlService.createTemplateFromFile("caseLog");
-    t.version = "v27";
+    t.version = "v28";
     return t.evaluate().setXFrameOptionsMode(HtmlService.XFrameOptionsMode.ALLOWALL);
 }
 function doPost(e) {
@@ -1909,7 +1909,7 @@ function getLogEntries() {
             if (log[5] == el) {
                 stuRecord.push(log);
                 count++;
-                if (count > 9) { break; }
+                if (count > 19) { break; }
             }
         }
         allRecords.push([el, stuRecord]);
