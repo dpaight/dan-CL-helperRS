@@ -1,16 +1,25 @@
 {
   "timeZone": "America/Los_Angeles",
   "dependencies": {
-    "enabledAdvancedServices": [{
-      "userSymbol": "Tasks",
-      "serviceId": "tasks",
-      "version": "v1"
-    }],
-    "libraries": [{
-      "userSymbol": "Moment",
-      "libraryId": "15hgNOjKHUG4UtyZl9clqBbl23sDvWMS8pfDJOyIapZk5RBqwL3i-rlCo",
-      "version": "9"
-    }]
+    "enabledAdvancedServices": [
+      {
+        "userSymbol": "Tasks",
+        "serviceId": "tasks",
+        "version": "v1"
+      },
+      {
+        "userSymbol": "Calendar",
+        "version": "v3",
+        "serviceId": "calendar"
+      }
+    ],
+    "libraries": [
+      {
+        "userSymbol": "Moment",
+        "libraryId": "15hgNOjKHUG4UtyZl9clqBbl23sDvWMS8pfDJOyIapZk5RBqwL3i-rlCo",
+        "version": "9"
+      }
+    ]
   },
   "webapp": {
     "access": "MYSELF",

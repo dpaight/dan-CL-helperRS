@@ -26,7 +26,7 @@
     }
 
     function setPointerAndStart(id) {
-      localStorage.setItem('lastId', id);
+      sessionStorage.setItem('lastId', id);
       startup();
     }
 
@@ -183,7 +183,7 @@
       var id = $("#seis_id").val();
       var field = $(this).attr("id");
       var value = $(this).val();
-      console.log('id = %s, field = %s, value = %s', id, field, value);
+      // console.log('id = %s, field = %s, value = %s', id, field, value);
       google.script.run
         .withSuccessHandler(updateLocalStorage) // works with returned values: id, index, value
         .saveField([id, field, value]);
@@ -191,9 +191,9 @@
     });
     function updateLocalStorage(array) {
       var [id, index, value] = array;
-      var cachedRecord = JSON.parse(localStorage.getItem('rec' + id));
+      var cachedRecord = JSON.parse(sessionStorage.getItem('rec' + id));
       cachedRecord.splice(index, 1, value);
-      localStorage.setItem('rec' + id, JSON.stringify(cachedRecord));
+      sessionStorage.setItem('rec' + id, JSON.stringify(cachedRecord));
     }
 
     // save all data in changeable fields in the  spreadsheet
@@ -204,7 +204,7 @@
       var id = $("#seis_id").val();
       if (entry.length > 0) {
         $("html,body").css("cursor", "wait");
-        console.log('id and entry are %s and %s', id, entry);
+        // console.log('id and entry are %s and %s', id, entry);
         google.script.run
           .withSuccessHandler(updateLogEntryCache)
           .saveLogEntry([id, entry]);
@@ -260,6 +260,20 @@
           .sendLevelsForm(stuName, id, tem);
       }
     });
+
+    $("body").on("mouseenter", ".logEntry", function () {
+      $(this).css("cursor", "text");
+    });
+
+    $("body").on("click", ".logEntry", function (e) {
+      // console.log('event triggered a[name=goalList clicked');
+      e.preventDefault();
+      // open goal for editing
+      var log_entry_id = $(this).data("entry_id");
+      google.script.run
+        .withSuccessHandler(editLogEntryInModal)
+        .getLogEntry(log_entry_id);
+    });
   });
 
 
@@ -270,9 +284,9 @@
   function focus(id = getPointer()) {
     setPointer(id);
     contactInfo(id);
-    if (localStorage.getItem("reclog" + id) != null) {
-      var logs = JSON.parse(localStorage.getItem("reclog" + id));
-      console.log('the log entries are: %s', JSON.stringify(logs));
+    calRefresh();
+    if (sessionStorage.getItem("reclog" + id) != null) {
+      var logs = JSON.parse(sessionStorage.getItem("reclog" + id));
       showLog(logs);
     } else {
       google.script.run
@@ -287,13 +301,13 @@
       // these records have id numbers at 0; within each id number item lies a 2-d array with contact log entries      
       var key = 'reclog' + elAll[0];
       var val = JSON.stringify(elAll[1]);
-      localStorage.setItem(key, val);
+      sessionStorage.setItem(key, val);
     }
     focus();
   }
   // for (let i = 0; i < obs.length; i++) {
   //   const element = obs[i];
-  //   localStorage.setItem(key, element);
+  //   sessionStorage.setItem(key, element);
 
   // }
   // if (Object.hasOwnProperty.call(obj, key)) {
@@ -304,10 +318,10 @@
   function contactInfo(id = getPointer()) {
 
     console.log("id = %s", id);
-    localStorage.setItem("lastId", id);
+    sessionStorage.setItem("lastId", id);
 
-    if (localStorage.getItem("rec" + id)) {
-      showContactInfo(JSON.parse(localStorage.getItem("rec" + id)));
+    if (sessionStorage.getItem("rec" + id)) {
+      showContactInfo(JSON.parse(sessionStorage.getItem("rec" + id)));
     } else {
       google.script.run
         .withSuccessHandler(showContactInfo)
@@ -316,8 +330,8 @@
   }
   //   $("#loc01tb").hide();
   //   var key = "rec' + id;
-  //   if (localStorage[key] != null) {
-  //     showFocusRecord(JSON.parse(localStorage[key]));
+  //   if (sessionStorage[key] != null) {
+  //     showFocusRecord(JSON.parse(sessionStorage[key]));
   //   } else {
   //     google.script.run
   //       .withSuccessHandler(showFocusRecord)
@@ -361,8 +375,8 @@
     var id = $('#seis_id').val();
     records.forEach(function (el, i) {
       const key = 'rec' + el[9];
-      localStorage[key] = JSON.stringify(el);
-      // console.log(localStorage[key]);
+      sessionStorage[key] = JSON.stringify(el);
+      // console.log(sessionStorage[key]);
     });
 
     // this isn't necessary b/c it just received id as a param from server
@@ -390,14 +404,14 @@
     var id = $("#seis_id").val();
     // console.log("data passed to goal search: %s, %s, %s", glLvl, glArea, id);
 
-    localStorage.setItem('glLvl', glLvl);
-    localStorage.setItem('glArea', glArea);
+    sessionStorage.setItem('glLvl', glLvl);
+    sessionStorage.setItem('glArea', glArea);
     var search = glLvl + '_' + glArea;
 
 
-    if (localStorage.getItem('goals' + search)) {
+    if (sessionStorage.getItem('goals' + search)) {
       // console.log('getting items from cache for ' + search);
-      showGoals(localStorage.getItem('goals' + search));
+      showGoals(sessionStorage.getItem('goals' + search));
     } else {
       google.script.run
         .withSuccessHandler(showGoals)
@@ -411,8 +425,8 @@
 
   function getAllLevSnipForTB() {
     var id = $("#seis_id").val();
-    if (localStorage['lSnp' + $('#seis_id').val()] != null) {
-      showTBsnippet(localStorage['lvlsSnp' + $('#seis_id').val()]);
+    if (sessionStorage['lSnp' + $('#seis_id').val()] != null) {
+      showTBsnippet(sessionStorage['lvlsSnp' + $('#seis_id').val()]);
     } else {
       google.script.run
         .withSuccessHandler(showTBsnippet)
@@ -421,8 +435,8 @@
   }
   function getAllLevSnipForGoal() {
     var id = $("#seis_id").val();
-    if (localStorage['lSnp' + $('#seis_id').val()] != null) {
-      makeGoalSnip(localStorage['lvlsSnp' + $('#seis_id').val()]);
+    if (sessionStorage['lSnp' + $('#seis_id').val()] != null) {
+      makeGoalSnip(sessionStorage['lvlsSnp' + $('#seis_id').val()]);
     } else {
       google.script.run
         .withSuccessHandler(makeGoalSnip)
@@ -436,16 +450,16 @@
     var [
       nmjdob, idaeries, teachemail, u1_phone, stuemail, u3_parent_1a_email, corrlng, u5_lang, teachname, seis_id, last_name, first_name, date_of_birth, case_manager, date_of_last_annual_iep, date_of_last_evaluation, date_of_initial_parent_consent, parent_1_mail_address, parent_1_email, parent_1_home_phone, parent_1_cell_phone, grade_code, student_eligibility_status, disability_1, disability_2, parent_guardian_1_name, parent_guardian_2_name, date_of_next_annual_iep, reading_group, notes
     ] = record;
-    console.log('record: %s', JSON.stringify(record));
+    // console.log('record: %s', JSON.stringify(record));
     var key = seis_id;
-    localStorage.key = JSON.stringify(record);
+    sessionStorage.key = JSON.stringify(record);
 
     $("#langflu").val(u5_lang);
     $("#corrlng").val(corrlng);
     $("#stuname").val(first_name + ' ' + last_name);
     $("#namenav").text(first_name + ' ' + last_name);
     $("#dob").val(date_of_birth);
-    $("#parentscopy").val(parent_guardian_1_name);
+    $("#parent_guardian_1_name").val(parent_guardian_1_name);
     $("#parent_1_home_phone").val(parent_1_home_phone);
     $("#u1_phone").val(u1_phone);
     $("#parent_1_email").val(parent_1_email);
@@ -635,7 +649,7 @@
   }
   function showLog(logEntries) { // [entries, id]
     // input is an array containing one arrays and one string ('loc'): array contains all the log entries that correspond to that record
-    console.log('in "showLog" the log entries are: %s', JSON.stringify(logEntries));
+    // console.log('in "showLog" the log entries are: %s', JSON.stringify(logEntries));
 
     var list = $("#loc01" + "tb");
     list.empty();
@@ -644,16 +658,19 @@
     for (var i = 0; i < logEntries.length; i++) {
       var el = logEntries[i];
       var [
-        Timestamp, email, studentMC, log_entry, empty, seis_id, Last_Name, First_Name, First_Name, Student_ID
+        Timestamp, email, studentMC, log_entry, log_entry_id, seis_id, Last_Name, First_Name, First_Name, Student_ID
       ] = el;
       list.append(
-        '<tr><td class="tableDate">' +
+        '<tr>' +
+        '<td data-entry_id=' +
+        log_entry_id + ' class="tableDate logEntry"'+ 'data-toggle="tooltip" data-placement="left" data-html="true" title ' +
+        ' data-original-title= "click to edit">' +
         moment(el[0]).format("YYYY-MM-DD") +
-        "</td>" +
-        "<td>" +
+        '</td>' +
+        '<td data-entry_id=' + log_entry_id + ' class="tableDate logEntry" style="text-align: left;">' +
         el[3].toString() +
-        "</td>" +
-        "</tr>"
+        '</td>' +
+        '</tr>'
       );
     }
     $("#corrlng[value='01']", function () {
@@ -666,7 +683,7 @@
 
   }
 
-  // array will be put in localStorage
+  // array will be put in sessionStorage
   // var array = [];
   // for (let j = 0; j < entries.length; j++) {
   //   let [theDate, theEvent] = entries[j];
@@ -686,14 +703,14 @@
   //     array.push([timeStamp, theEvent]);
   //   }
   // }
-  // stores array in localStorage for retrieval in case we want to write a pdf file
-  //   localStorage.setItem('logPrint', JSON.stringify(array));
+  // stores array in sessionStorage for retrieval in case we want to write a pdf file
+  //   sessionStorage.setItem('logPrint', JSON.stringify(array));
   // } else {
   // no log entries returned
 
   function printSelectedLogEntries() {
     var stuName = $('#stuName').val();
-    var array = JSON.parse(localStorage.getItem('logPrint'));
+    var array = JSON.parse(sessionStorage.getItem('logPrint'));
     document.body.style.cursor = "wait";
     google.script.run
       .withSuccessHandler(showToast)
@@ -769,8 +786,8 @@
   function showLogUpdates(record) {
     //update the browser cache with saved data
     var key = 'rec' + record[9];
-    localStorage[key] = JSON.stringify(record);
-    // console.log(localStorage[key]);
+    sessionStorage[key] = JSON.stringify(record);
+    // console.log(sessionStorage[key]);
     // get contact logs
     $("#logEntry").val("");
     document.body.style.cursor = "default";
@@ -894,7 +911,7 @@
     snip += ',"fn"="' + $("#stuName").val().toString().replace(/([A-Z]{1}[a-z]+) ([A-Z]{1}[A-z]+)/, "$1") + '"';
     snip += ',"ln"="' + $("#stuName").val().toString().replace(/([A-Z]{1}[a-z]+) ([A-Z]{1}[A-z]+)/, "$2") + '"';
     snip += ',"dob"="' + $("#dob").val() + '"';
-    snip += ',"par"="' + $("#parentsCopy").val() + '"';
+    snip += ',"par"="' + $("#parent_guardian_1_name").val() + '"';
     snip += ',"ph1"="' + $("#Parent_1_Home_Phone").val() + '"';
     snip += ',"ph2"="' + $("#u1_phone").val() + '"';
     snip += ',"pem1"="' + $("#Parent_1_Email").val() + '"';
@@ -973,16 +990,24 @@
     obj.timestamp = new Date().toLocaleDateString();
 
     // console.log('data = %s', JSON.stringify(data));
-    console.log('data is %s', JSON.stringify(obj));
+    // console.log('data is %s', JSON.stringify(obj));
     google.script.run
       .withSuccessHandler(saveGoalSuccess)
       .saveGoalSS(obj);
 
   }
   function saveGoalSuccess(value) {
-    console.log('returned: %s', value);
+    // console.log('returned: %s', value);
     findGoals();
   }
+  function saveLogEntrySuccess(obj) {
+    // console.log('returned: %s', JSON.stringify(obj));
+    sessionStorage.removeItem('reclog' + obj.seis_id);
+    focus(obj.seis_id);
+  }
+
+
+
   function Goal(id, grdLvl, area, strand, annual, standard, objctv1, objctv2, objctv3, timestamp) {
     this.id = id;
     this.lvl = grdLvl;
@@ -1057,28 +1082,66 @@
     obj.lastEval = $("#lastEval").val();
     obj.seisID = $("#seisID").val();
 
-    console.log(JSON.stringify(obj));
+    // console.log(JSON.stringify(obj));
 
     google.script.run
       .withSuccessHandler(showNewStu)
       .addStudentByIdFromRESstudentsServer(obj);
   }
   function reload() {
-    localStorage.clear();
+    sessionStorage.clear();
     window.open('https://script.google.com/a/macros/hemetusd.org/s/AKfycbyuLrQ4FFJ2B-wErlCVm4yg9YxldINmlUNE9K0HFCKj/dev', '_top')
   }
 
   function getPointer() {
-    return localStorage.getItem('lastId');
+    return sessionStorage.getItem('lastId');
   }
   function setPointer(id) {
-    localStorage.setItem('lastId', id);
+    sessionStorage.setItem('lastId', id);
   }
 
   function updateLogEntryCache(array) {
     var [id, row] = array;
-    var logs = JSON.parse(localStorage.getItem('reclog' + id));
+    var logs = JSON.parse(sessionStorage.getItem('reclog' + id));
     logs.unshift(row);
+    sessionStorage.setItem('reclog' + id, JSON.stringify(logs));
     showLog(logs);
   }
+
+  function editLogEntryInModal(logEntry) {
+    // console.log('the log record is %s', JSON.stringify(logEntry));
+    $('#logEntryModal').modal({
+      focus: true
+    });
+    $('#lelog_entry_id').val(logEntry.log_entry_id);
+    $('#leEntry').val(logEntry.log_entry);
+    $('#timestamp').val(logEntry.timestamp);
+  }
+
+  function saveEditedEntry(option) {
+    var obj = {};
+    obj.lelog_entry_id = $('#lelog_entry_id').val();
+    obj.leEntry = $('#leEntry').val().toString();
+    obj.letimestamp = new Date().toLocaleDateString();
+    obj.delete = (option != -1) ? false : true;
+    obj.seis_id = $("#seis_id").val();
+    google.script.run
+      .withSuccessHandler(saveLogEntrySuccess)
+      .saveEditedLogEntry(obj);
+
+  }
+
+  // var logEntry = {
+  //   "timeStamp": el[0],
+  //   "email": el[1],
+  //   "studentMC": el[2],
+  //   "log_entry": el[3],
+  //   "log_entry_id": el[4],
+  //   "SEIS_ID": el[5],
+  //   "Last_Name": el[6],
+  //   "First_Name": el[7],
+  //   "Student_ID": el[8]
+  // }
+
+
 </script>

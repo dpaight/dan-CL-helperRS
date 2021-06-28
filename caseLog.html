@@ -39,7 +39,7 @@
 <body>
   <!-- Navigation bar -->
   <nav class="navbar sticky-top navbar-expand-md navbar-dark bg-primary" style="z-index: 2000;">
-    <a class="navbar-brand" href="#" style="font-size: 1rem; font-weight: bold;">CASE LOGS</a>
+    <a class="navbar-brand" href="#" style="font-size: small; font-weight: bold;">CASE LOGS</a>
     <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent"
       aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
       <span class="navbar-toggler-icon"></span>
@@ -101,9 +101,9 @@
       </div>
     </div>
   </nav>
-  <div class="container-12">
+  <div class="container-fluid">
     <div class="row">
-      <div class="card col-sm p-0 m-2 stuInfo" style="font-size: 1rem;">
+      <div class="card col-sm p-0 m-2 stuInfo" style="font-size: small;">
         <div class="card-body">
           <div id="stuData">
             <form>
@@ -166,9 +166,9 @@
                 </div>
                 <div class="input-group input-group-sm m-1 col-12 mb-3">
                   <div class="input-group-prepend">
-                    <span class="input-group-text" id="parents-pre">Parents </span>
+                    <span class="input-group-text" id="parent_guardian_1_name-pre">Parents </span>
                   </div>
-                  <input type="text" class="form-control spr" id="parentscopy" value="" name="clickCopy">
+                  <input type="text" class="form-control spr" id="parent_guardian_1_name" value="">
                 </div>
 
               </div>
@@ -207,7 +207,7 @@
             </form>
           </div>
           <div class="card-footer p-1">
-            <p style="font-size: medium; margin: 5px;">Notes</p>
+            <p style="font-size: small; margin: 5px;">Notes</p>
             <textarea name="notes" class="spr" id="notes" cols="40" rows="6"
               style="margin-top: 0px; width: 100%; height: 130px"></textarea>
             <button class="btn btn-sm btn-success" onclick="openAddStudentModal()" style="font-weight: bold;">+
@@ -216,7 +216,7 @@
         </div>
       </div>
 
-      <div class="card col-sm p-1 m-2 contactCaseLog">
+      <div class="card col-sm p-1 m-2 contactCaseLog" style="font-size: small;">
         <div class='card-header'>
           <h6 style="color: #555555; margin-right: 5px;">New Log Entry:</h6>
           <textarea id="logEntry" class="editable m-1" style="width: 100%;" name="logEntry"></textarea>
@@ -265,7 +265,7 @@
         </div>
       </div>
 
-      <div class="card col-sm p-1 m-2 rosterList">
+      <div class="card col-sm p-1 m-2 rosterList" style="font-size: small;">
         <div class="card-header">
         </div>
         <div class="card-body p-0 m-1">
@@ -287,7 +287,7 @@
         </div>
       </div>
 
-      <div class="card col-sm p-1 m-2 TBlaze">
+      <div class="card col-sm p-1 m-2 TBlaze" style="font-size: small;">
         <div class="card-header">
           <h6 class="card-title">TextBlaze Snippets</h6>
           <h6 class="card-subtitle">Levels/Goals Bank</h6>
@@ -343,7 +343,7 @@
         </div>
         <div class="card-footer centerLabels">
           <textarea id="tbSnippetCopy" class="inline-flex tbSnippet" name="clickCopy" readonly
-            style="font-size: 1em; height: 3rem; width: 100%; margin: 0px; padding: 0px;"></textarea>
+            style="font-size: small; height: 3rem; width: 100%; margin: 0px; padding: 0px;"></textarea>
 
           <span style="display: inline-flex;">
             <div class="centered mx-1">
@@ -425,6 +425,49 @@
   <!-- modals and toasts -->
   <div class="container-fluid">
     <div class="row">
+      <div class="modal fade centered " id="logEntryModal" tabindex="-1" role="dialog" aria-labelledby="logEntryModalLabel"
+        aria-hidden="true" style="margin-top: 30px;">
+        <div class="modal-dialog" style="height: 500px;" role="document">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h5 class="modal-title" id="logEntryModalLabel">Edit logEntry</h5>
+              <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+              </button>
+            </div>
+            <div container-fluid>
+              <div class="form-row align-items-center p-2" style="display: inline-flexbox;">
+
+
+                <label for="glEditAnnual" class="form"
+                  style="margin-bottom: 0;margin-left: 2rem; font-size: small;">
+                  logEntry:</label>
+                <br>
+              </div>
+              <textarea name="leEdit" id="leEntry" class="editable logEntry col-11" style="height: 200px; "
+                name="logEntryText"></textarea>
+
+              <div class="input-group input-group-sm m-1 col-12">
+
+              </div>
+
+
+            </div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-sm btn-success" data-dismiss="modal"
+              onclick="saveEditedEntry()">SAVE</button>
+              <button type="button" class="btn btn-sm btn-secondary" data-dismiss="modal">CANCEL</button>
+              <button type="button" class="btn btn-sm btn-danger" data-dismiss="modal"
+              onclick="saveEditedEntry(-1)">DELETE</button>
+              <input id='lelog_entry_id' type='text' value='' style='background-color: lightyellow; width: 3rem;' readonly>
+
+            </div>
+
+          </div>
+        </div>
+      </div>
+
+
       <div class="modal fade centered " id="goalModal" tabindex="-1" role="dialog" aria-labelledby="goalModalLabel"
         aria-hidden="true" style="margin-top: 30px;">
         <div class="modal-dialog" style="height: 500px;" role="document">
@@ -467,7 +510,7 @@
                 </div>
 
                 <label for="glEditAnnual" class="form"
-                  style="margin-bottom: 0;margin-left: 2rem; font-size: medium;">Annual
+                  style="margin-bottom: 0;margin-left: 2rem; font-size: small;">Annual
                   Goal:</label>
                 <br>
               </div>
@@ -578,7 +621,7 @@
                 <span aria-hidden="true">&times;</span>
               </button>
             </div>
-            <div class="modal-body" style="text-align: left;">
+            <div class="modal-body" style="text-align: left;" >
               <p>To:</p>
               <textarea id="emailRecipients" class="editable email" style="width: 425px;"
                 name="emaiRecipients"></textarea>
@@ -693,7 +736,7 @@
         </div>
       </div>
 
-      <div style="font-size: medium;">
+      <div style="font-size: small;">
         <div class="toast ml-2 mb-2" data-autohide="true"
           style="position: absolute; bottom: 3rem; left: 3rem; z-index: 2100;">
           <div class="toast-header">

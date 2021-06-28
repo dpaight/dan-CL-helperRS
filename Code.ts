@@ -65,7 +65,7 @@ function sendLevelsForm(stuName, stuId, teachemail) {
 function doGet(e) {
     ss.getSheetByName('roster').sort(1);
     var t = HtmlService.createTemplateFromFile("caseLog");
-    t.version = "v28";
+    t.version = "v29";
     return t.evaluate().setXFrameOptionsMode(HtmlService.XFrameOptionsMode.ALLOWALL);
 }
 function doPost(e) {
@@ -126,16 +126,19 @@ function findLastRow(sheet, column) {
 }
 // takes Data sent from the client side and saves it on the server side spreadsheet; 
 // returns id for 'show...' function
-function saveLogEntry(input) {
+function saveLogEntry(input = ['1010101', 'test entry ' + moment()]) {
     var id = input[0], entry = input[1];
     var students = getAllRecords('roster');
-    var row = [[moment().format('MM/DD/YY HH:mm'), Session.getActiveUser().getEmail(), , entry, , id]];
     var logResp = ss.getSheetByName('logRespMerged');
     var colAlen = logResp.getRange('A1:A').getValues().filter(String).length;
+    var last = logResp.getRange("E1:E").getValues().filter(String).length;
+    var entry_ids = logResp.getRange('E2:E' + last).getValues().flat();
+    var log_entry_id = Math.max(...entry_ids) + 1;
+    var row = [[moment().format('MM/DD/YY HH:mm'), Session.getActiveUser().getEmail(), , entry, log_entry_id, id]];
     var range = logResp.getRange(colAlen + 1, 1, 1, row[0].length);
     range.setValues(row);
     SpreadsheetApp.flush();
-    Logger.log('id is %s and row is %s', id, JSON.stringify(row));
+    // Logger.log('id is %s and row is %s', id, JSON.stringify(row));
     return [id, row[0]];
 }
 /**
@@ -292,6 +295,31 @@ function getGoal(gId = 47) {
         // return false;
     }
     return goal;
+}
+function getLogEntry(logEntryID = '1') {
+    var sheet = ss.getSheetByName('logRespMerged');
+    var last = sheet.getRange('A1:A').getValues().filter(String).length;
+    var range = sheet.getRange(2, 1, last - 1, sheet.getLastColumn());
+    var values = range.getDisplayValues();
+    for (let i = 0; i < values.length; i++) {
+        const el = values[i];
+        if (el[4] == logEntryID) {
+            var logEntry = {
+                "timeStamp": el[0],
+                "email": el[1],
+                "studentMC": el[2],
+                "log_entry": el[3],
+                "log_entry_id": el[4],
+                "SEIS_ID": el[5],
+                "Last_Name": el[6],
+                "First_Name": el[7],
+                "First_Name2": el[8],
+                "Student_ID": el[9]
+            }
+            Logger.log('log entry is %s', JSON.stringify(logEntry));
+            return logEntry;
+        }
+    }
 }
 function getOneGoalForEditing(gId = 47) {
     var sheet = ss.getSheetByName('goals');
@@ -1914,14 +1942,61 @@ function getLogEntries() {
         }
         allRecords.push([el, stuRecord]);
     }
-    Logger.log(JSON.stringify(allRecords));
-    Logger.log('length = %s', allRecords.length);
-    Logger.log('next length is %s', allRecords[0].length);
-    Logger.log('next length is %s', allRecords[0][0].length);
-
     return allRecords;
 
     // Logger.log('objArray = %s', JSON.stringify(objArray));
 }
+function deleteEntry(entryId) {
+    Logger.log(entryId);
+    return entryId;
+}
+
+function saveEditedLogEntry(obj) {
+    // obj = {
+    //     "delete": true,
+    //     "lelog_entry_id": 548
+    // };
+    var sheet = ss.getSheetByName('logRespMerged');
+    var last = sheet.getRange('A1:A').getValues().filter(String).length;
+    var range = sheet.getRange('A1:J' + last);
+    var values = range.getValues();
+    for (let i = 0; i < values.length; i++) {
+        var el = values[i];
+        if (el[4] == obj.lelog_entry_id) {
+            if (obj.delete == true) {
+                values.splice(i, 1);
+                sheet.clearContents();
+                range = sheet.getRange(1, 1, values.length, values[i].length);
+                range.setValues(values);
+            } else {
+                var newEntry = [
+                    moment().format('YYYY-MM-DDTHH:mm'),
+                    el[1],
+                    el[2],
+                    obj.leEntry,
+                    getNextLogEntryId(),
+                    el[5],
+                    el[6],
+                    el[7],
+                    el[8],
+                    el[9]
+                ];
+                values.splice(i, 1, newEntry);
+                range = sheet.getRange(1, 1, values.length, el.length);
+                range.setValues(values);
+                // timestamp	email	studentMC	log_entry	log_entry_id	SEIS_ID	Last_Name	First_Name	First_Name2	Student_ID
+            }
+
+        }
+    }
+    return obj;
+}
+function getNextLogEntryId() {
+    var sheet = ss.getSheetByName('logRespMerged');
+    var last = sheet.getRange('A1:A').getValues().filter(String).length;
+    var entry_ids = sheet.getRange('E2:E' + last).getValues().flat();
+    return Math.max(...entry_ids) + 1;
+}
+
 //# sourceMappingURL=module.jsx.map
 //# sourceMappingURL=module.jsx.map
