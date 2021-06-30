@@ -85,7 +85,7 @@
         var mime_type = doc[google.picker.Document.MIME_TYPE];
         if (mime_type.search(/csv/) != -1) {
           var message =
-            '<p style="font-size:1.0em">Reading file...</p>';
+            '<p style="font-size:small;">Reading file...</p>';
           document.getElementById('result').innerHTML = message;
 
           google.script.run

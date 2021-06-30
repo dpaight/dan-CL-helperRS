@@ -39,7 +39,7 @@
 <body>
   <!-- Navigation bar -->
   <nav class="navbar sticky-top navbar-expand-md navbar-dark bg-primary" style="z-index: 2000;">
-    <a class="navbar-brand" href="#" style="font-size: small; font-weight: bold;">CASE LOGS</a>
+    <a class="navbar-brand" href="#" style="font-size: medium; font-weight: bold;">CASE LOGS</a>
     <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent"
       aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
       <span class="navbar-toggler-icon"></span>
@@ -103,8 +103,9 @@
   </nav>
   <div class="container-fluid">
     <div class="row">
-      <div class="card col-sm p-0 m-2 stuInfo" style="font-size: small;">
+      <div class="card col-sm p-0 m-2 stuInfo" style="font-size: medium;">
         <div class="card-body">
+          <h5>Current Student</h5>
           <div id="stuData">
             <form>
               <div class="form-row align-items-center">
@@ -113,13 +114,13 @@
                   <div class="input-group-prepend">
                     <span class="input-group-text   col-12" id="stuName-pre">Name</span>
                   </div>
-                  <input type="text" class="form-control" id="stuname" style="font-size: large; font-weight: bold;"
+                  <input type="text" class="form-control" id="stuName" style="font-size: large; font-weight: bold;"
                     value="" readonly>
                 </div>
 
                 <div class="input-group input-group-sm m-1 col-12 mb-3">
                   <div class="input-group-prepend">
-                    <span class="input-group-text  " id="stuName-pre">CrLng</span>
+                    <span class="input-group-text" id="corrlng-pre">CrLng</span>
                   </div>
                   <input type="text" class="form-control col-1 spr" id="corrlng" value="">
                   <div class="input-group-prepend">
@@ -207,7 +208,7 @@
             </form>
           </div>
           <div class="card-footer p-1">
-            <p style="font-size: small; margin: 5px;">Notes</p>
+            <p style="font-size: medium; margin: 5px;">Notes</p>
             <textarea name="notes" class="spr" id="notes" cols="40" rows="6"
               style="margin-top: 0px; width: 100%; height: 130px"></textarea>
             <button class="btn btn-sm btn-success" onclick="openAddStudentModal()" style="font-weight: bold;">+
@@ -216,13 +217,15 @@
         </div>
       </div>
 
-      <div class="card col-sm p-1 m-2 contactCaseLog" style="font-size: small;">
+      <div class="card col-sm p-1 m-2 contactCaseLog" style="font-size: medium;">
         <div class='card-header'>
+          <h6>Log Entries</h6>
           <h6 style="color: #555555; margin-right: 5px;">New Log Entry:</h6>
-          <textarea id="logEntry" class="editable m-1" style="width: 100%;" name="logEntry"></textarea>
+          <textarea id="logEntry" class="editable m-1" style="width: 100%; font-size: medium;"
+            name="logEntry"></textarea>
           <div id="logEntryButtons_2" class="input-group input-group svChngs">
             <span style="display: inline-flex; vertical-align: top;">
-  
+
               <div class="btn-group" role="group">
                 <button id="saveEntry_2" class="btn btn-sm btn-success  svChngs saveEntryBtn">SAVE</button>
                 <button id="cancelEntry_2" class="btn btn-sm btn-secondary svChngs cancelEntryBtn">CANCEL</button>
@@ -265,8 +268,10 @@
         </div>
       </div>
 
-      <div class="card col-sm p-1 m-2 rosterList" style="font-size: small;">
+      <div class="card col-sm p-1 m-2 rosterList" style="font-size: medium;">
         <div class="card-header">
+          <h5>Roster</h5>
+          <p>Click a name to view more information.</p>
         </div>
         <div class="card-body p-0 m-1">
 
@@ -287,7 +292,7 @@
         </div>
       </div>
 
-      <div class="card col-sm p-1 m-2 TBlaze" style="font-size: small;">
+      <div class="card col-sm p-1 m-2 TBlaze" style="font-size: medium;">
         <div class="card-header">
           <h6 class="card-title">TextBlaze Snippets</h6>
           <h6 class="card-subtitle">Levels/Goals Bank</h6>
@@ -343,7 +348,7 @@
         </div>
         <div class="card-footer centerLabels">
           <textarea id="tbSnippetCopy" class="inline-flex tbSnippet" name="clickCopy" readonly
-            style="font-size: small; height: 3rem; width: 100%; margin: 0px; padding: 0px;"></textarea>
+            style="font-size: medium; height: 3rem; width: 100%; margin: 0px; padding: 0px;"></textarea>
 
           <span style="display: inline-flex;">
             <div class="centered mx-1">
@@ -425,8 +430,8 @@
   <!-- modals and toasts -->
   <div class="container-fluid">
     <div class="row">
-      <div class="modal fade centered " id="logEntryModal" tabindex="-1" role="dialog" aria-labelledby="logEntryModalLabel"
-        aria-hidden="true" style="margin-top: 30px;">
+      <div class="modal fade centered " id="logEntryModal" tabindex="-1" role="dialog"
+        aria-labelledby="logEntryModalLabel" aria-hidden="true" style="margin-top: 30px;">
         <div class="modal-dialog" style="height: 500px;" role="document">
           <div class="modal-content">
             <div class="modal-header">
@@ -435,31 +440,39 @@
                 <span aria-hidden="true">&times;</span>
               </button>
             </div>
-            <div container-fluid>
-              <div class="form-row align-items-center p-2" style="display: inline-flexbox;">
+            <div class="modal-body">
+
+              <div container-fluid>
 
 
-                <label for="glEditAnnual" class="form"
-                  style="margin-bottom: 0;margin-left: 2rem; font-size: small;">
-                  logEntry:</label>
-                <br>
-              </div>
-              <textarea name="leEdit" id="leEntry" class="editable logEntry col-11" style="height: 200px; "
-                name="logEntryText"></textarea>
 
-              <div class="input-group input-group-sm m-1 col-12">
-
+                <div class="input-group input-group-sm m-1 mb-3">
+                  <div class="input-group-prepend">
+                    <span class="input-group-text  " id="timestamp-pre">Date </span>
+                  </div>
+                  <input type="date" class="form-control spr "  id="timestamp" value="">
+                </div>
               </div>
 
+              <div class="form-row align-items-center">
+                <div class="input-group input-group-sm m-1 mb-3">
+                  <div class="input-group-prepend">
+                    <span class="input-group-text  " id="leEntry-pre">Entry</span>
+                  </div>
+                  <textarea name="leEdit" id="leEntry" class="col-11" name="logEntryText"
+                    style="font-size: medium; font-family: Verdana, Geneva, Tahoma, sans-serif; height: 100px;"></textarea>
+                </div>
 
+
+              </div>
             </div>
             <div class="modal-footer">
               <button type="button" class="btn btn-sm btn-success" data-dismiss="modal"
-              onclick="saveEditedEntry()">SAVE</button>
+                onclick="saveEditedEntry()">SAVE</button>
               <button type="button" class="btn btn-sm btn-secondary" data-dismiss="modal">CANCEL</button>
               <button type="button" class="btn btn-sm btn-danger" data-dismiss="modal"
-              onclick="saveEditedEntry(-1)">DELETE</button>
-              <input id='lelog_entry_id' type='text' value='' style='background-color: lightyellow; width: 3rem;' readonly>
+                onclick="saveEditedEntry(-1)">DELETE</button>
+              <input id='lelog_entry_id' type='text' value='' style='background-color: lightyellow; width: 3rem;'>
 
             </div>
 
@@ -510,7 +523,7 @@
                 </div>
 
                 <label for="glEditAnnual" class="form"
-                  style="margin-bottom: 0;margin-left: 2rem; font-size: small;">Annual
+                  style="margin-bottom: 0;margin-left: 2rem; font-size: medium;">Annual
                   Goal:</label>
                 <br>
               </div>
@@ -621,7 +634,7 @@
                 <span aria-hidden="true">&times;</span>
               </button>
             </div>
-            <div class="modal-body" style="text-align: left;" >
+            <div class="modal-body" style="text-align: left;">
               <p>To:</p>
               <textarea id="emailRecipients" class="editable email" style="width: 425px;"
                 name="emaiRecipients"></textarea>
@@ -736,7 +749,7 @@
         </div>
       </div>
 
-      <div style="font-size: small;">
+      <div style="font-size: medium;">
         <div class="toast ml-2 mb-2" data-autohide="true"
           style="position: absolute; bottom: 3rem; left: 3rem; z-index: 2100;">
           <div class="toast-header">

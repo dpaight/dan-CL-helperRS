@@ -1,7 +1,6 @@
 <script>
   // The code in this function runs when the page is aoaded.
   $(document).ready(function () {
-
     //startup
     startup();
 
@@ -31,6 +30,8 @@
     }
 
     // var id = google.script.run.getLastId();
+
+
     $("#ready").hide();
 
     $(".pleaseHide").hide();
@@ -262,7 +263,7 @@
     });
 
     $("body").on("mouseenter", ".logEntry", function () {
-      $(this).css("cursor", "text");
+      $(this).css("cursor", "pointer");
     });
 
     $("body").on("click", ".logEntry", function (e) {
@@ -270,6 +271,7 @@
       e.preventDefault();
       // open goal for editing
       var log_entry_id = $(this).data("entry_id");
+      console.log('log entry id is %s', log_entry_id);
       google.script.run
         .withSuccessHandler(editLogEntryInModal)
         .getLogEntry(log_entry_id);
@@ -285,6 +287,7 @@
     setPointer(id);
     contactInfo(id);
     calRefresh();
+    
     if (sessionStorage.getItem("reclog" + id) != null) {
       var logs = JSON.parse(sessionStorage.getItem("reclog" + id));
       showLog(logs);
@@ -296,6 +299,9 @@
   }
 
   function logsToCache(allRecords) {
+    // console.log('allRecords = %s', allRecords);
+
+    allRecords = JSON.parse(allRecords);
     for (let i = 0; i < allRecords.length; i++) {
       const elAll = allRecords[i];
       // these records have id numbers at 0; within each id number item lies a 2-d array with contact log entries      
@@ -419,10 +425,6 @@
     }
     // returns [[gId, gLvl, gArea, gDmn, gAnl, gO1, gO2, gO3]]
   }
-
-
-
-
   function getAllLevSnipForTB() {
     var id = $("#seis_id").val();
     if (sessionStorage['lSnp' + $('#seis_id').val()] != null) {
@@ -456,7 +458,7 @@
 
     $("#langflu").val(u5_lang);
     $("#corrlng").val(corrlng);
-    $("#stuname").val(first_name + ' ' + last_name);
+    $("#stuName").val(first_name + ' ' + last_name);
     $("#namenav").text(first_name + ' ' + last_name);
     $("#dob").val(date_of_birth);
     $("#parent_guardian_1_name").val(parent_guardian_1_name);
@@ -469,6 +471,16 @@
     $("#seis_id").val(seis_id);
     $("#stuemail").val(stuemail);
     $("#notes").val(notes);
+
+    if($("#corrlng").val() == 1) {
+      $("#corrlng").css("background-color", "#FF0000");
+      $("#corrlng").css("color", "#FFFFFF");
+
+    } else {
+      $("#corrlng").css("background-color", "#FFFFFF");
+      $("#corrlng").css("color", "#000000");
+    }
+
   }
   function calRefresh() {
     document.body.style.cursor = "wait";
@@ -524,32 +536,6 @@
       .withSuccessHandler(copyToClipboard)
       .createDraftEmail(buttonVal, JSON.stringify(params));
   }
-  // function writeEmail(addressee) {
-  // console.log("writeEmail fired");
-  //   // window.open('mailto:' + adr[0] + '?subject=' + adr[1] + '&cc=dpaight@hemetusd.org');
-  //   $('#mailModal').modal({
-  //     focus: true
-  //   });
-  //   if (addressee == 'pem') {
-  //     $('#emailRecipients').val($('#Parent_1_Email').val() + ', ' + $('#u3_Parent_1a_Email').val());
-  //   } else if (addressee == 'tem') {
-  //     $('#emailRecipients').val($('#teachemail').val());
-  //   }
-  //   $('#emailSubject').val($('#stuName').val());
-  //   $('#emailBody').val('\n\n--\n' +
-  //     'Dan Paight\n' +
-  //     'Special Education Teacher\n' +
-  //     'Ramona Elementary (951.765.1670)\n' +
-  //     '951.364.4479 (mobile)'
-  //   );
-  // }
-
-  // +
-  // '\n\n\nNOTICE OF PROCEDURAL SAFEGUARDS AND PARENTS’ RIGHTS.pdf\n' +
-  // 'https://drive.google.com/file/d/1hRKDCRV0UB79E_V_KZKIF13gXpFPeW9u/view?usp=sharing' +
-  // '\n\n\nAVISO DE GARANTÍAS PROCESALES Y DERECHOS DE LOS PADRES\n'+
-  // 'https://drive.google.com/file/d/1JbzZ12pxkRGTv_jSu8hccXMRheSJXso_/view?usp=sharing'
-
   function editGoalInModal(goal) {
     // goal is a goal object from 'getGoal'
     // this.id = id;
@@ -663,7 +649,7 @@
       list.append(
         '<tr>' +
         '<td data-entry_id=' +
-        log_entry_id + ' class="tableDate logEntry"'+ 'data-toggle="tooltip" data-placement="left" data-html="true" title ' +
+        log_entry_id + ' class="tableDate logEntry"' + 'data-toggle="tooltip" data-placement="right" data-html="true" title ' +
         ' data-original-title= "click to edit">' +
         moment(el[0]).format("YYYY-MM-DD") +
         '</td>' +
@@ -683,30 +669,6 @@
 
   }
 
-  // array will be put in sessionStorage
-  // var array = [];
-  // for (let j = 0; j < entries.length; j++) {
-  //   let [theDate, theEvent] = entries[j];
-  //   // console.log('this log date is %s; start is: %s; end is: %s', JSON.stringify(theDate), JSON.stringify(dateStart), JSON.stringify(dateEnd));
-  //   if (moment(theDate).isAfter(dateStart) && moment(theDate).isBefore(dateEnd)) {
-  //     var timeStamp = moment(theDate).format("YYYY-MM-DD") + '\n' +
-  //       moment(theDate).format("HH:mm");
-  //     var timeStampDt = moment(theDate).format("YYYY-MM-DD");
-  //     var timeStampTm = moment(theDate).format("HH:mm");
-
-  //     list.append(
-  //       "<tr>" +
-  //       "<td class='tableDateL'>" + timeStampDt + '<br>' + timeStampTm + "</td>" +
-  //       "<td>" + theEvent.toString() + "</td>" +
-  //       "</tr>"
-  //     );
-  //     array.push([timeStamp, theEvent]);
-  //   }
-  // }
-  // stores array in sessionStorage for retrieval in case we want to write a pdf file
-  //   sessionStorage.setItem('logPrint', JSON.stringify(array));
-  // } else {
-  // no log entries returned
 
   function printSelectedLogEntries() {
     var stuName = $('#stuName').val();
@@ -717,69 +679,6 @@
       .printSelectedLogEntries(stuName, array);
   }
 
-
-  // // this one displays the contact log table
-  // function showLog(loc_and_logEntries) {
-  //   // input is an array containing one arrays and one string ('loc'): loc_and_logEntries contains all the log entries that correspond to that record
-  //   var logEntries = loc_and_logEntries[0];
-  //   var loc = loc_and_logEntries[1];
-
-  //   var list = $("#" + loc + "tb");
-  //   list.empty();
-
-  //   var entries = [];
-  //   var stuName = First_Name + ' ' + Last_Name;
-  //   for (var i = 0; i < logEntries.length; i++) {
-  //     var [
-  //       Timestamp, email, studentMC, log_entry, empty, seis_id, Last_Name, First_Name, First_Name, Student_ID
-  //     ] = logEntries[i];
-
-  //     entries.push([Timestamp, log_entry]);
-  //   }
-
-  //   if (entries.length > 0) {
-  //     var list = $("#" + loc + "th");
-  //     list.empty();
-  //     list.append(
-  //       "<tr><thead><th >" + "Date" + "</th><th >" + "Entry" + "</thead></th>"
-  //     );
-  //     list = $("#" + loc + "tb");
-  //     list.empty();
-  //     for (let j = 0; j < entries.length; j++) {
-  //       let [theDate, theEvent] = entries[j];
-  //       let timeStamp = moment(theDate).format("MM-DD-YY") + "<br>" +
-  //         moment(theDate).format("HH:mm");
-  //       list.append(
-  //         '<tr><td class="tableDateL">' +
-  //         timeStamp +
-  //         "</td>" +
-  //         "<td>" +
-  //         theEvent.toString() +
-  //         "</td>" +
-  //         "</tr>"
-  //       );
-  //     }
-  //   } else {
-  //     list = $("#" + loc + "tb");
-  //     list.append(
-  //       '<tr><td class="tableDate">' +
-  //       "no data" +
-  //       "</td>" +
-  //       "<td>" +
-  //       entries[i][1].toString() +
-  //       "</td>" +
-  //       "</tr>"
-  //     );
-  //   }
-  //   $("#corr[value='01']", function () {
-  //     $(this).css("background-color", "#ff0000")
-  //   });
-
-  //   $("#loc01tb").show();
-
-  //   document.body.style.cursor = "default";
-  // }
-  // lt_consLogTimeEnd(eval(fname));
 
 
   // clears new log entry field and resets button colors
@@ -840,12 +739,6 @@
       }
     }
     store(data);
-
-    // google.script.run
-    //   .withSuccessHandler(focus)
-    //   .getLastId();
-    // var id = getPointer();
-    // focus(id);
   }
 
   // bindSetStudentClick();
@@ -859,14 +752,8 @@
       var p = moment(c, 'YYYY-MM-DD');
       var q = moment();
 
-
-      // if (1==1) {  //p.diff(q) > 1 && h.toString().match(/.*paight.*/g)
       $("#loc00hd").append(
         "<li ' class='upcomingEvent'>" + moment(c, 'YYYY-MM-DD').format('dd YY-MM-DD') + "     " + b + "; \n" + f + '\n');
-      // } else {
-      // console.log('this did not pass the test: %s %s', b, c);
-      // }
-      /*                 "<a href='" + htmlLink + "' target='_blank'>" + date + "          " + summary + "</a><br>"); */
       document.body.style.cursor = "default";
     }
   }
@@ -887,12 +774,9 @@
     document.body.style.cursor = "default";
   }
   function showTBsnippet(snippet) {
-    // console.log('session storage item: ' + lvlsSnp + $('#seis_id'));
     $("#tbSnippetCopy").text(snippet);
     $("#tbSnippetCopy").select();
     document.execCommand('copy');
-    // $("#snippetSelected").toast({ delay: 5000 });
-    // $("#snippetSelected").toast("show");
     document.body.style.cursor = "default";
   }
 
@@ -1042,17 +926,6 @@
     snipInfo();
     setTimeout(function () { window.open("https://voice.google.com/u/0/messages/", target = "_blank"); }, 2000);
   }
-
-
-  // function printLogs(id, loc) {
-  //   // console.log('upon start: id = %s; loc = %s', id, loc);
-  //   document.body.style.cursor = "wait";
-  //   var stuId, stuName;
-  //   stuName = $("#stuName").val();
-  //   google.script.run
-  //     .withSuccessHandler(showLog)
-  //     .getLogEntries([id, loc]);
-  // }
   function successMsg(msgAndUrlJSON) {
     var object = JSON.parse(msgAndUrlJSON);
     var msg = object.msg;
@@ -1109,39 +982,26 @@
   }
 
   function editLogEntryInModal(logEntry) {
-    // console.log('the log record is %s', JSON.stringify(logEntry));
-    $('#logEntryModal').modal({
-      focus: true
-    });
+    logEntry = JSON.parse(logEntry);
+    console.log('the log record is %s', JSON.stringify(logEntry));
+    $('#logEntryModal').modal({ focus: true });
     $('#lelog_entry_id').val(logEntry.log_entry_id);
-    $('#leEntry').val(logEntry.log_entry);
-    $('#timestamp').val(logEntry.timestamp);
+    $('#leEntry').val(logEntry.entry);
+    var theDate = moment(logEntry.timestamp, 'YYYY-MM-DDTHH:mm:ss.SSSZ').toDate();
+    document.getElementById("timestamp").valueAsDate = theDate;
   }
 
   function saveEditedEntry(option) {
     var obj = {};
     obj.lelog_entry_id = $('#lelog_entry_id').val();
     obj.leEntry = $('#leEntry').val().toString();
-    obj.letimestamp = new Date().toLocaleDateString();
+    obj.letimestamp = moment($('#timestamp').val(), 'YYYY-MM-DDTHH:mm:ss.SSSZ').format('YYYY-MM-DDTHH:mm:ss.SSSZ');
     obj.delete = (option != -1) ? false : true;
     obj.seis_id = $("#seis_id").val();
+    console.log('the obj sent to saveEdidedLogEntry is %s', JSON.stringify(obj));
     google.script.run
       .withSuccessHandler(saveLogEntrySuccess)
       .saveEditedLogEntry(obj);
 
   }
-
-  // var logEntry = {
-  //   "timeStamp": el[0],
-  //   "email": el[1],
-  //   "studentMC": el[2],
-  //   "log_entry": el[3],
-  //   "log_entry_id": el[4],
-  //   "SEIS_ID": el[5],
-  //   "Last_Name": el[6],
-  //   "First_Name": el[7],
-  //   "Student_ID": el[8]
-  // }
-
-
 </script>
