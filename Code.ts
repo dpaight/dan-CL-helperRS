@@ -855,13 +855,6 @@ function getRecord(id) {
         }
     }
 }
-/**
- * @returns array with all records from 'roster'
- */
-function getRosterValues() {
-    var [headings, values, sheet, range, lastR, lastC] = get('roster');
-    return values;
-}
 function addTimTest() {
     var fileIdS, fileIdD, lastCol, last, destSheet, destR;
     var filesS = ['1SKGEJsXdRcjvGUGT-C6n39JQkINVa_iOiXIYYToEv24', '1enI0CF5MHtkZ1CTRC2xQDSa8EVxTTQvuMlR38_JdgJo'];

@@ -276,6 +276,16 @@
         .withSuccessHandler(editLogEntryInModal)
         .getLogEntry(log_entry_id);
     });
+    $(".logEntry").bind("taphold", function (e) {
+      // console.log('event triggered a[name=goalList clicked');
+      e.preventDefault();
+      // open goal for editing
+      var log_entry_id = $(this).data("entry_id");
+      console.log('log entry id is %s', log_entry_id);
+      google.script.run
+        .withSuccessHandler(editLogEntryInModal)
+        .getLogEntry(log_entry_id);
+    });
   });
 
 
@@ -420,7 +430,7 @@
   // that display data retrieved from a script run on the server
   function showContactInfo(record) {
     var [
-      nmjdob, idaeries, teachemail, u1_phone, stuemail, u3_parent_1a_email, corrlng, u5_lang, teachname, seis_id, last_name, first_name, date_of_birth, case_manager, date_of_last_annual_iep, date_of_last_evaluation, date_of_initial_parent_consent, parent_1_mail_address, parent_1_email, parent_1_home_phone, parent_1_cell_phone, grade_code, student_eligibility_status, disability_1, disability_2, parent_guardian_1_name, parent_guardian_2_name, date_of_next_annual_iep, reading_group, notes
+      nmjdob, idaeries, teachemail, u1_phone, stuemail, u3_parent_1a_email, corrlng, u5_lang, teachname, seis_id, last_name, first_name, date_of_birth, case_manager, date_of_last_annual_iep, date_of_last_evaluation, date_of_initial_parent_consent, parent_1_mail_address, parent_1_email, parent_1_home_phone, parent_1_cell_phone, grade_code, student_eligibility_status, disability_1, disability_2, parent_guardian_1_name, parent_guardian_2_name, date_of_next_annual_iep, gender, reading_group, notes
     ] = record;
     // console.log('record: %s', JSON.stringify(record));
     var key = seis_id;
@@ -436,6 +446,7 @@
     $("#u1_phone").val(u1_phone);
     $("#parent_1_email").val(parent_1_email);
     $("#u3_parent_1a_email").val(u3_parent_1a_email);
+    $("#sex").val(gender.toString()[0]);
     $("#teachname").val(teachname);
     $("#teachemail").val(teachemail);
     $("#seis_id").val(seis_id);
@@ -619,11 +630,11 @@
       list.append(
         '<tr>' +
         '<td data-entry_id=' +
-        log_entry_id + ' class="tableDate logEntry"' + 'data-toggle="tooltip" data-placement="right" data-html="true" title ' +
-        ' data-original-title= "dblclick to edit">' +
-        moment(el[0]).format("YYYY-MM-DD") +
+        log_entry_id + ' class="col-sm-3 logEntry"' + 'data-toggle="tooltip" data-placement="right" ' +
+        'title= "double-click to edit">' +
+        moment(el[0]).format("MM-DD-YYYY") +
         '</td>' +
-        '<td data-entry_id=' + log_entry_id + ' class="tableDate logEntry" style="text-align: left;">' +
+        '<td data-entry_id=' + log_entry_id + ' class="logEntry col-sm-9" style="text-align: left;">' +
         el[3].toString() +
         '</td>' +
         '</tr>'
@@ -765,16 +776,17 @@
     snip += ',"fn"="' + $("#stuName").val().toString().replace(/([A-Z]{1}[a-z]+) ([A-Z]{1}[A-z]+)/, "$1") + '"';
     snip += ',"ln"="' + $("#stuName").val().toString().replace(/([A-Z]{1}[a-z]+) ([A-Z]{1}[A-z]+)/, "$2") + '"';
     snip += ',"dob"="' + $("#dob").val() + '"';
+    snip += ',"sex"="' + $("#sex").val() + '"';
     snip += ',"par"="' + $("#parent_guardian_1_name").val() + '"';
     snip += ',"ph1"="' + $("#Parent_1_Home_Phone").val() + '"';
     snip += ',"ph2"="' + $("#u1_phone").val() + '"';
-    snip += ',"pem1"="' + $("#Parent_1_Email").val() + '"';
-    snip += ',"pem2"="' + $("#u3_Parent_1a_Email").val() + '"';
+    snip += ',"pem1"="' + $("#parent_1_email").val() + '"';
+    snip += ',"pem2"="' + $("#u3_parent_1a_email").val() + '"';
     snip += ',"tem"="' + $("#teachemail").val() + '"';
     snip += ',"tch"="' + $("#teachname").val() + '"';
     snip += ',"sid"="' + $("#seis_id").val() + '"';
-    snip += ',"id"="' + $("#stuem").val().toString().replace(/[A-z]{2}(\d{6}).*/, "$1") + '"';
-    snip += ',"sem"="' + $("#stuem").val() + '"';
+    snip += ',"id"="' + $("#stuemail").val().toString().replace(/[A-z]{2}(\d{6}).*/, "$1") + '"';
+    snip += ',"sem"="' + $("#stuemail").val() + '"';
     snip += "]";
     // console.log(snip);
 

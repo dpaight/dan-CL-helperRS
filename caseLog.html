@@ -11,6 +11,7 @@
   <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"
     integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj"
     crossorigin="anonymous"></script>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
 
   <!-- Google icons -->
   <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
@@ -33,6 +34,7 @@
 
   <!-- the following provides, probably among other things, the 'normsdist' function as used in spreadsheets -->
   <script src="https://cdn.jsdelivr.net/jstat/latest/jstat.min.js"></script>
+
 
 </head>
 
@@ -120,17 +122,14 @@
 
                 <div class="input-group input-group-sm m-1 col-12 mb-3">
                   <div class="input-group-prepend">
-                    <span class="input-group-text" id="corrlng-pre">CrLng</span>
-                  </div>
-                  <input type="text" class="form-control col-1 spr" id="corrlng" value="">
-                  <div class="input-group-prepend">
-                    <span class="input-group-text  " id="lang-pre">Lang</span>
-                  </div>
-                  <input type="text" class="form-control col-1 spr" id="langflu" value="" readonly>
-                  <div class="input-group-prepend">
                     <span class="input-group-text" id="dob-pre">DOB </span>
                   </div>
-                  <input type="text" class="form-control spr" id="dob" read-only value="" readonly>
+                  <input type="text" class="form-control spr col-5" id="dob" read-only value="" readonly>
+                  <div class="input-group-prepend">
+                    <span class="input-group-text" id="sex-pre">Sex </span>
+                  </div>
+                  <input type="text" class="form-control spr col-3" id="sex" read-only value="" readonly>
+
                 </div>
 
                 <div class="input-group input-group-sm m-1 col-12 mb-3">
@@ -139,7 +138,16 @@
                   </div>
                   <input type="text" class="form-control spr" id="teachname" read-only value="" readonly>
                 </div>
-
+                <div class="input-group input-group-sm m-1 col-12 mb-3">
+                  <div class="input-group-prepend">
+                    <span class="input-group-text" id="corrlng-pre">CrLng</span>
+                  </div>
+                  <input type="text" class="form-control col-2 spr" id="corrlng" value="">
+                  <div class="input-group-prepend">
+                    <span class="input-group-text  " id="lang-pre">Lang</span>
+                  </div>
+                  <input type="text" class="form-control col-2 spr" id="langflu" value="" readonly>
+                </div>
 
                 <div class="input-group input-group-sm m-1 col-12 mb-3">
                   <div class="input-group-prepend">
@@ -450,7 +458,7 @@
                   <div class="input-group-prepend">
                     <span class="input-group-text  " id="timestamp-pre">Date </span>
                   </div>
-                  <input type="date" class="form-control spr "  id="timestamp" value="">
+                  <input type="date" class="form-control spr " id="timestamp" value="">
                 </div>
               </div>
 
