@@ -266,7 +266,7 @@
       $(this).css("cursor", "pointer");
     });
 
-    $("body").on("click", ".logEntry", function (e) {
+    $("body").on("dblclick", ".logEntry", function (e) {
       // console.log('event triggered a[name=goalList clicked');
       e.preventDefault();
       // open goal for editing
@@ -311,15 +311,6 @@
     }
     focus();
   }
-  // for (let i = 0; i < obs.length; i++) {
-  //   const element = obs[i];
-  //   sessionStorage.setItem(key, element);
-
-  // }
-  // if (Object.hasOwnProperty.call(obj, key)) {
-  //     const element = obj[key];
-  //   }
-  // }
 
   function contactInfo(id = getPointer()) {
 
@@ -334,28 +325,7 @@
         .getRecord(id);
     }
   }
-  //   $("#loc01tb").hide();
-  //   var key = "rec' + id;
-  //   if (sessionStorage[key] != null) {
-  //     showFocusRecord(JSON.parse(sessionStorage[key]));
-  //   } else {
-  //     google.script.run
-  //       .withSuccessHandler(showFocusRecord)
-  //       .getTableData_roster();
-  //   }
-  // }
-
   function showTBsnippetGl(goalObj) {
-    // console.log('goalObj = %s', JSON.stringify(goalObj));
-    // this.snip = function () {
-    //     return '[' +
-    //         '"area" = "' + goalObj.area + '",' +
-    //         '"strand" = "' + goalObj.strand + '",' +
-    //         '"stnd" = "' + goalObj.standard + '",' +
-    //         '"gl" = "' + goalObj.annual + '"' +
-    //         ']';
-    // }
-    // var goalObj = JSON.stringify(goalObjJSN)
     var snippet = '[' +
       '"area" = "' + goalObj.area + '",' +
       '"strand" = "' + goalObj.strand + '",' +
@@ -650,7 +620,7 @@
         '<tr>' +
         '<td data-entry_id=' +
         log_entry_id + ' class="tableDate logEntry"' + 'data-toggle="tooltip" data-placement="right" data-html="true" title ' +
-        ' data-original-title= "click to edit">' +
+        ' data-original-title= "dblclick to edit">' +
         moment(el[0]).format("YYYY-MM-DD") +
         '</td>' +
         '<td data-entry_id=' + log_entry_id + ' class="tableDate logEntry" style="text-align: left;">' +
