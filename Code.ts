@@ -66,7 +66,7 @@ function doGet(e) {
     ss.getSheetByName('roster').sort(1);
     ss.getSheetByName('logRespMerged').sort(1);
     var t = HtmlService.createTemplateFromFile("caseLog");
-    t.version = "v32";
+    t.version = "v33";
     return t.evaluate().setXFrameOptionsMode(HtmlService.XFrameOptionsMode.ALLOWALL);
 }
 function doPost(e) {

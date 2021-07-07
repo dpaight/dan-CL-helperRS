@@ -612,6 +612,7 @@
     $('#logModal').modal({
       focus: true
     });
+    $('#pdfUrl').empty();
     $('#printedLogsth').empty();
     $('#printedLogstb').empty();
     $('#printLogStuName').html('<h4>' + $('#stuName').val() + '</h4>');
@@ -905,7 +906,7 @@ function showUrl(obj) {
   function saveLogEntrySuccess(obj) {
     // console.log('returned: %s', JSON.stringify(obj));
     sessionStorage.removeItem('reclog' + obj.seis_id);
-    focus(obj.seis_id);
+    focus(obj.seis_id, 'loc01');
   }
 
 
@@ -996,7 +997,7 @@ function showUrl(obj) {
     var logs = JSON.parse(sessionStorage.getItem('reclog' + id));
     logs.unshift(row);
     sessionStorage.setItem('reclog' + id, JSON.stringify(logs));
-    showLog(logs);
+    showLog(logs, 'loc01');
   }
 
   function editLogEntryInModal(logEntry) {
