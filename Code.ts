@@ -844,6 +844,7 @@ function getCalData_events() {
 function getRecord(id) {
     var key = 'rec' + id;
     // record was not cached; search for it
+    
     var array = get('roster')[1];
     for (var i = 0; i < array.length; i++) {
         var el = array[i];
@@ -855,6 +856,7 @@ function getRecord(id) {
         }
     }
 }
+
 function addTimTest() {
     var fileIdS, fileIdD, lastCol, last, destSheet, destR;
     var filesS = ['1SKGEJsXdRcjvGUGT-C6n39JQkINVa_iOiXIYYToEv24', '1enI0CF5MHtkZ1CTRC2xQDSa8EVxTTQvuMlR38_JdgJo'];
@@ -1184,6 +1186,7 @@ function matchRosterFieldsToSeisAndAllPupils(rosH, seisH, alpH) {
     Logger.log('fieldMatches = %s', JSON.stringify(fieldMatches));
     return fieldMatches;
 }
+
 function updateRoster() {
     // get current data
     var roster = SpreadsheetApp.getActiveSpreadsheet().getSheetByName('roster');

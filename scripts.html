@@ -4,12 +4,14 @@
     //startup
     startup();
 
-    function startup() {
-      var id = getPointer();
+    function startup(id) {
       if (id == undefined) {
-        google.script.run
-          .withSuccessHandler(setPointerAndStart)
-          .getFirstPointer();
+        var id = getPointer();
+        if (id == undefined) {
+          google.script.run
+            .withSuccessHandler(setPointerAndStart)
+            .getFirstPointer();
+        }
 
       } else {
         // contactInfo(id);
@@ -24,9 +26,14 @@
       }
     }
 
-    function setPointerAndStart(id) {
-      sessionStorage.setItem('lastId', id);
-      startup();
+    async function setPointerAndStart(id) {
+      setPointer(id);
+      console.log('setPointerAndStart ran');
+      await sleep(2000);
+      startup(id);
+    }
+    function sleep(ms) {
+      return new Promise(resolve => setTimeout(resolve, ms));
     }
 
     // var id = google.script.run.getLastId();
@@ -330,7 +337,7 @@
     console.log("id = %s", id);
     sessionStorage.setItem("lastId", id);
 
-    if (sessionStorage.getItem("rec" + id)) {
+    if (sessionStorage.getItem("rec" + id) != null) {
       showContactInfo(JSON.parse(sessionStorage.getItem("rec" + id)));
     } else {
       google.script.run
@@ -692,12 +699,12 @@
       .printSelectedLogEntries(stuName, array);
   }
 
-function showUrl(obj) {
-  var msg = obj.msg;
-  var url = obj.url;
-  $('#pdfUrl').html(msg + '\n<br>' + '<a href="' + url + '" target="_blank">Open File</a>');
-  document.body.style.cursor = "default";
-}
+  function showUrl(obj) {
+    var msg = obj.msg;
+    var url = obj.url;
+    $('#pdfUrl').html(msg + '\n<br>' + '<a href="' + url + '" target="_blank">Open File</a>');
+    document.body.style.cursor = "default";
+  }
 
   // clears new log entry field and resets button colors
   function showLogUpdates(record) {
