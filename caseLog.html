@@ -256,7 +256,7 @@
                 <th class='sticky-top'> Entry </th>
 
               </thead>
-              <tbody id="loc01tb" class="table" style="overflow: scroll;">
+              <tbody id="loc01" class="table" style="overflow: scroll;">
                 <!-- insert case log entries -->
               </tbody>
             </table>
@@ -706,25 +706,27 @@
             <div class="modal-body">
               <div id="printLogStuName" class="container-fluid"> </div>
               <div class="row">
-                <div class="input-group input-group-sm m-1 col-6">
+                <div class="input-group input-group-sm m-1 col-7">
                   <div class="input-group-prepend">
                     <span class="input-group-text" name="stDtEdit" id="stDtEditPre">Start Date:
                     </span>
                   </div>
-                  <input type="date" class="form-control" name="stDtEdit" id="stDtEdit" value="">
+                  <input type="date" class="form-control logWindow" name="stDtEdit" id="stDtEdit" value="">
                 </div>
 
-                <div class="input-group input-group-sm m-1 col-6">
+                <div class="input-group input-group-sm m-1 col-7">
                   <div class="input-group-prepend">
                     <span class="input-group-text" name="endDtEdit" id="endDtEditEndDatePre">End
                       Date:
                     </span>
                   </div>
-                  <input type="date" class="form-control" name="endDtEdit" id="endDtEdit" value="">
+                  <input type="date" class="form-control logWindow" name="endDtEdit" id="endDtEdit" value="">
                 </div>
               </div>
+              
+              <div id="pdfUrl" style="text-align: left;">
 
-
+              </div>
 
               <div class="table sticky-top"
                 style="height: 300px; padding: 0; margin-top: 0; margin-bottom: 0; margin-left: 1rem; width: 90%;">
@@ -737,7 +739,7 @@
 
                     </thead>
                   </div>
-                  <tbody id="printedLogstb" class="table" style="overflow: scroll;">
+                  <tbody id="loc04" class="table" style="overflow: scroll;">
                     <!-- insert case log entries -->
                   </tbody>
                 </table>
@@ -747,9 +749,7 @@
 
             <div class="modal-footer">
               <button type="button" class="btn btn-sm btn-secondary" data-dismiss="modal">CANCEL</button>
-              <button id="printEntry" class="btn btn-sm btn-primary svChngs printEntryBtn"
-                onclick="printLogs($('#seis_id').val(), 'printedLogs')">GET ENTRIES</button>
-              <button type="button" class="btn btn-sm btn-success" data-dismiss="modal"
+              <button type="button" class="btn btn-sm btn-success" 
                 onclick="printSelectedLogEntries()">MAKE PDF</button>
 
             </div>

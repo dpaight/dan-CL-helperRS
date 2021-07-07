@@ -752,19 +752,19 @@ function removeOldMeetings() {
 }
 //# sourceMappingURL=module.jsx.map
 function printSelectedLogEntries(stuName, array) {
+    array = JSON.parse(array);
+
+    var items = [['Timestamp', 'Entries for ' + stuName]];
+    for (let i = 0; i < array.length; i++) {
+        const el = array[i];
+        items.push([el[0], el[3]]);
+    }
+
     var destFile = SpreadsheetApp.openById('1sEkijMXT3j9uIJWPqExmREZ2M8U8pO1olxLo-WgsTtI');
     var destSheet = destFile.getSheets()[0];
-
-    var [headings, values, sheet, range, lastR, lastC] = get('logRespMerged');
-
-    var last = lastR;
-    var entries = range.getValues();
-    var destHeadings = [['Timestamp', 'Entries for ' + stuName]];
-    var keepers = array;
-    keepers = destHeadings.concat(keepers);
     destSheet.clearContents();
-    var destRange = destSheet.getRange(1, 1, keepers.length, 2);
-    destRange.setValues(keepers);
+    var destRange = destSheet.getRange(1, 1, items.length, 2);
+    destRange.setValues(items);
     SpreadsheetApp.flush();
     var ssFile = DriveApp.getFileById('1sEkijMXT3j9uIJWPqExmREZ2M8U8pO1olxLo-WgsTtI');
     var file = DriveApp.createFile(ssFile.getBlob());
@@ -1543,7 +1543,7 @@ function getFirstPointer() {
     Logger.log(JSON.stringify(idList[0]));
     return idList[0];
 }
-function getLogEntries() {
+function getLogEntries(id?, loc?, startDate?, endDate?) {
     var [headings, ids, sheet, range, lastR, lastC] = get('roster', 10, true);
     var allRecords = [];
     var [logTableHeadings, values, sheet, range, lastR, lastC] = get('logRespMerged');
@@ -1574,7 +1574,7 @@ function getLogEntries() {
         allRecords.push([el, stuRecord]);
     }
     // Logger.log('allRecords = %s', JSON.stringify(allRecords));
-    return JSON.stringify(allRecords);
+    return JSON.stringify(allRecords, loc);
 }
 function deleteEntry(entryId) {
     Logger.log(entryId);

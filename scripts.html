@@ -178,6 +178,9 @@
         .withSuccessHandler(showCalData)
         .getCalData_events();
     });
+    $("body").on("change", ".logWindow", function () {
+      filterLogEntriesByDateWindow()
+    });
 
     //save changes to spreadsheet
     $("body").on("change", ".spr", function (event) {
@@ -297,14 +300,14 @@
     setPointer(id);
     contactInfo(id);
     calRefresh();
-    
+
     if (sessionStorage.getItem("reclog" + id) != null) {
       var logs = JSON.parse(sessionStorage.getItem("reclog" + id));
-      showLog(logs);
+      showLog(logs, 'loc01');
     } else {
       google.script.run
         .withSuccessHandler(logsToCache)
-        .getLogEntries();
+        .getLogEntries('', 'loc01');
     }
   }
 
@@ -373,11 +376,11 @@
     // printLogs(id, loc);
     document.body.style.cursor = "default";
   }
-  // function printLogs(id, loc) {
-  //   google.script.run
-  //     .withSuccessHandler(showLog)
-  //     .getLogEntries([id, loc]);
-  // }
+  function printLogs(id, loc, startDate, endDate) {
+    google.script.run
+      .withSuccessHandler(showLog)
+      .getLogEntries([id, loc, startDate, endDate]);
+  }
 
   // search the goal bank for goals of a given level and area
   function findGoals() {
@@ -453,7 +456,7 @@
     $("#stuemail").val(stuemail);
     $("#notes").val(notes);
 
-    if($("#corrlng").val() == 1) {
+    if ($("#corrlng").val() == 1) {
       $("#corrlng").css("background-color", "#FF0000");
       $("#corrlng").css("color", "#FFFFFF");
 
@@ -612,13 +615,41 @@
     $('#printedLogsth').empty();
     $('#printedLogstb').empty();
     $('#printLogStuName').html('<h4>' + $('#stuName').val() + '</h4>');
+    var start = moment().subtract(1, 'y').toDate();
+    var end = moment().toDate();
+    document.getElementById("endDtEdit").valueAsDate = end;
+    document.getElementById("stDtEdit").valueAsDate = start;
 
+    // var logEntries = filterLogEntriesByDateWindow();
+    // showLog(logEntries, 'loc04');
+    filterLogEntriesByDateWindow();
   }
-  function showLog(logEntries) { // [entries, id]
+  function filterLogEntriesByDateWindow() {
+    console.log('fired');
+    console.log('current start date: %s; end date: %s', $('#stDtEdit').val(), $('#endDtEdit').val());
+    var logEntries = JSON.parse(sessionStorage.getItem('reclog' + $('#seis_id').val()));
+    var keepers = [];
+    for (let i = 0; i < logEntries.length; i++) {
+      const el = logEntries[i];
+      var start = moment($('#stDtEdit').val());
+      var end = moment($('#endDtEdit').val());
+      if (moment(el[0]).isBefore(end.add(1, 'd')) && moment(el[0]).isAfter(start)) {
+        console.log('%s is before %s', moment(el[0]).format('YYYY-MM-DD'), end.format('YYYY-MM-DD'));
+        keepers.push(el);
+      }
+    }
+    sessionStorage.setItem('logPrintItems', JSON.stringify(keepers));
+    showLog(keepers, 'loc04');
+  }
+  function showLog(logEntries, loc) { // [entries, id]
     // input is an array containing one arrays and one string ('loc'): array contains all the log entries that correspond to that record
-    // console.log('in "showLog" the log entries are: %s', JSON.stringify(logEntries));
+    console.log('in "showLog" the first log entry is: %s; the loc is %s', JSON.stringify(logEntries[0]), loc);
+    console.log('logEntries is a type of %s', typeof logEntries);
+    if (typeof logEntries == 'string') {
+      logEntries = JSON.parse(logEntries);
+    }
 
-    var list = $("#loc01" + "tb");
+    var list = $("#" + loc);
     list.empty();
 
     var stuName = First_Name + ' ' + Last_Name;
@@ -653,14 +684,19 @@
 
   function printSelectedLogEntries() {
     var stuName = $('#stuName').val();
-    var array = JSON.parse(sessionStorage.getItem('logPrint'));
+    var array = sessionStorage.getItem('logPrintItems');
     document.body.style.cursor = "wait";
     google.script.run
-      .withSuccessHandler(showToast)
+      .withSuccessHandler(showUrl)
       .printSelectedLogEntries(stuName, array);
   }
 
-
+function showUrl(obj) {
+  var msg = obj.msg;
+  var url = obj.url;
+  $('#pdfUrl').html(msg + '\n<br>' + '<a href="' + url + '" target="_blank">Open File</a>');
+  document.body.style.cursor = "default";
+}
 
   // clears new log entry field and resets button colors
   function showLogUpdates(record) {
