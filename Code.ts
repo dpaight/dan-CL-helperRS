@@ -95,7 +95,7 @@ function saveLogEntry(input = ['1010101', 'test entry ' + moment()]) {
     var id = input[0], entry = input[1];
     var [headings, logVals, logResp, range, last, lastC] = get('logRespMerged');
     var log_entry_id = getNextLogEntryId();
-    var row = [[moment().format('YYYY-MM-DDTHH:mm'), Session.getActiveUser().getEmail(), , entry, log_entry_id, id]];
+    var row = [[moment().format('YYYY-MM-DDTHH:mm:ss.SSSZ'), Session.getActiveUser().getEmail(), , entry, log_entry_id, id]];
     var range = logResp.getRange(last + 1, 1, 1, row[0].length);
     range.setValues(row);
     SpreadsheetApp.flush();
@@ -751,7 +751,7 @@ function removeOldMeetings() {
     }
 }
 //# sourceMappingURL=module.jsx.map
-function printSelectedLogEntries(stuName, array) {
+function printSelectedLogEntries(stuName, sDate, eDate, array) {
     array = JSON.parse(array);
 
     var items = [['Timestamp', 'Entries for ' + stuName]];
@@ -767,7 +767,7 @@ function printSelectedLogEntries(stuName, array) {
     destRange.setValues(items);
     SpreadsheetApp.flush();
     var ssFile = DriveApp.getFileById('1sEkijMXT3j9uIJWPqExmREZ2M8U8pO1olxLo-WgsTtI');
-    var file = DriveApp.createFile(ssFile.getBlob());
+    var file = DriveApp.createFile(ssFile.getBlob().setName('log entries from ' + sDate + ' to ' + eDate + ' for ' + stuName));
     var url = file.getUrl();
     try {
         var folder = DriveApp.getFolderById('1S7TEP1ixTjhHwZ0APcasGj0fqAaZhvqC');
@@ -779,7 +779,8 @@ function printSelectedLogEntries(stuName, array) {
         return "failed " + error;
     }
     return {
-        'msg': 'contact logs saved to ' + file.getName(),
+        'msg': 'Contact logs saved to: ',
+        'filename': file.getName(),
         'url': url
     };
 }
@@ -844,15 +845,13 @@ function getCalData_events() {
 function getRecord(id) {
     var key = 'rec' + id;
     // record was not cached; search for it
-    
-    var array = get('roster')[1];
-    for (var i = 0; i < array.length; i++) {
-        var el = array[i];
-        sp.put('rec' + el[9], JSON.stringify(el));
+    var [headings, values, sheet, range, lastR, lastC] = get('roster');
+    for (var i = 0; i < values.length; i++) {
+        var el = values[i];
+        // sp.put('rec' + el[9], JSON.stringify(el));
         // cache all records along the way
         if (id == el[9]) {
-            var found = el;
-            return found;
+            return JSON.stringify(el);
         }
     }
 }

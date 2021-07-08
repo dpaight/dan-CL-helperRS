@@ -4,15 +4,12 @@
     //startup
     startup();
 
-    function startup(id) {
+    function startup(id = getPointer()) {
+      $('#spinner01').show();
       if (id == undefined) {
-        var id = getPointer();
-        if (id == undefined) {
-          google.script.run
-            .withSuccessHandler(setPointerAndStart)
-            .getFirstPointer();
-        }
-
+        google.script.run
+          .withSuccessHandler(setPointerAndStart)
+          .getFirstPointer();
       } else {
         // contactInfo(id);
         console.log('current id at startup is %s', id);
@@ -26,10 +23,10 @@
       }
     }
 
-    async function setPointerAndStart(id) {
+    function setPointerAndStart(id) {
       setPointer(id);
       console.log('setPointerAndStart ran');
-      await sleep(2000);
+      // await sleep(2000);
       startup(id);
     }
     function sleep(ms) {
@@ -311,11 +308,13 @@
     if (sessionStorage.getItem("reclog" + id) != null) {
       var logs = JSON.parse(sessionStorage.getItem("reclog" + id));
       showLog(logs, 'loc01');
+      $('#spinner01').hide();
     } else {
       google.script.run
         .withSuccessHandler(logsToCache)
         .getLogEntries('', 'loc01');
     }
+
   }
 
   function logsToCache(allRecords) {
@@ -439,6 +438,10 @@
   // show functions ; functions named show... should be call backs success handlers 
   // that display data retrieved from a script run on the server
   function showContactInfo(record) {
+    if (typeof record == 'string') {
+      console.log('parsed json');
+      record = JSON.parse(record);
+    }
     var [
       nmjdob, idaeries, teachemail, u1_phone, stuemail, u3_parent_1a_email, corrlng, u5_lang, teachname, seis_id, last_name, first_name, date_of_birth, case_manager, date_of_last_annual_iep, date_of_last_evaluation, date_of_initial_parent_consent, parent_1_mail_address, parent_1_email, parent_1_home_phone, parent_1_cell_phone, grade_code, student_eligibility_status, disability_1, disability_2, parent_guardian_1_name, parent_guardian_2_name, date_of_next_annual_iep, gender, reading_group, notes
     ] = record;
@@ -528,6 +531,8 @@
       .createDraftEmail(buttonVal, JSON.stringify(params));
   }
   function editGoalInModal(goal) {
+    $('#spinner01').show();
+
     // goal is a goal object from 'getGoal'
     // this.id = id;
     // this.lvl = grdLvl;
@@ -553,6 +558,8 @@
     $('#glEditobj2').val(goal.objective2);
     $('#glEditobj3').val(goal.objective3);
     $('#timestamp').val(goal.timestamp);
+
+    $('#spinner01').hide();
   }
   function clearEmailFields() {
     $("textarea.email").val("");
@@ -631,6 +638,7 @@
     // var logEntries = filterLogEntriesByDateWindow();
     // showLog(logEntries, 'loc04');
     filterLogEntriesByDateWindow();
+    // $('#spinner02').hide();
   }
   function filterLogEntriesByDateWindow() {
     console.log('fired');
@@ -671,7 +679,7 @@
         '<td data-entry_id=' +
         log_entry_id + ' class="col-sm-3 logEntry"' + 'data-toggle="tooltip" data-placement="right" ' +
         'title= "double-click to edit">' +
-        moment(el[0]).format("MM-DD-YYYY") +
+        moment(el[0]).format("MM-DD-YY") +
         '</td>' +
         '<td data-entry_id=' + log_entry_id + ' class="logEntry col-sm-9" style="text-align: left;">' +
         el[3].toString() +
@@ -691,19 +699,30 @@
 
 
   function printSelectedLogEntries() {
+    // $('#spinner02').show();
+    document.body.style.cursor = "wait";
+
     var stuName = $('#stuName').val();
     var array = sessionStorage.getItem('logPrintItems');
-    document.body.style.cursor = "wait";
+    var sDate = $('#stDtEdit').val().toString();
+    var eDate = $('#endDtEdit').val().toString();
+    
     google.script.run
       .withSuccessHandler(showUrl)
-      .printSelectedLogEntries(stuName, array);
+      .printSelectedLogEntries(stuName, sDate, eDate, array);
   }
 
-  function showUrl(obj) {
+  async function showUrl(obj) {
     var msg = obj.msg;
+    var filename = obj.filename;
     var url = obj.url;
-    $('#pdfUrl').html(msg + '\n<br>' + '<a href="' + url + '" target="_blank">Open File</a>');
+    $('#pdfUrl').html('<p>' + msg + '</p>' + '\n'
+     + '<a href="' + url + '" target="_blank">'+ filename + '</a>');
     document.body.style.cursor = "default";
+    sleep(1000);
+
+    // $('#spinner02').hide();
+
   }
 
   // clears new log entry field and resets button colors
@@ -866,17 +885,12 @@
 
     // alert("The data has been copied as a TextBlaze key-value list to the clipboard.");
   }
-  function showToast(object) {
 
-    if (object.url) {
-      $('#toastBody').html('<a href=' + object.url + ' target="_blank" style="color: black;">' + object.msg + ' (click to open pdf file) ' + '</a>')
-    } else {
-      // $('#toastBody').html('<p>' + msg + '</p>')
-    }
-    $('.toast').toast({ delay: 20000 });
+  function showToast(msg) {
+    $('#toastBody').html('<p>' + msg + '</p>')
+    $('.toast').toast({ delay: 10000 });
     $('.toast').toast('show');
     document.body.style.cursor = "default";
-
   }
 
   function saveGoal(newReplace) {
