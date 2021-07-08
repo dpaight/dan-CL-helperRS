@@ -46,7 +46,7 @@
 
   <!-- Navigation bar -->
   <nav class="navbar sticky-top navbar-expand-md navbar-dark bg-primary" style="z-index: 2000;">
-    <a class="navbar-brand" href="#" style="font-size: medium; font-weight: bold;">CASE LOGS</a>
+    <a class="navbar-brand" href="#" style="font-weight: bold;">CASE LOGS</a>
     <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent"
       aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
       <span class="navbar-toggler-icon"></span>
@@ -110,7 +110,7 @@
   </nav>
   <div class="container-fluid">
     <div class="row">
-      <div class="card col-sm p-0 m-2 stuInfo" style="font-size: medium;">
+      <div class="card col-sm p-0 m-2 stuInfo">
         <div class="card-body">
           <h5>Current Student</h5>
           <div id="stuData">
@@ -221,7 +221,7 @@
             </form>
           </div>
           <div class="card-footer p-1">
-            <p style="font-size: medium; margin: 5px;">Notes</p>
+            <p style="margin: 5px;">Notes</p>
             <textarea name="notes" class="spr" id="notes" cols="40" rows="6"
               style="margin-top: 0px; width: 100%; height: 130px"></textarea>
             <button class="btn btn-sm btn-success" onclick="openAddStudentModal()" style="font-weight: bold;">+
@@ -230,12 +230,12 @@
         </div>
       </div>
 
-      <div class="card col-sm p-1 m-2 contactCaseLog" style="font-size: medium;">
+      <div class="card col-sm p-1 m-2 contactCaseLog" >
         <div class='card-header'>
 
           <h6>Log Entries</h6>
           <h6 style="color: #555555; margin-right: 5px;">New Log Entry:</h6>
-          <textarea id="logEntry" class="editable m-1" style="width: 100%; font-size: medium;"
+          <textarea id="logEntry" class="editable m-1" style="width: 100%;"
             name="logEntry"></textarea>
           <div id="logEntryButtons_2" class="input-group input-group svChngs">
             <span style="display: inline-flex; vertical-align: top;">
@@ -253,11 +253,13 @@
         </div>
 
         <div class="card-body p-0 m-0 ">
-          <div class="table " style="margin-top: 0; padding: 0; height: 425px;">
-            <table class="table">
-              <thead class="thead sticky-top">
-                <th class='sticky-top'> Date </th>
-                <th class='sticky-top'> Entry </th>
+          <div class="table" style="margin-top: 0; padding: 0; height: 425px;">
+            <table class="table ">
+              <thead class="table table-header sticky-top ">
+                <tr class="d-flex ">
+                  <th class='table table-header  col-4'> Date </th>
+                  <th class='table table-header  col-8'> Entry </th>
+                </tr>
 
               </thead>
               <tbody id="loc01" class="table" style="overflow: scroll;">
@@ -268,9 +270,9 @@
 
           <!-- <p class="my-0">body text contact log table</p> -->
         </div>
-        <div class="card-footer sticky-top" style="height: 150px;  overflow-y: scroll;">
+        <div class="card-footer " style="height: 150px;  overflow-y: scroll;">
           <div class="row">
-            <h6 class="sticky-top ml-5rem" style="z-index: inherit;">Calendared</h6>
+            <h6 class=" ml-5rem" style="z-index: inherit;">Calendared</h6>
           </div>
           <div class="row">
             <ul id="loc00hd">
@@ -280,7 +282,7 @@
         </div>
       </div>
 
-      <div class="card col-sm p-1 m-2 rosterList" style="font-size: small;">
+      <div class="card col-sm p-1 m-2 rosterList">
         <div class="card-header">
           <h5>Roster</h5>
           <p>Click a name to view more information.</p>
@@ -288,9 +290,9 @@
         <div class="card-body p-0 m-1">
 
           <div class="table m-0 p-0" style="height: 650px;">
-            <table id="rosterList" class="table table">
+            <table id="rosterList" class="table">
               <div class="thead sticky-top">
-                <thead id="loc00th" class="thead sticky-top">
+                <thead id="loc00th" class="thead sticky-top  col">
                   <!-- insert headings for due dates table -->
                 </thead>
               </div>
@@ -304,7 +306,7 @@
         </div>
       </div>
 
-      <div class="card col-sm p-1 m-2 TBlaze" style="font-size: medium;">
+      <div class="card col-sm p-1 m-2 TBlaze" >
         <div class="card-header">
           <h6 class="card-title">TextBlaze Snippets</h6>
           <h6 class="card-subtitle">Levels/Goals Bank</h6>
@@ -340,7 +342,7 @@
           </span>
           <i class="material-icons md-24 text-left" data-toggle="tooltip" data-placement="bottom" data-html="true"
             title="
-          <li class='text-left'>shift-click a goal to edit</li>
+          <li class='text-left'>double-click a goal to edit</li>
             <li class='text-left'>click to add goal to gl items</li>
             <li class='text-left'>click gl items to make TextBlaze list</li>" style="margin-right: 2rem;">help</i>
 
@@ -360,7 +362,7 @@
         </div>
         <div class="card-footer centerLabels">
           <textarea id="tbSnippetCopy" class="inline-flex tbSnippet" name="clickCopy" readonly
-            style="font-size: medium; height: 3rem; width: 100%; margin: 0px; padding: 0px;"></textarea>
+            style="height: 3rem; width: 100%; margin: 0px; padding: 0px;"></textarea>
 
           <span style="display: inline-flex;">
             <div class="centered mx-1">
@@ -472,7 +474,7 @@
                     <span class="input-group-text  " id="leEntry-pre">Entry</span>
                   </div>
                   <textarea name="leEdit" id="leEntry" class="col-11" name="logEntryText"
-                    style="font-size: medium; font-family: Verdana, Geneva, Tahoma, sans-serif; height: 100px;"></textarea>
+                    style="font-family: Verdana, Geneva, Tahoma, sans-serif; height: 100px;"></textarea>
                 </div>
 
 
@@ -535,7 +537,7 @@
                 </div>
 
                 <label for="glEditAnnual" class="form"
-                  style="margin-bottom: 0;margin-left: 2rem; font-size: medium;">Annual
+                  style="margin-bottom: 0;margin-left: 2rem;">Annual
                   Goal:</label>
                 <br>
               </div>
@@ -766,7 +768,7 @@
         </div>
       </div>
 
-      <div style="font-size: medium;">
+      <div>
         <div class="toast ml-2 mb-2" data-autohide="true"
           style="position: absolute; bottom: 3rem; left: 3rem; z-index: 2100;">
           <div class="toast-header">
