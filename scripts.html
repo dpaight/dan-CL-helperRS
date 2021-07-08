@@ -53,33 +53,31 @@
       focus(id);
     });
 
-    $("body").on("click", ".goalList", function (e) {
+    $("body").on("dblclick", ".goalList", function (e) {
       // console.log('event triggered a[name=goalList clicked');
       e.preventDefault();
-      if (e.shiftKey) {
-        // open goal for editing
-        var thisGoal = JSON.parse($(this).text());
-        var gId = parseInt(thisGoal[thisGoal.length - 1], 10);
-        google.script.run
-          .withSuccessHandler(editGoalInModal)
-          .getGoal(gId);
+      // open goal for editing
+      var thisGoal = JSON.parse($(this).text());
+      var gId = parseInt(thisGoal[thisGoal.length - 1], 10);
+      google.script.run
+        .withSuccessHandler(editGoalInModal)
+        .getGoal(gId);
+    });
+    // console.log('sent to goal edit: %s', $(this).text());
+    $("body").on("click", ".goalList", function (e) {
+      // console.log('put the goal number into a gl field');
+      var item = JSON.parse($(this).text());
+      var gId = item[item.length - 1]
+      // item = item.toString().match(/\d+$/);
 
-        // console.log('sent to goal edit: %s', $(this).text());
-      } else {
-        // console.log('put the goal number into a gl field');
-        var item = JSON.parse($(this).text());
-        var gId = item[item.length - 1]
-        // item = item.toString().match(/\d+$/);
-
-        $("input[name='gls']").each(function (i, el) {
-          if ($(this).val() == "") {
-            $(this).val(gId);
-            $(this).attr("title", gId);
-            return false;
-          }
-        });
-        var crntScrl = $(window).scrollTop();
-      }
+      $("input[name='gls']").each(function (i, el) {
+        if ($(this).val() == "") {
+          $(this).val(gId);
+          $(this).attr("title", gId);
+          return false;
+        }
+      });
+      var crntScrl = $(window).scrollTop();
     });
 
     // shift-click clears a litte goal number box
@@ -675,13 +673,13 @@
         Timestamp, email, studentMC, log_entry, log_entry_id, seis_id, Last_Name, First_Name, First_Name, Student_ID
       ] = el;
       list.append(
-        '<tr>' +
+        '<tr class="d-flex">' +
         '<td data-entry_id=' +
-        log_entry_id + ' class="col-sm-3 logEntry"' + 'data-toggle="tooltip" data-placement="right" ' +
+        log_entry_id + ' class="col-4 logEntry"' + 'data-toggle="tooltip" data-placement="right" ' +
         'title= "double-click to edit">' +
-        moment(el[0]).format("MM-DD-YY") +
+        moment(el[0]).format("YYYY-MM-DD") +
         '</td>' +
-        '<td data-entry_id=' + log_entry_id + ' class="logEntry col-sm-9" style="text-align: left;">' +
+        '<td data-entry_id=' + log_entry_id + ' class="logEntry col-8" style="text-align: left;">' +
         el[3].toString() +
         '</td>' +
         '</tr>'
@@ -706,7 +704,7 @@
     var array = sessionStorage.getItem('logPrintItems');
     var sDate = $('#stDtEdit').val().toString();
     var eDate = $('#endDtEdit').val().toString();
-    
+
     google.script.run
       .withSuccessHandler(showUrl)
       .printSelectedLogEntries(stuName, sDate, eDate, array);
@@ -717,7 +715,7 @@
     var filename = obj.filename;
     var url = obj.url;
     $('#pdfUrl').html('<p>' + msg + '</p>' + '\n'
-     + '<a href="' + url + '" target="_blank">'+ filename + '</a>');
+      + '<a href="' + url + '" target="_blank">' + filename + '</a>');
     document.body.style.cursor = "default";
     sleep(1000);
 
@@ -744,15 +742,15 @@
     list = $("#" + loc + "tb");
     list.empty();
     list.append(
-      "<tr >" +
-      "<th class='sticky-top' onclick=\"sortTable(\'rosterList\',0)\">" +
+      "<tr class='d-flex'>" +
+      "<th class='sticky-top tableName col-6' onclick=\"sortTable(\'rosterList\',0)\">" +
       "Name" +
       "</th>" +
-      "<th class='sticky-top tableDate' onclick=\"sortTable(\'rosterList\',1)\">" +
+      "<th class='sticky-top  col-3' onclick=\"sortTable(\'rosterList\',1)\">" +
       "Annual" +
       "</th>" +
-      "<th class='sticky-top tableDate' onclick=\"sortTable(\'rosterList\',2)\">" +
-      "Triennial" +
+      "<th class='sticky-top col-3' onclick=\"sortTable(\'rosterList\',2)\">" +
+      "Tri/Cnst" +
       "</th></tr>"
     );
     for (let i = 0; i < data.length; i++) {
@@ -766,17 +764,23 @@
         alert(" has no id"); // lnCmafn + 
       } else {
         // .toString().slice(0, 1) + "."
+        if (moment(Date_of_Last_Evaluation).isValid() == false) {
+          var evalDate = moment(Date_of_Initial_Parent_Consent).format('YYYY-MM-DD');
+        } else {
+          evalDate = moment(Date_of_Last_Evaluation).format('YYYY-MM-DD');
+        }
+        console.log('evalDate is %s for %s', evalDate, First_Name);
         list.append(
-          '<tr><td class="setStudent" data-stuId=' +
+          '<tr class="d-flex"><td class="setStudent  col-6" data-stuId=' +
           seis_id +
           "> " +
           Last_Name + ', ' + First_Name +
           "</td>" +
-          '<td class="tableDate">' +
+          '<td class="tableDate col-3">' +
           moment(Date_of_Last_Annual_IEP).format('YYYY-MM-DD') +
           "</td>" +
-          '<td class="tableDate">' +
-          moment(Date_of_Last_Evaluation).format('YYYY-MM-DD') +
+          '<td class="tableDate col-3">' +
+          moment(evalDate).format('YYYY-MM-DD') +
           "</td>" +
           "</tr></div>"
         );

@@ -1,20 +1,23 @@
 <style>
   body {
     margin: 0;
-    font-size: medium;
+    font-size: 1rem;
   }
-option {
-  line-height: 30px;
-}
+
+  option {
+    line-height: 30px;
+  }
+
   #rosterList td {
-    font-size: small;
+    font-size: 0.9rem;
   }
+
   .table,
   .table-body {
-    padding: 1rem;
     margin-top: 0;
-    font-size: medium;
+    font-size: 0.9rem;
     overflow-y: scroll;
+    overflow-x: scroll;
   }
 
   .toast {
@@ -22,33 +25,9 @@ option {
     background-color: lightblue;
   }
 
-  tr,
-  th,
-  td {
-    position: relative;
-    font-size: small;
-    text-align: left;
-    opacity: initial;
-    top: 0;
-    margin: 0;
-    color: black;
-    padding: 0;
-    background-color: white;
-  }
-
-  thead {
-    position: relative;
-    position: sticky;
-    font-size: medium;
-    top: 0;
-    margin: 0;
-    color: black;
-    padding: 0;
-    background-color: white;
-  }
 
   [name="gls"] {
-    font-size: medium;
+    font-size: 1rem;
   }
 
   #stuContactInfo {
@@ -58,7 +37,7 @@ option {
   .card {
     padding: 0;
     margin: 0.5rem;
-    font-size: medium;
+    font-size: 1rem;
     height: 800px;
   }
 
@@ -73,20 +52,6 @@ option {
     text-align: center;
   }
 
-  .tableDate {
-    text-align: right;
-    padding-left: 5px;
-    padding-right: 5px;
-    white-space: nowrap;
-  }
-
-  .tableDateL {
-    text-align: left;
-    padding-left: 5px;
-    padding-right: 5px;
-    white-space: nowrap;
-
-  }
 
   .material-icons.md-18 {
     font-size: 18px;
@@ -108,11 +73,16 @@ option {
     color: rgba(0, 0, 0, 0.26);
   }
 
+  .table-head {
+    background-color: white;
+    opacity: 100%;
+  }
+
   .card,
   .card-header,
   form {
     height: fit-content;
-    font-size: medium;
+    font-size: 1rem;
   }
 
   .delete {
@@ -121,21 +91,49 @@ option {
 
 
   .dropdown-menu>.dropdown-item {
-    font-size: medium;
+    font-size: 1rem;
   }
 
   .input-group-prepend,
   .form-control {
-    font-size: medium;
+    font-size: 1rem;
   }
 
 
   .btn {
-    font-size: medium;
+    font-size: 1rem;
   }
 
   p+p,
   .card li+li {
     margin-top: 8px;
+  }
+
+  .tableDate {
+    text-align: left;
+    font-size: 0.9rem;
+    white-space: nowrap;
+  }
+
+  .tableDateL {
+    font-size: 0.9rem;
+    text-align: left;
+    white-space: nowrap;
+
+  }
+
+  tr:after {
+    content: normal;
+    display: block;
+    visibility: hidden;
+    clear: both;
+  }
+
+  thead,
+  tbody,
+  tr,
+  td,
+  th {
+    display: block;
   }
 </style>
