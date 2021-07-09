@@ -738,6 +738,7 @@
   function showRosterTable(loc_and_data) {
     var [loc, data, id] = loc_and_data;
     var list = $("#" + loc + "th");
+    var pending = 'white';
     list.empty();
     list = $("#" + loc + "tb");
     list.empty();
@@ -750,7 +751,7 @@
       "Annual" +
       "</th>" +
       "<th class='sticky-top col-3' onclick=\"sortTable(\'rosterList\',2)\">" +
-      "Tri/Cnst" +
+      "Tri" + "<br><div style='color:red;'>" + "InitConsent" + "</div>" + 
       "</th></tr>"
     );
     for (let i = 0; i < data.length; i++) {
@@ -759,15 +760,18 @@
         nmJdob, idAeries, teachemail, u1_phone, stuemail, u3_Parent_1a_Email, u4_unused, u5_unused, u6_unused, seis_id, Last_Name, First_Name, Date_of_Birth, Case_Manager, Date_of_Last_Annual_IEP, Date_of_Last_Evaluation, Date_of_Initial_Parent_Consent, Parent_1_Mail_Address, Parent_1_Email, Parent_1_Home_Phone, Parent_1_Cell_Phone, Grade_Code, Student_Eligibility_Status, Disability_1, Disability_2, Parent_Guardian_1_Name, Parent_Guardian_2_Name, Date_of_Next_Annual_IEP
       ] = el;
       list = $("#" + loc + "tb");
+
       if (!seis_id) {
 
         alert(" has no id"); // lnCmafn + 
       } else {
         // .toString().slice(0, 1) + "."
         if (moment(Date_of_Last_Evaluation).isValid() == false) {
-          var evalDate = moment(Date_of_Initial_Parent_Consent).format('YYYY-MM-DD');
+          var evalDate = moment(Date_of_Initial_Parent_Consent).add(1, 's').format('YYYY-MM-DD');
+          pending = 'red';
         } else {
           evalDate = moment(Date_of_Last_Evaluation).format('YYYY-MM-DD');
+          pending = 'white';
         }
         console.log('evalDate is %s for %s', evalDate, First_Name);
         list.append(
@@ -779,7 +783,7 @@
           '<td class="tableDate col-3">' +
           moment(Date_of_Last_Annual_IEP).format('YYYY-MM-DD') +
           "</td>" +
-          '<td class="tableDate col-3">' +
+          '<td class="tableDate col-3" style="background-color:' + pending + '">' +
           moment(evalDate).format('YYYY-MM-DD') +
           "</td>" +
           "</tr></div>"

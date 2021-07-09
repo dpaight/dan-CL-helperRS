@@ -230,13 +230,12 @@
         </div>
       </div>
 
-      <div class="card col-sm p-1 m-2 contactCaseLog" >
+      <div class="card col-sm p-1 m-2 contactCaseLog">
         <div class='card-header'>
 
           <h6>Log Entries</h6>
           <h6 style="color: #555555; margin-right: 5px;">New Log Entry:</h6>
-          <textarea id="logEntry" class="editable m-1" style="width: 100%;"
-            name="logEntry"></textarea>
+          <textarea id="logEntry" class="editable m-1" style="width: 100%;" name="logEntry"></textarea>
           <div id="logEntryButtons_2" class="input-group input-group svChngs">
             <span style="display: inline-flex; vertical-align: top;">
 
@@ -253,16 +252,19 @@
         </div>
 
         <div class="card-body p-0 m-0 ">
-          <div class="table" style="margin-top: 0; padding: 0; height: 425px;">
+          <div class="table m-0 p-0" style="height: 425px;">
             <table class="table ">
-              <thead class="table table-header sticky-top ">
-                <tr class="d-flex ">
-                  <th class='table table-header  col-4'> Date </th>
-                  <th class='table table-header  col-8'> Entry </th>
-                </tr>
+              <div class="table thead sticky-top">
+
+                <thead class="table table-header sticky-top">
+                  <tr class="d-flex ">
+                    <th class='table table-header  col-4'> Date </th>
+                    <th class='table table-header  col-8'> Entry </th>
+                  </tr>
+              </div>
 
               </thead>
-              <tbody id="loc01" class="table" style="overflow: scroll;">
+              <tbody id="loc01" class="table tbody" style="overflow: scroll;">
                 <!-- insert case log entries -->
               </tbody>
             </table>
@@ -287,7 +289,7 @@
           <h5>Roster</h5>
           <p>Click a name to view more information.</p>
         </div>
-        <div class="card-body p-0 m-1">
+        <div class="card-body p-0 m-0">
 
           <div class="table m-0 p-0" style="height: 650px;">
             <table id="rosterList" class="table">
@@ -306,7 +308,7 @@
         </div>
       </div>
 
-      <div class="card col-sm p-1 m-2 TBlaze" >
+      <div class="card col-sm p-1 m-2 TBlaze">
         <div class="card-header">
           <h6 class="card-title">TextBlaze Snippets</h6>
           <h6 class="card-subtitle">Levels/Goals Bank</h6>
@@ -536,8 +538,7 @@
                   <input type="text" class="form-control" name="glEdit" id="glEditStandard">
                 </div>
 
-                <label for="glEditAnnual" class="form"
-                  style="margin-bottom: 0;margin-left: 2rem;">Annual
+                <label for="glEditAnnual" class="form" style="margin-bottom: 0;margin-left: 2rem;">Annual
                   Goal:</label>
                 <br>
               </div>
