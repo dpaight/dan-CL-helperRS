@@ -673,7 +673,7 @@
         Timestamp, email, studentMC, log_entry, log_entry_id, seis_id, Last_Name, First_Name, First_Name, Student_ID
       ] = el;
       list.append(
-        '<tr class="d-flex">' +
+        '<tr class="table  d-flex">' +
         '<td data-entry_id=' +
         log_entry_id + ' class="col-4 logEntry"' + 'data-toggle="tooltip" data-placement="right" ' +
         'title= "double-click to edit">' +
@@ -737,23 +737,7 @@
   // display table of names sorted by due dates
   function showRosterTable(loc_and_data) {
     var [loc, data, id] = loc_and_data;
-    var list = $("#" + loc + "th");
-    var pending = 'white';
-    list.empty();
-    list = $("#" + loc + "tb");
-    list.empty();
-    list.append(
-      "<tr class='d-flex'>" +
-      "<th class='sticky-top tableName col-6' onclick=\"sortTable(\'rosterList\',0)\">" +
-      "Name" +
-      "</th>" +
-      "<th class='sticky-top  col-3' onclick=\"sortTable(\'rosterList\',1)\">" +
-      "Annual" +
-      "</th>" +
-      "<th class='sticky-top col-3' onclick=\"sortTable(\'rosterList\',2)\">" +
-      "Tri" + "<br><div style='color:red;'>" + "InitConsent" + "</div>" + 
-      "</th></tr>"
-    );
+    var pending = ['#ffffff', '#000000'];
     for (let i = 0; i < data.length; i++) {
       const el = data[i];
       var [
@@ -762,16 +746,14 @@
       list = $("#" + loc + "tb");
 
       if (!seis_id) {
-
         alert(" has no id"); // lnCmafn + 
       } else {
-        // .toString().slice(0, 1) + "."
         if (moment(Date_of_Last_Evaluation).isValid() == false) {
           var evalDate = moment(Date_of_Initial_Parent_Consent).add(1, 's').format('YYYY-MM-DD');
-          pending = 'red';
+          pending = ['#FF3939', '#FFFFFF'];
         } else {
           evalDate = moment(Date_of_Last_Evaluation).format('YYYY-MM-DD');
-          pending = 'white';
+          pending = ['#FFFFFF','#000000'];
         }
         console.log('evalDate is %s for %s', evalDate, First_Name);
         list.append(
@@ -783,7 +765,7 @@
           '<td class="tableDate col-3">' +
           moment(Date_of_Last_Annual_IEP).format('YYYY-MM-DD') +
           "</td>" +
-          '<td class="tableDate col-3" style="background-color:' + pending + '">' +
+          '<td class="tableDate col-3" style="background-color:' + pending[0] + '; color:' + pending[1] + ';">' +
           moment(evalDate).format('YYYY-MM-DD') +
           "</td>" +
           "</tr></div>"
@@ -1052,4 +1034,5 @@
       .saveEditedLogEntry(obj);
 
   }
+  
 </script>

@@ -103,14 +103,50 @@
         </li>
         <!-- <button onclick="emParents()">em par</button> -->
       </ul>
-      <div class="text-right text-warning">
+      <div onclick="reload()" class="text-right text-warning">
         <?=version?>
       </div>
     </div>
   </nav>
   <div class="container-fluid">
     <div class="row">
-      <div class="card col-sm p-0 m-2 stuInfo">
+
+
+      <div class="card col-sm-12 col-lg-3 col-md-6 p-1 m-2 rosterList d-flex">
+        <div class="card-header">
+          <h5>Roster</h5>
+          <p>Click a name to view more information.</p>
+        </div>
+        <div class="card-body p-0 m-0">
+
+          <div class="table m-0 p-0" style="height: 650px;">
+            <table id="rosterList" class="table table-sm">
+              <thead class="thead sticky">
+                <tr class='d-flex'>
+                  <th scope='col' class='tableName col-6' onclick="sortTable('rosterList',0)">
+                    Name
+                  </th>
+                  <th scope='col' class=' col-3' onclick="sortTable('rosterList',1)">
+                    Annual
+                  </th>
+                  <th scope='col' class='col-3' onclick="sortTable('rosterList',2)">
+                    Tri/<div style='color:#ff3939;'>InitConsent</div>
+                  </th>
+                </tr>
+                <!-- insert headings for due dates table -->
+              </thead>
+              <tbody id="loc00tb">
+                <!-- insert names and dates -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+        <div class="card-footer">
+        </div>
+      </div>
+
+
+      <div class="card col-sm-12 col-lg-3 col-md-5 p-1 m-2 stuInfo d-flex">
         <div class="card-body">
           <h5>Current Student</h5>
           <div id="stuData">
@@ -156,7 +192,7 @@
 
                 <div class="input-group input-group-sm m-1 col-12 mb-3">
                   <div class="input-group-prepend">
-                    <span class="input-group-text" id="tem-pre">EM</span>
+                    <span class="input-group-text" id="tem-pre">TchrEM</span>
                   </div>
                   <input type="text" class="form-control editable spr" id="teachemail" value="">
                 </div>
@@ -174,7 +210,7 @@
               <div class="form-row align-items-center">
                 <div class="input-group input-group-sm m-1  mb-3">
                   <div class="input-group-prepend">
-                    <span class="input-group-text  " id="stuem-pre">EM</span>
+                    <span class="input-group-text  " id="stuem-pre">StuEM</span>
                   </div>
                   <input type="text" class="form-control spr" id="stuemail" value="" readonly>
                 </div>
@@ -230,7 +266,7 @@
         </div>
       </div>
 
-      <div class="card col-sm p-1 m-2 contactCaseLog">
+      <div class="card col-sm-12 col-lg-3 col-md-6 p-1 m-2 contactCaseLog d-flex">
         <div class='card-header'>
 
           <h6>Log Entries</h6>
@@ -253,15 +289,13 @@
 
         <div class="card-body p-0 m-0 ">
           <div class="table m-0 p-0" style="height: 425px;">
-            <table class="table ">
-              <div class="table thead sticky-top">
+            <table class="table table-sm">
 
-                <thead class="table table-header sticky-top">
-                  <tr class="d-flex ">
-                    <th class='table table-header  col-4'> Date </th>
-                    <th class='table table-header  col-8'> Entry </th>
-                  </tr>
-              </div>
+              <thead class="table thead sticky">
+                <tr class="d-flex ">
+                  <th scope="col" class="col-4"> Date </th>
+                  <th scope="col" class="col-8"> Entry </th>
+                </tr>
 
               </thead>
               <tbody id="loc01" class="table tbody" style="overflow: scroll;">
@@ -283,32 +317,7 @@
           </div>
         </div>
       </div>
-
-      <div class="card col-sm p-1 m-2 rosterList">
-        <div class="card-header">
-          <h5>Roster</h5>
-          <p>Click a name to view more information.</p>
-        </div>
-        <div class="card-body p-0 m-0">
-
-          <div class="table m-0 p-0" style="height: 650px;">
-            <table id="rosterList" class="table">
-              <div class="thead sticky-top">
-                <thead id="loc00th" class="thead sticky-top  col">
-                  <!-- insert headings for due dates table -->
-                </thead>
-              </div>
-              <tbody id="loc00tb">
-                <!-- insert names and dates -->
-              </tbody>
-            </table>
-          </div>
-        </div>
-        <div class="card-footer">
-        </div>
-      </div>
-
-      <div class="card col-sm p-1 m-2 TBlaze">
+      <div class="card col-sm-12 col-lg-2 col-md-5 p-1 m-2 TBlaze d-flex">
         <div class="card-header">
           <h6 class="card-title">TextBlaze Snippets</h6>
           <h6 class="card-subtitle">Levels/Goals Bank</h6>
@@ -328,7 +337,9 @@
                 <option id="gMnLA" name="glLvls" value="-1">ANY</option>
               </select>
             </div>
-
+          </span>
+          <br>
+          <span style="display: inline-flex;">
             <div class="input-group input-group-sm m-1 mb-3">
               <div class="input-group-prepend">
                 <label class="input-group-text" for="glArea">Area</label>
@@ -349,8 +360,8 @@
             <li class='text-left'>click gl items to make TextBlaze list</li>" style="margin-right: 2rem;">help</i>
 
           <div class="btn-group" role="group" aria-label="Button group">
-            <button type="button" class="btn btn-sm btn-primary" onclick="findGoals()">SEARCH GOALS</button>
-            <button type="button" class="btn btn-success btn-sm" onclick="getAllLevSnipForTB()">SNIP LEVELS</button>
+            <button type="button" class="btn btn-sm btn-primary" onclick="findGoals()">SEARCH</button>
+            <button type="button" class="btn btn-success btn-sm" onclick="getAllLevSnipForTB()">SNIP</button>
 
           </div>
           <!-- <h6 class="float-right" style="color: green; font-weight: bold; margin-left: 1rem;" id="ready">READY</h6> -->
@@ -358,7 +369,7 @@
         </div>
         <div class="card-body" style="height: fit-content; overflow: scroll;">
           <div class="list-group ">
-            <div id="glLst" class="disabled" style="height: 375px; overflow: scroll;">
+            <div id="glLst" class="disabled" style="font-size: 0.8rem; height: 375px; overflow: scroll;">
             </div>
           </div>
         </div>
@@ -366,7 +377,7 @@
           <textarea id="tbSnippetCopy" class="inline-flex tbSnippet" name="clickCopy" readonly
             style="height: 3rem; width: 100%; margin: 0px; padding: 0px;"></textarea>
 
-          <span style="display: inline-flex;">
+          <div class="d-flex flex-row">
             <div class="centered mx-1">
               <label for="gl0"></label>
               <div>
@@ -398,7 +409,9 @@
                 <br>gl3
               </div>
             </div>
+          </div>
 
+          <div class="d-flex flex-row">
             <div class="centered mx-1">
               <label for="gl4"></label>
               <div>
@@ -430,16 +443,17 @@
                 <br>gl7
               </div>
             </div>
-          </span>
-          <br>
+          </div>
         </div>
+        <br>
       </div>
     </div>
+  </div>
 
-    <div class="row">
+  <div class="row">
 
 
-    </div>
+  </div>
 
   </div>
 
