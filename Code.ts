@@ -795,7 +795,13 @@ function getTableData_roster(id) {
 
     lastR = (lastR > 1) ? lastR : 2;
     var values = sheet.getRange(2, 1, lastR - 1, lastC).getDisplayValues();
-    values.sort(function (a, b) { return moment(a[7]) - moment(b[7]); });
+    values.sort(function (a, b) {
+        if (a[0] > b[0]) {
+            return 1;
+        } else if (a[0] < b[0]) {
+            return -1;
+        } else return 0;
+    });
     return [loc, values, id];
 }
 

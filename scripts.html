@@ -21,6 +21,8 @@
 
         focus(id);
       }
+      // await sleep(3000);
+      // sortTable('rosterList', 0)
     }
 
     function setPointerAndStart(id) {
@@ -154,12 +156,18 @@
       event.preventDefault();
       snipInfo();
     });
+    $(".btn").mouseup(function () {
+      $(this).blur();
+    });
     // copy a text blaze snippet to clipboard when clicking on the item
     $("body").on("click", '[name$="Copy"]', function () {
       $(this).select();
       document.execCommand('copy');
     });
-
+    $(".btn-success").click(function () {
+      $(this).toggleClass("btn-active").siblings().removeClass("btn-active");
+      $(this).blur();
+    });
     // when clicking on a table row, change the color of the field
     $("body").on("mousedown", ".setStudent", function (event) {
       event.preventDefault();
@@ -206,6 +214,7 @@
     $("body").on("click", ".saveEntryBtn", function (event) {
       event.preventDefault();
       document.body.style.cursor = "wait";
+
       var entry = $("#logEntry").val();
       var id = $("#seis_id").val();
       if (entry.length > 0) {
@@ -216,6 +225,25 @@
           .saveLogEntry([id, entry]);
       }
       document.body.style.cursor = "default";
+      $("#logEntry").val('');
+    });
+    $("body").on("keypress", ".saveEntryBtn", function (event) {
+
+      $(this).addClass("active");
+      event.preventDefault();
+      document.body.style.cursor = "wait";
+
+      var entry = $("#logEntry").val();
+      var id = $("#seis_id").val();
+      if (entry.length > 0) {
+        $("html,body").css("cursor", "wait");
+        // console.log('id and entry are %s and %s', id, entry);
+        google.script.run
+          .withSuccessHandler(updateLogEntryCache)
+          .saveLogEntry([id, entry]);
+      }
+      document.body.style.cursor = "default";
+      $(this).removeClass("active");
       $("#logEntry").val('');
     });
     // turn the color of the button back to green without doing anything
@@ -562,10 +590,10 @@
   function clearEmailFields() {
     $("textarea.email").val("");
   }
-
   // this is a bit of code I stole from w3 schools; works great!; 
   // together with the code in the HTML file, this allows sorting by columns when the headings are clicked
   function sortTable(t_id, n) {
+    console.log('sortTable args = %s, %s', t_id, n);
     var table, rows, switching, i, x, y, shouldSwitch, dir, switchcount = 0;
     table = document.getElementById("rosterList");
     switching = true;
@@ -673,13 +701,13 @@
         Timestamp, email, studentMC, log_entry, log_entry_id, seis_id, Last_Name, First_Name, First_Name, Student_ID
       ] = el;
       list.append(
-        '<tr class="table  d-flex">' +
+        '<tr class="table table-sm d-flex">' +
         '<td data-entry_id=' +
         log_entry_id + ' class="col-4 logEntry"' + 'data-toggle="tooltip" data-placement="right" ' +
         'title= "double-click to edit">' +
         moment(el[0]).format("YYYY-MM-DD") +
         '</td>' +
-        '<td data-entry_id=' + log_entry_id + ' class="logEntry col-8" style="text-align: left;">' +
+        '<td data-entry_id=' + log_entry_id + ' class="logEntry col-8">' +
         el[3].toString() +
         '</td>' +
         '</tr>'
@@ -750,10 +778,13 @@
       } else {
         if (moment(Date_of_Last_Evaluation).isValid() == false) {
           var evalDate = moment(Date_of_Initial_Parent_Consent).add(1, 's').format('YYYY-MM-DD');
-          pending = ['#FF3939', '#FFFFFF'];
+          pending = ['#FF3939', '#000000'];
+        } else if (moment(Date_of_Last_Evaluation).add(3, 'y').isBefore(moment().add(6, 'month'))) {
+          evalDate = moment(Date_of_Last_Evaluation).format('YYYY-MM-DD');
+          pending = ['#39FF39', '#000000'];
         } else {
           evalDate = moment(Date_of_Last_Evaluation).format('YYYY-MM-DD');
-          pending = ['#FFFFFF','#000000'];
+          pending = ['#FFFFFF', '#000000'];
         }
         console.log('evalDate is %s for %s', evalDate, First_Name);
         list.append(
@@ -773,8 +804,8 @@
       }
     }
     store(data);
+    return 'rosterList', 0;
   }
-
   // bindSetStudentClick();
   // show upcoming iep meetings on the calendar
   function showCalData(data) {
@@ -1034,5 +1065,5 @@
       .saveEditedLogEntry(obj);
 
   }
-  
+
 </script>

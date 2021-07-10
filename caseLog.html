@@ -112,7 +112,7 @@
     <div class="row">
 
 
-      <div class="card col-sm-12 col-lg-3 col-md-6 p-1 m-2 rosterList d-flex">
+      <div class="card col-sm-12 col-lg-3 col-md-6 p-2 m-0 rosterList d-flex" style="background-color: white;">
         <div class="card-header">
           <h5>Roster</h5>
           <p>Click a name to view more information.</p>
@@ -145,10 +145,14 @@
         </div>
       </div>
 
-
-      <div class="card col-sm-12 col-lg-3 col-md-5 p-1 m-2 stuInfo d-flex">
+      <div class="card col-sm-12 col-lg-3 col-md-5 p-2 m-0 stuInfo d-flex" style="background-color: white;">
         <div class="card-body">
-          <h5>Current Student</h5>
+          <div id="logEntryButtons" class="svChngs centered w-40% btn-group input-group input-group">
+            <h5>Current Student</h5>
+            <!-- <button id="saveEntry" class="btn btn-sm btn-success my-1 saveEntryBtn">SAVE</button> -->
+            <button id="snipThis" class="btn btn-sm btn-primary ml-4 mr-2 my-1 snipThis">SNIP</button>
+          </div>
+
           <div id="stuData">
             <form>
               <div class="form-row align-items-center">
@@ -250,10 +254,6 @@
                 </div>
               </div>
 
-              <div id="logEntryButtons" class="svChngs centered w-40% btn-group input-group input-group">
-                <!-- <button id="saveEntry" class="btn btn-sm btn-success my-1 saveEntryBtn">SAVE</button> -->
-                <button id="snipThis" class="btn btn-sm btn-primary my-1 snipThis">SNIP</button>
-              </div>
             </form>
           </div>
           <div class="card-footer p-1">
@@ -266,7 +266,7 @@
         </div>
       </div>
 
-      <div class="card col-sm-12 col-lg-3 col-md-6 p-1 m-2 contactCaseLog d-flex">
+      <div class="card col-sm-12 col-lg-3 col-md-6 p-2 m-0 contactCaseLog d-flex" style="background-color: white;">
         <div class='card-header'>
 
           <h6>Log Entries</h6>
@@ -317,7 +317,8 @@
           </div>
         </div>
       </div>
-      <div class="card col-sm-12 col-lg-2 col-md-5 p-1 m-2 TBlaze d-flex">
+
+      <div class="card col-sm-12 col-lg-3 col-md-5 p-1 m-0 TBlaze d-flex" style="background-color: lightcyan;">
         <div class="card-header">
           <h6 class="card-title">TextBlaze Snippets</h6>
           <h6 class="card-subtitle">Levels/Goals Bank</h6>
@@ -368,8 +369,8 @@
           <!-- <p class="my-0">header text R1C3</p> -->
         </div>
         <div class="card-body" style="height: fit-content; overflow: scroll;">
-          <div class="list-group ">
-            <div id="glLst" class="disabled" style="font-size: 0.8rem; height: 375px; overflow: scroll;">
+          <div class="list-group m-0">
+            <div id="glLst" class="p-1 m-0 disabled" style="font-size: 0.8rem; height: 375px; overflow: scroll; background-color: white;">
             </div>
           </div>
         </div>
