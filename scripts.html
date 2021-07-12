@@ -48,7 +48,7 @@
 
     // click student name in roster table switches to that student for both contact info and
     // log entries
-    $("body").on("click", ".setStudent", function (event) {
+    $("body").on("click tap", ".setStudent", function (event) {
       event.preventDefault();
       var id = $(this).attr("data-stuId");
       console.log('id = %s', id);
