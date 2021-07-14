@@ -1,4 +1,5 @@
 // Compiled using ts2gas 3.6.4 (TypeScript 4.2.4)
+// Compiled using ts2gas 3.6.4 (TypeScript 4.2.4)
 var ss = SpreadsheetApp.getActiveSpreadsheet();
 /**
  *
@@ -22,11 +23,9 @@ function get(sheetName, column = -1, flat = false) {
     range = (column == -1) ?
         sheet.getRange(1, 1, lastR, lastC) :
         sheet.getRange(1, column, lastR, 1);
-
     values = (flat == undefined || flat == false) ?
         range.getValues() :
         range.getValues().flat();
-
     headings = values.shift();
     return [headings, values, sheet, range, lastR, lastC];
 }
@@ -45,4 +44,5 @@ function findLastRow(sheet, column) {
         1;
     return last;
 }
+//# sourceMappingURL=module.jsx.map
 //# sourceMappingURL=module.jsx.map
