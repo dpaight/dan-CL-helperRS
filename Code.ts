@@ -1674,12 +1674,12 @@ function cacheLogEntry(recordJSN) {
 }
 function checkForNewLogEntryRecordInCache() {
   var sp = PropertiesService.getScriptProperties();
-  try {
-    var record = sp.getProperty("newRecord");
+  var record = sp.getProperty("newRecord");
+  if (record == JSON.stringify([])) {
+    return "no records in properties";
+  } else {
     sp.setProperty('newRecord', JSON.stringify([]));
     return record;
-  } catch (error) {
-    throw 'error ' + error;
   }
 }
 function getCachedLogs() {

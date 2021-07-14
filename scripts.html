@@ -817,10 +817,12 @@
           "> " +
           Last_Name + ', ' + First_Name +
           "</td>" +
-          '<td class="tableDate col-3">' +
+          '<td class="tableDate setStudent col-3" data-stuId=' +
+          seis_id+'>' +
           moment(Date_of_Last_Annual_IEP).format('YYYY-MM-DD') +
           "</td>" +
-          '<td class="tableDate col-3" style="background-color:' + pending[0] + '; color:' + pending[1] + ';">' +
+          '<td class="tableDate setStudent col-3" style="background-color:' + pending[0] + '; color:' + pending[1] + ';" data-stuId=' +
+          seis_id+'>' +
           moment(evalDate).format('YYYY-MM-DD') +
           "</td>" +
           "</tr></div>"
@@ -926,14 +928,14 @@
     window.getSelection().addRange(range);
     document.execCommand('copy');
     document.body.removeChild(container);
-    showToast('data copied to the clipboard');
+    showToast('data copied to clipboard as a TextBlaze-compatible list');
 
     // alert("The data has been copied as a TextBlaze key-value list to the clipboard.");
   }
 
   function showToast(msg) {
     $('#toastBody').html('<p>' + msg + '</p>')
-    $('.toast').toast({ delay: 10000 });
+    $('.toast').toast({ delay: 5000 });
     $('.toast').toast('show');
     document.body.style.cursor = "default";
   }
@@ -971,7 +973,7 @@
   }
   function saveLogEntrySuccess(obj) {
     // console.log('returned: %s', JSON.stringify(obj));
-    // sessionStorage.removeItem('reclog' + obj.seis_id);
+    sessionStorage.removeItem('reclog' + obj.seis_id);
     focus(obj.seis_id, 'loc01');
   }
 
