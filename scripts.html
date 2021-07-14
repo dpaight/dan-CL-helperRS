@@ -1,51 +1,74 @@
 <script>
-  // The code in this function runs when the page is aoaded.
-  $(document).ready(function () {
-    //startup
-    startup();
+  // var inactivityTime = function () {
+  //   var time;
+  //   document.onload = resetTimer;
 
-    function startup(id = getPointer()) {
+  //   document.onmousemove = resetTimer;
+  //   document.onkeydown = resetTimer;
+
+  //   function checkForNewLogEntries() {
+  //     google.script.run
+  //       .withSuccessHandler(catchCheck)
+  //       .withFailureHandler(null)
+  //       .checkForNewLogEntryRecordInCache();
+  //   }
+
+  //   function catchCheck(record) {
+  //     console.log('val at catchCheck:', record);
+  //     updateLogEntryCache(record);
+  //   }
+
+  //   function resetTimer() {
+  //     time = setTimeout(checkForNewLogEntries, (5000));
+  //     clearTimeout(time);
+  //     // 1000 milliseconds = 1 second
+  //   }
+  // }
+  // inactivityTime;
+  // //start
+  // window.onload = function () {
+  //     inactivityTime;
+  //   }
+
+  // // end
+
+  // The code in this function runs when the page is loaded.
+  $(document).ready(function () {
+    startup();
+    
+    
+    function startup(id) {
       $('#spinner01').show();
+      id = getPointer();
       if (id == undefined) {
         google.script.run
-          .withSuccessHandler(setPointerAndStart)
-          .getFirstPointer();
+        .withSuccessHandler(setPointerAndStart)
+        .getFirstPointer();
       } else {
         // contactInfo(id);
         console.log('current id at startup is %s', id);
-
+        
         document.body.style.cursor = "wait";
         google.script.run
-          .withSuccessHandler(showRosterTable)
-          .getTableData_roster(id);
-
+        .withSuccessHandler(showRosterTable)
+        .getTableData_roster(id);
+        
         focus(id);
       }
-      // await sleep(3000);
-      // sortTable('rosterList', 0)
+      function setPointerAndStart(id) {
+        setPointer(id);
+        console.log('setPointerAndStart ran');
+        // await sleep(2000);
+        startup(id);
+      }
+      
     }
-
-    function setPointerAndStart(id) {
-      setPointer(id);
-      console.log('setPointerAndStart ran');
-      // await sleep(2000);
-      startup(id);
-    }
-    function sleep(ms) {
-      return new Promise(resolve => setTimeout(resolve, ms));
-    }
-
-    // var id = google.script.run.getLastId();
+    
 
 
     $("#ready").hide();
-
     $(".pleaseHide").hide();
-
-    // loading data into the cards
-    // this gets the data to be displayed for the student in focus, but not the log entries yet
     document.body.style.cursor = "wait";
-
     // click student name in roster table switches to that student for both contact info and
     // log entries
     $("body").on("click tap", ".setStudent", function (event) {
@@ -55,7 +78,7 @@
       focus(id);
     });
 
-    $("body").on("dblclick", ".goalList", function (e) {
+    $("body").on("dblclick dbl-tap", ".goalList", function (e) {
       // console.log('event triggered a[name=goalList clicked');
       e.preventDefault();
       // open goal for editing
@@ -322,7 +345,6 @@
   });
 
 
-
   // named functions
   // calls function on server side to return data for this student
 
@@ -340,7 +362,9 @@
         .withSuccessHandler(logsToCache)
         .getLogEntries('', 'loc01');
     }
-
+  }
+  function sleep(ms) {
+    return new Promise(resolve => setTimeout(resolve, ms));
   }
 
   function logsToCache(allRecords) {
@@ -947,7 +971,7 @@
   }
   function saveLogEntrySuccess(obj) {
     // console.log('returned: %s', JSON.stringify(obj));
-    sessionStorage.removeItem('reclog' + obj.seis_id);
+    // sessionStorage.removeItem('reclog' + obj.seis_id);
     focus(obj.seis_id, 'loc01');
   }
 
@@ -1022,10 +1046,6 @@
       .withSuccessHandler(showNewStu)
       .addStudentByIdFromRESstudentsServer(obj);
   }
-  function reload() {
-    sessionStorage.clear();
-    window.open('https://script.google.com/a/macros/hemetusd.org/s/AKfycbyuLrQ4FFJ2B-wErlCVm4yg9YxldINmlUNE9K0HFCKj/dev', '_top')
-  }
 
   function getPointer() {
     return sessionStorage.getItem('lastId');
@@ -1034,13 +1054,7 @@
     sessionStorage.setItem('lastId', id);
   }
 
-  function updateLogEntryCache(array) {
-    var [id, row] = array;
-    var logs = JSON.parse(sessionStorage.getItem('reclog' + id));
-    logs.unshift(row);
-    sessionStorage.setItem('reclog' + id, JSON.stringify(logs));
-    showLog(logs, 'loc01');
-  }
+
 
   function editLogEntryInModal(logEntry) {
     logEntry = JSON.parse(logEntry);
@@ -1064,6 +1078,23 @@
       .withSuccessHandler(saveLogEntrySuccess)
       .saveEditedLogEntry(obj);
 
+  }
+  function updateLogEntryCache(record) {
+    console.log('record is %s', record);
+    record = JSON.parse(record);
+    for (let i = 0; i < record.length; i++) {
+      const el = record[i];
+      var id = el[5]
+      var logs = JSON.parse(sessionStorage.getItem('reclog' + id));
+      logs.unshift(el);
+      sessionStorage.setItem('reclog' + id, JSON.stringify(logs));
+    }
+    showLog(logs, 'loc01');
+  }
+
+  function reload() {
+    sessionStorage.clear();
+    window.open('https://script.google.com/a/macros/hemetusd.org/s/AKfycbyuLrQ4FFJ2B-wErlCVm4yg9YxldINmlUNE9K0HFCKj/dev', '_top')
   }
 
 </script>

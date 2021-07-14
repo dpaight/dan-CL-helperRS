@@ -208,7 +208,7 @@
                   <div class="input-group-prepend">
                     <span class="input-group-text  " id="seis_id-pre">ID(SEIS) </span>
                   </div>
-                  <input type="text" class="form-control spr" id="seis_id" value="">
+                  <input type="text" class="form-control spr" id="seis_id" value="" readonly>
                 </div>
               </div>
               <div class="form-row align-items-center">
@@ -504,7 +504,6 @@
               <button type="button" class="btn btn-sm btn-danger" data-dismiss="modal"
                 onclick="saveEditedEntry(-1)">DELETE</button>
               <input id='lelog_entry_id' type='text' value='' style='background-color: lightyellow; width: 3rem;'>
-
             </div>
 
           </div>
@@ -808,5 +807,6 @@
 <?!= include('scripts'); ?>
 <?!= include('moment_js'); ?>
 <?!= include('caseLogCss'); ?>
+<?!= include('idleScript'); ?>
 
 </html>

@@ -1,0 +1,38 @@
+<script>
+    // idleLogout();
+    // function idleLogout() {
+        var t;
+
+        window.addEventListener("mousemove", resetTimer, true);
+        window.addEventListener("mousedown", resetTimer, true);
+        window.addEventListener("mousedown", resetTimer, true);
+        window.addEventListener("touchstart", resetTimer, true);
+        window.addEventListener("click", resetTimer, true);
+        window.addEventListener("keydown", resetTimer, true);
+
+        // window.onload = resetTimer;
+        // window.onmousemove = resetTimer;
+        // window.onmousedown = resetTimer;  // catches touchscreen presses as well      
+        // window.ontouchstart = resetTimer; // catches touchscreen swipes as well 
+        // window.onclick = resetTimer;      // catches touchpad clicks as well
+        // window.onkeydown = resetTimer;
+        window.addEventListener('scroll', resetTimer, true); // improved; see comments
+
+        function checkForNewLogEntries() {
+            google.script.run
+                .withSuccessHandler(catchCheck)
+                // .withFailureHandler(error)
+                .checkForNewLogEntryRecordInCache();
+        }
+
+        function catchCheck(record) {
+            console.log('val at catchCheck:', record);
+            updateLogEntryCache(record);
+        }
+
+        function resetTimer() {
+            clearTimeout(t);
+            t = setTimeout(checkForNewLogEntries, 3000);  // time is in milliseconds
+        }
+    // }
+</script>
