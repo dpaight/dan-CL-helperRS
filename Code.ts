@@ -77,12 +77,12 @@ function doPost(e) {
     var body = JSON.parse(e.postData.contents);
     //Adding a new row with content from the request body
     sheet.appendRow([body.id,
-        body.date_created,
-        body.first_name,
-        body.shipping.address,
-        body.shipping.phone,
-        body.billing.phone,
-        body.billing.postcode
+    body.date_created,
+    body.first_name,
+    body.shipping.address,
+    body.shipping.phone,
+    body.billing.phone,
+    body.billing.postcode
     ]);
 }
 // script and CSS files have to be stored in HTML files for Google app script
@@ -428,8 +428,8 @@ function createDraftEmail(buttonVal, paramsJSN) {
     }
     else {
         GmailApp.createDraft(params.to, params.subj, params.body, {
-        // @ts-ignore
-        // attachments: [file.getAs(MimeType.PDF), file2.getAs(MimeType.PDF)]
+            // @ts-ignore
+            // attachments: [file.getAs(MimeType.PDF), file2.getAs(MimeType.PDF)]
         });
     }
     return params.body.toString();
@@ -1668,11 +1668,13 @@ function cacheLogEntry(recordJSN) {
 function checkForNewLogEntryRecordInCache() {
     var sp = PropertiesService.getScriptProperties();
     var record = sp.getProperty("newRecord");
-    if (record == JSON.stringify([])) {
-        return "no records in properties";
+    Logger.log('record is %s', record);
+
+    if (record == null) {
+        throw "no records in properties";
     }
     else {
-        sp.setProperty('newRecord', JSON.stringify([]));
+        sp.deleteProperty('newRecord');
         return record;
     }
 }
