@@ -35,24 +35,24 @@
   // The code in this function runs when the page is loaded.
   $(document).ready(function () {
     startup();
-    
-    
+
+
     function startup(id) {
       $('#spinner01').show();
       id = getPointer();
       if (id == undefined) {
         google.script.run
-        .withSuccessHandler(setPointerAndStart)
-        .getFirstPointer();
+          .withSuccessHandler(setPointerAndStart)
+          .getFirstPointer();
       } else {
         // contactInfo(id);
         console.log('current id at startup is %s', id);
-        
+
         document.body.style.cursor = "wait";
         google.script.run
-        .withSuccessHandler(showRosterTable)
-        .getTableData_roster(id);
-        
+          .withSuccessHandler(showRosterTable)
+          .getTableData_roster(id);
+
         focus(id);
       }
       function setPointerAndStart(id) {
@@ -61,9 +61,9 @@
         // await sleep(2000);
         startup(id);
       }
-      
+
     }
-    
+
 
 
     $("#ready").hide();
@@ -818,11 +818,11 @@
           Last_Name + ', ' + First_Name +
           "</td>" +
           '<td class="tableDate setStudent col-3" data-stuId=' +
-          seis_id+'>' +
+          seis_id + '>' +
           moment(Date_of_Last_Annual_IEP).format('YYYY-MM-DD') +
           "</td>" +
           '<td class="tableDate setStudent col-3" style="background-color:' + pending[0] + '; color:' + pending[1] + ';" data-stuId=' +
-          seis_id+'>' +
+          seis_id + '>' +
           moment(evalDate).format('YYYY-MM-DD') +
           "</td>" +
           "</tr></div>"
@@ -1099,4 +1099,20 @@
     window.open('https://script.google.com/a/macros/hemetusd.org/s/AKfycbyuLrQ4FFJ2B-wErlCVm4yg9YxldINmlUNE9K0HFCKj/dev', '_top')
   }
 
+  function deleteRecord() {
+    $('#genericModal').modal({ focus: true });
+    $('#genericModalMsg').html("Remove this record?");
+    $('#genericButtons').html(
+      '<button type="button" class="btn btn-secondary" data-dismiss="modal">NO</button>' +
+      '<button type="button" class="btn btn-primary" data-dismiss="modal" onclick="deleteRecordConfirmed()">YES</button>'
+    );
+  }
+  function deleteRecordConfirmed() {
+    var id = $("#seis_id").val();
+    console.log('the id to delete is %s', id);
+    google.script.run
+      .withSuccessHandler(reload) // reload
+      .withFailureHandler()
+      .deleteRecord(id);
+  }
 </script>

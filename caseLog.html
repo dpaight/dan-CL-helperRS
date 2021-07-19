@@ -103,7 +103,9 @@
         </li>
         <!-- <button onclick="emParents()">em par</button> -->
       </ul>
-        <h6 onclick="reload()" class="text-right text-warning" style="cursor: pointer;"> <?=version?></h6>
+      <h6 onclick="reload()" class="text-right text-warning" style="cursor: pointer;">
+        <?=version?>
+      </h6>
     </div>
   </nav>
   <div class="container-fluid">
@@ -143,14 +145,19 @@
         </div>
       </div>
 
-      <div class="card col-sm-12 col-lg-3 col-md-5 p-2 m-0 stuInfo" style="background-color: white; ">
-        <div class="card-body">
-          <h5 style="display: inline; width: 30%;">Current Student</h5>
-          <div id="logEntryButtons" class="svChngs w-40% btn-group">
-            <!-- <button id="saveEntry" class="btn btn-sm btn-success my-1 saveEntryBtn">SAVE</button> -->
-            <button id="snipThis" class="btn btn-sm btn-primary ml-4 mr-4 my-1 snipThis">SNIP</button>
-          </div>
+      <div class="card col-sm-12 col-lg-3 col-md-5 p-0 m-0 stuInfo d-flex" style="background-color: white; ">
+        <div class="card-header d-flex col-12">
 
+          <h6 class="col-6">Current Student</h6>
+
+            <div id="logEntryButtons" class="svChngs col-5 btn-group flex-row" role="group">
+              <!-- <button id="saveEntry" class="btn btn-sm btn-success my-1 saveEntryBtn">SAVE</button> -->
+              <button id="snipThis" class="btn btn-sm btn-primary snipThis">SNIP</button>
+              <button id="delThis" onclick="deleteRecord()" class="btn btn-sm btn-danger deleteThis">REMOVE</button>
+            </div>
+        </div>
+
+        <div class="card-body">
           <div id="stuData">
             <form>
               <div class="form-row align-items-center">
@@ -368,7 +375,8 @@
         </div>
         <div class="card-body" style="height: fit-content; overflow: scroll;">
           <div class="list-group m-0">
-            <div id="glLst" class="p-1 m-0 disabled" style="font-size: 0.8rem; height: 375px; overflow: scroll; background-color: white;">
+            <div id="glLst" class="p-1 m-0 disabled"
+              style="font-size: 0.8rem; height: 375px; overflow: scroll; background-color: white;">
             </div>
           </div>
         </div>
@@ -781,25 +789,49 @@
         </div>
       </div>
 
-      <div>
-        <div class="toast ml-2 mb-2" data-autohide="true"
-          style="position: absolute; top: 4rem; left: 50%; z-index: 2100;">
-          <div class="toast-header">
-            <!-- <small class="text-muted">5 mins ago</small> -->
-            <button type="button" class="ml-2 mb-1 close" data-dismiss="toast">&times;</button>
+      <div class="modal fade" id="genericModal" tabindex="-1" role="dialog"
+        aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered" role="document">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h5 class="modal-title" id="exampleModalCenterTitle"></h5>
+              <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+              </button>
+            </div>
+            <div class="modal-body d-flex inline-flexbox">
+              <h5 id="genericModalMsg"></h5>
+              ...
+            </div>
+            <div id="genericButtons" class="modal-footer">
+              <!-- insert html from script -->
+              <!-- <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button> -->
+              <!-- <button type="button" class="btn btn-primary">Save changes</button> -->
+            </div>
           </div>
-          <div id="toastBody" class="toast-body" style="color: black; text-decoration: underline;">
-            data copied to TextBlaze key-value list
-          </div>
-        </div>
-
-        <!-- alerts -->
-        <div id="a-clpCpy" class="alert alert-primary fade alert-dismisible" role="alert">
-          <p> The data has been copied as a TextBlaze key-value list to the clipboard.</p>
-          <button class="btn btn-sm" data-dismiss="alert">DISMISS</button>
         </div>
       </div>
     </div>
+
+    <div>
+      <div class="toast ml-2 mb-2" data-autohide="true"
+        style="position: absolute; top: 4rem; left: 50%; z-index: 2100;">
+        <div class="toast-header">
+          <!-- <small class="text-muted">5 mins ago</small> -->
+          <button type="button" class="ml-2 mb-1 close" data-dismiss="toast">&times;</button>
+        </div>
+        <div id="toastBody" class="toast-body" style="color: black; text-decoration: underline;">
+          data copied to TextBlaze key-value list
+        </div>
+      </div>
+
+      <!-- alerts -->
+      <div id="a-clpCpy" class="alert alert-primary fade alert-dismisible" role="alert">
+        <p> The data has been copied as a TextBlaze key-value list to the clipboard.</p>
+        <button class="btn btn-sm" data-dismiss="alert">DISMISS</button>
+      </div>
+    </div>
+  </div>
   </div>
 </body>
 <?!= include('scripts'); ?>

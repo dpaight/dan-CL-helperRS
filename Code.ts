@@ -1372,14 +1372,10 @@ function fileInFolders() {
 // Compiled using ts2gas 3.6.4 (TypeScript 4.2.4)
 function scanForTasks() {
     // if (moment().month() < 8) { return };
-    var taskSheet = ss.getSheetByName('tasks');
-    var last = taskSheet.getRange('A1:A').getValues().filter(String).length;
-    last = (last < 2) ? 1 : last;
-    var taskRange = taskSheet.getRange('D2:D' + last);
-    var taskNotesVals = taskRange.getValues().flat();
+    var [taskHeadings, taskNotesVals, taskSheet, taskRange, lastR, lastC] = get('tasks');
     var array = [];
-    var values = get('roster')[1];
-    var headings = values.shift();
+
+    var [headings, values, sheet, range, lastR, lastC] = get('roster');
     var iObj = getIndicesByHeading(headings);
     var taskList = getTaskLists();
     var taskListId = taskList[0].id;
@@ -1390,8 +1386,8 @@ function scanForTasks() {
     Logger.log('nextYear is %s', moment(nextYear).format('YYYY-MM-DD'));
     for (let i = 0; i < values.length; i++) {
         var el = values[i];
-        var anl = moment(el[iObj['date_of_last_annual_iep']], 'YYYY-MM-DD');
-        var tri = moment(el[iObj['date_of_last_evaluation']], 'YYYY-MM-DD');
+        var anl = moment(el[iObj['date_of_last_annual_iep']]);
+        var tri = moment(el[iObj['date_of_last_evaluation']]);
         var nxtAnl = moment(anl).add(1, 'y');
         var nxtTri = moment(tri).add(3, 'y');
         Logger.log('Anl is %s; Tri is %s', moment(anl).format('YYYY-MM-DD'), moment(tri).format('YYYY-MM-DD'));
@@ -1402,7 +1398,7 @@ function scanForTasks() {
         var nmjdob = el[iObj['nmjdob']];
         var langflu = el[iObj['langflu']];
         var key = nmjdob;
-        if (taskNotesVals.indexOf(key + id) > -1) {
+        if (taskNotesVals.flat().indexOf(key + id) > -1) {
             // do nothing
         }
         else {
@@ -1544,7 +1540,8 @@ function getFirstPointer() {
     Logger.log(JSON.stringify(idList[0]));
     return idList[0];
 }
-function getLogEntries(id, loc, startDate, endDate) {
+function getLogEntries(id = '1010101', loc = null, startDate, endDate) {
+
     var [headings, ids, sheet, range, lastR, lastC] = get('roster', 10, true);
     var allRecords = [];
     var [logTableHeadings, values, sheet, range, lastR, lastC] = get('logRespMerged');
@@ -1694,4 +1691,70 @@ function getCachedLogs() {
         return -1;
     }
 }
+function deleteRecord(id = '1010101') {
+    var [headings, values, sheet, range, lastR, lastC] = get('roster');
+    var [headings_del, values_del, sheet_del, range_del, lastR_del, lastC_del] = get('deleted');
+    var logsToRemove = [];
+    var id_index = headings.indexOf('seis_id');
+
+    for (let i = 0; i < values.length; i++) {
+        const el = values[i];
+        var thisId = el[id_index];
+        if (thisId.toString() == id.toString()) {
+            var deleteMe = values.splice(i, 1);
+            var remainingValues = headings_del.concat(values_del.concat(deleteMe));
+            var delDestRange = sheet_del.getRange(lastR_del + 1, 1, 1, deleteMe[0].length);
+            delDestRange.setValues(deleteMe);
+
+            if (id.toString() != '1010101') {
+                var remainingRosterRange = sheet.getRange(2, 1, values.length, values[0].length);
+                sheet.getRange(2, 1, lastR, lastC).clear();
+                remainingRosterRange.setValues(values);
+            }
+            extractLogEntries(id);
+
+            return id;
+        }
+    }
+    throw "the id was not found, which is really odd";
+}
+function extractLogEntries(id = '1010101') {
+    var [headings, values, sheet, range, lastR, lastC] = get('logRespMerged');
+    var logsToRemove = [];
+    
+    for (let j = 0; j < values.length; j++) {
+        const elEntry = values[j];
+        if (elEntry[5].toString() == id.toString()) {
+            logsToRemove.push(elEntry);
+            values.splice(j, 1);
+            j--;
+        }
+    }
+
+    var [headings_rm, values_rm, sheet_rm, range_rm, lastR_rm, lastC_rm] = get('removedLogEntries');
+    var rmRng = sheet_rm.getRange(lastR_rm + 1, 1, logsToRemove.length, logsToRemove[0].length);
+    rmRng.setValues(logsToRemove);
+
+    if (values.length > 0) {
+        values = [headings].concat(values);
+        range.clear();
+        SpreadsheetApp.flush();
+        var keepersRng = sheet.getRange(1, 1, values.length, values[0].length);
+        keepersRng.setValues(values);
+    } else {
+        throw 'we have a problem';
+    }
+}
+function findIndexOfStringInArray(stringItem, array) {
+    // stringItem = "abc";
+    // array = ["efg", "ABR", "ABC", "xyz"];
+    for (let k = 0; k < array.length; k++) {
+        const element = array[k];
+        if (stringItem.toLowerCase() == element.toLowerCase()) {
+            Logger.log(k);
+            return k;
+        }
+    }
+}
+
 //# sourceMappingURL=module.jsx.map
