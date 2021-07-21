@@ -46,7 +46,10 @@
 
   <!-- Navigation bar -->
   <nav class="navbar sticky-top navbar-expand-md navbar-dark bg-primary" style="z-index: 2000;">
-    <a class="navbar-brand" href="#" style="font-weight: bold;">CASE LOGS</a>
+    <a class="navbar-brand data-toggle" href="#" title="clear session cache and reload" onclick="reload()"
+      style="font-weight: 500;">CASE LOGS
+      <?=version?>
+    </a>
     <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent"
       aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
       <span class="navbar-toggler-icon"></span>
@@ -103,9 +106,6 @@
         </li>
         <!-- <button onclick="emParents()">em par</button> -->
       </ul>
-      <h6 onclick="reload()" class="text-right text-warning" style="cursor: pointer;">
-        <?=version?>
-      </h6>
     </div>
   </nav>
   <div class="container-fluid">
@@ -150,11 +150,11 @@
 
           <h6 class="col-6">Current Student</h6>
 
-            <div id="logEntryButtons" class="svChngs col-5 btn-group flex-row" role="group">
-              <!-- <button id="saveEntry" class="btn btn-sm btn-success my-1 saveEntryBtn">SAVE</button> -->
-              <button id="snipThis" class="btn btn-sm btn-success snipThis">SNIP</button>
-              <button id="delThis" onclick="deleteRecord()" class="btn btn-sm btn-danger deleteThis">REMOVE</button>
-            </div>
+          <div id="logEntryButtons" class="svChngs col-5 btn-group flex-row" role="group">
+            <!-- <button id="saveEntry" class="btn btn-sm btn-success my-1 saveEntryBtn">SAVE</button> -->
+            <button id="snipThis" class="btn btn-sm btn-success snipThis">SNIP</button>
+            <button id="delThis" onclick="deleteRecord()" class="btn btn-sm btn-danger deleteThis">REMOVE</button>
+          </div>
         </div>
 
         <div class="card-body">
@@ -293,7 +293,7 @@
         </div>
 
         <div class="card-body p-0 m-0 ">
-          <div class="table m-0 p-0" style="height: 425px;">
+          <div class="table my-1 py-1" style="height: 350px;">
             <table class="table table-sm">
 
               <thead class="table thead sticky">
@@ -311,18 +311,10 @@
 
           <!-- <p class="my-0">body text contact log table</p> -->
         </div>
-        <div class="card-footer " style="height: 150px;  overflow-y: scroll;">
-          <div class="row">
-            <h6 class=" ml-5rem" style="z-index: inherit;">Calendared</h6>
-          </div>
-          <div class="row">
-            <ul id="loc00hd">
-              <!-- this is where upcoming events are inserted -->
-            </ul>
-          </div>
+        <div class="card-footer my-1 p-1">
+          <iframe src="https://calendar.google.com/calendar/embed?height=320&amp;wkst=2&amp;bgcolor=%23ffffff&amp;ctz=America%2FLos_Angeles&amp;src=ZHBhaWdodEBoZW1ldHVzZC5vcmc&amp;src=ZW4udXNhI2hvbGlkYXlAZ3JvdXAudi5jYWxlbmRhci5nb29nbGUuY29t&amp;color=%23039BE5&amp;color=%23009688&amp;showTz=0&amp;showCalendars=0&amp;showTabs=0&amp;showPrint=0&amp;showDate=1&amp;mode=AGENDA" style="border-width:0" width="320" height="320" frameborder="0" scrolling="no"></iframe>
         </div>
       </div>
-
       <div class="card col-sm-12 col-lg-3 col-md-5 p-1 m-0 TBlaze d-flex" style="background-color: lightcyan;">
         <div class="card-header">
           <h6 class="card-title">TextBlaze Snippets</h6>
@@ -362,8 +354,8 @@
           <i class="material-icons md-24 text-left" data-toggle="tooltip" data-placement="bottom" data-html="true"
             title="
           <li class='text-left'>double-click a goal to edit</li>
-            <li class='text-left'>click to add goal to gl items</li>
-            <li class='text-left'>click gl items to make TextBlaze list</li>" style="margin-right: 2rem;">help</i>
+            <li class='text-left'>shift-click to add goal to gl items</li>
+            <li class='text-left'>click gl-n items to make TextBlaze list</li>" style="margin-right: 2rem;">help</i>
 
           <div class="btn-group" role="group" aria-label="Button group">
             <button type="button" class="btn btn-sm btn-primary" onclick="findGoals()">SEARCH</button>
@@ -789,8 +781,8 @@
         </div>
       </div>
 
-      <div class="modal fade" id="genericModal" tabindex="-1" role="dialog"
-        aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+      <div class="modal fade" id="genericModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle"
+        aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered" role="document">
           <div class="modal-content">
             <div class="modal-header">
@@ -815,7 +807,7 @@
 
     <div>
       <div class="toast ml-2 mb-2" data-autohide="true"
-        style="position: absolute; top: 4rem; left: 50%; z-index: 2100;">
+        style="position: absolute; top: 1rem; right: 2rem; z-index: 2100;">
         <div class="toast-header">
           <!-- <small class="text-muted">5 mins ago</small> -->
           <button type="button" class="ml-2 mb-1 close" data-dismiss="toast">&times;</button>

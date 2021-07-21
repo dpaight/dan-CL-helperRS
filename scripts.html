@@ -91,18 +91,20 @@
     // console.log('sent to goal edit: %s', $(this).text());
     $("body").on("click", ".goalList", function (e) {
       // console.log('put the goal number into a gl field');
-      var item = JSON.parse($(this).text());
-      var gId = item[item.length - 1]
-      // item = item.toString().match(/\d+$/);
+      if (e.shiftKey) {
+        var item = JSON.parse($(this).text());
+        var gId = item[item.length - 1]
+        // item = item.toString().match(/\d+$/);
 
-      $("input[name='gls']").each(function (i, el) {
-        if ($(this).val() == "") {
-          $(this).val(gId);
-          $(this).attr("title", gId);
-          return false;
-        }
-      });
-      var crntScrl = $(window).scrollTop();
+        $("input[name='gls']").each(function (i, el) {
+          if ($(this).val() == "") {
+            $(this).val(gId);
+            $(this).attr("title", gId);
+            return false;
+          }
+        });
+        var crntScrl = $(window).scrollTop();
+      }
     });
 
     // shift-click clears a litte goal number box
@@ -205,12 +207,7 @@
       // console.log('mouse up');
     });
 
-    $("body").on("click", "#calRefresh", function () {
-      document.body.style.cursor = "wait";
-      google.script.run
-        .withSuccessHandler(showCalData)
-        .getCalData_events();
-    });
+
     $("body").on("change", ".logWindow", function () {
       filterLogEntriesByDateWindow()
     });
@@ -351,7 +348,6 @@
   function focus(id = getPointer()) {
     setPointer(id);
     contactInfo(id);
-    calRefresh();
 
     if (sessionStorage.getItem("reclog" + id) != null) {
       var logs = JSON.parse(sessionStorage.getItem("reclog" + id));
@@ -525,14 +521,6 @@
       $("#corrlng").css("color", "#000000");
     }
 
-  }
-  function calRefresh() {
-    document.body.style.cursor = "wait";
-    // google.script.run
-    //     .getSyncedEvents();
-    google.script.run
-      .withSuccessHandler(showCalData)
-      .getCalData_events();
   }
 
   function sndEm(buttonVal) {
@@ -837,14 +825,14 @@
   function showCalData(data) {
     // console.log('the data: %s', JSON.stringify(data));
     $("#loc00hd").empty();
-    $("#loc00hd").append("<ul>");
-    for (let i = 0; i < data.length; i++) {
-      var [a, b, c, d, e, f, g, h] = data[i];
-      var p = moment(c, 'YYYY-MM-DD');
+    parsedData = JSON.parse(data);
+    for (let i = 0; i < parsedData.length; i++) {
+      var [a, b, c, d, e, f, g, h] = parsedData[i];
+      var p = moment(c, 'YYYY-MM-DDTHH:mm');
       var q = moment();
 
       $("#loc00hd").append(
-        "<li ' class='upcomingEvent'>" + moment(c, 'YYYY-MM-DD').format('dd YY-MM-DD') + "     " + b + "; \n" + f + '\n');
+        "<li ' class='upcomingEvent'>" + moment(c, 'YYYY-MM-DDTHH:mm').format('dd MM-DD-YY @ HH:mm') + "     " + b + "; \n" + f + '\n');
       document.body.style.cursor = "default";
     }
   }

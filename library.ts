@@ -29,6 +29,27 @@ function get(sheetName, column = -1, flat = false) {
     headings = values.shift();
     return [headings, values, sheet, range, lastR, lastC];
 }
+function getDisp(sheetName, column = -1, flat = false) {
+    if (!sheetName) {
+        Logger.log('missing value');
+    }
+    else {
+        Logger.log(sheetName);
+    }
+    ;
+    var sheet, headings, values, range, lastR, lastC;
+    sheet = ss.getSheetByName(sheetName);
+    lastR = findLastRow(sheetName, 1);
+    lastC = sheet.getLastColumn();
+    range = (column == -1) ?
+        sheet.getRange(1, 1, lastR, lastC) :
+        sheet.getRange(1, column, lastR, 1);
+    values = (flat == undefined || flat == false) ?
+        range.getDisplayValues() :
+        range.getDisplayValues().flat();
+    headings = values.shift();
+    return [headings, values, sheet, range, lastR, lastC];
+}
 /**
  *
  * @param sheet: String (name of sheet)

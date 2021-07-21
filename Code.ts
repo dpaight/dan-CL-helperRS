@@ -453,182 +453,43 @@ function createDraftEmail(buttonVal, paramsJSN) {
  * @param {boolean} fullSync If true, throw out any existing sync token and
  *        perform a full sync; if false, use the existing sync token if possible.
  */
-function getSyncedEvents_bak(calendarId, fullSync) {
-    calendarId = "dpaight@hemetusd.org";
-    // hemetusd.k12.ca.us_mu0bm8h5amcsfvcvpmim3v1fag@group.calendar.google.com
+
+function getSyncedEvents(calendarId = "dpaight@hemetusd.org") {
     var myEvents = [];
-    var properties = PropertiesService.getScriptProperties();
-    var options = {
-        maxResults: 100
-    };
-    var syncToken = properties.getProperty('syncToken');
-    if (syncToken && !fullSync) {
-        // @ts-ignore
-        // options.syncToken = syncToken;
+    // google code
+    
+    var calendarId = 'primary';
+    var now = new Date();
+    var events = Calendar.Events.list(calendarId, {
+        timeMin: now.toISOString(),
+        singleEvents: true,
+        orderBy: 'startTime',
+        maxResults: 10
+    });
+    Logger.log(JSON.stringify(Calendar.Events.list(calendarId)));
+    if (events.items && events.items.length > 0) {
+        for (var i = 0; i < events.items.length; i++) {
+            var event = events.items[i];
+            if (event.start.date) {
+                // All-day event.
+                var start = new Date(event.start.date);
+                Logger.log('%s (%s)', event.summary, start.toLocaleDateString());
+                myEvents.push([event.summary, start.toLocaleDateString()]);
+            } else {
+                var start = new Date(event.start.dateTime);
+                Logger.log('%s (%s)', event.summary, start.toLocaleString());
+                Logger.log('%s (%s)', event.summary, start.toLocaleString());
+                myEvents.push([event.summary, start.toLocaleDateString()]);
+            }
+        }
+    } else {
+        Logger.log('No events found.');
     }
-    else {
-        // Sync events up to thirty (180) days in the past.
-        // @ts-ignore
-        options.timeMin = getRelativeDate(-180, 0).toISOString();
-    }
-    // Retrieve events one page at a time.
-    var events;
-    var pageToken;
-    do {
-        try {
-            // @ts-ignore
-            options.pageToken = pageToken;
-            //            properties.deleteProperty('syncToken');
-            events = Calendar.Events.list(calendarId, options);
-            Logger.log('events: %s', JSON.stringify(events));
-        }
-        catch (e) {
-            // Check to see if the sync token was invalidated by the server;
-            // if so, perform a full sync instead.
-            if (e.message === 'Sync token is no longer valid, a full sync is required.') {
-                properties.deleteProperty('syncToken');
-                getSyncedEvents(calendarId, true);
-                return;
-            }
-            else {
-                throw new Error(e.message);
-            }
-        }
-        if (events.items && events.items.length > 0) {
-            for (var i = 0; i < events.items.length; i++) {
-                var event = events.items[i];
-                if (event.status === 'cancelled') {
-                    deleteCanceledEvent(event.id);
-                }
-                else if (event.start.date) {
-                    // All-day event.
-                    var start = new Date(event.start.date);
-                }
-                else {
-                    // Events that don't last all day; they have defined start times.
-                    start = moment(event.start.dateTime).format("MM/DD/YY HH:mm");
-                    var end = moment(event.end.dateTime).format("MM/DD/YY HH:mm");
-                    if (event.attendees != null) {
-                        var attendeeStr = JSON.stringify(event.attendees);
-                        if (attendeeStr.indexOf("dpaight@hemetusd.org") != -1 ||
-                            // hemetusd.k12.ca.us_mu0bm8h5amcsfvcvpmim3v1fag@group.calendar.google.com
-                            event.description.toString().search(/test/g) != -1) {
-                            myEvents.push([
-                                event.id,
-                                event.summary,
-                                start,
-                                end,
-                                event.description,
-                                event.htmlLink
-                            ]);
-                        }
-                    }
-                }
-            }
-            addMyEventsToList(myEvents);
-        }
-        else {
-        }
-        pageToken = events.nextPageToken;
-    } while (pageToken);
-    properties.setProperty('syncToken', events.nextSyncToken);
+
 }
-function getSyncedEvents(calendarId, fullSync) {
-    fullSync = true;
-    calendarId = "dpaight@hemetusd.org";
-    // hemetusd.k12.ca.us_mu0bm8h5amcsfvcvpmim3v1fag@group.calendar.google.com
-    var myEvents = [];
-    var properties = PropertiesService.getScriptProperties();
-    var options = {
-        maxResults: 100
-    };
-    var syncToken = properties.getProperty('syncToken');
-    if (syncToken && !fullSync) {
-        // @ts-ignore
-        options.syncToken = syncToken;
-    }
-    else {
-        // Sync events up to thirty (90) days in the past.
-        // @ts-ignore
-        options.timeMin = getRelativeDate(-90, 0).toISOString();
-    }
-    // Retrieve events one page at a time.
-    var events;
-    var pageToken;
-    do {
-        try {
-            // @ts-ignore
-            options.pageToken = pageToken;
-            //            properties.deleteProperty('syncToken');
-            events = Calendar.Events.list(calendarId, options);
-            Logger.log('events: %s', JSON.stringify(events));
-        }
-        catch (e) {
-            // Check to see if the sync token was invalidated by the server;
-            // if so, perform a full sync instead.
-            if (e.message === 'Sync token is no longer valid, a full sync is required.') {
-                properties.deleteProperty('syncToken');
-                getSyncedEvents(calendarId, true);
-                return;
-            }
-            else {
-                throw new Error(e.message);
-            }
-        }
-        if (events.items && events.items.length > 0) {
-            for (var i = 0; i < events.items.length; i++) {
-                var event = events.items[i];
-                if (event.status === 'cancelled') {
-                    // deleteCanceledEvent(event.id);
-                }
-                else if (event.start.date) {
-                    // All-day event.
-                    var start = new Date(event.start.date);
-                }
-                else {
-                    // Events that don't last all day; they have defined start times.
-                    start = moment(event.start.dateTime).format("MM/DD/YY HH:mm");
-                    var end = moment(event.end.dateTime).format("MM/DD/YY HH:mm");
-                    if (event.attendees != null) {
-                        var attendeeStr = JSON.stringify(event.attendees);
-                        if (attendeeStr.indexOf("dpaight@hemetusd.org") != -1) {
-                            // hemetusd.k12.ca.us_mu0bm8h5amcsfvcvpmim3v1fag@group.calendar.google.com
-                            var attendees = condenseAttendees(event.attendees);
-                            myEvents.push([
-                                event.id,
-                                event.summary,
-                                start,
-                                end,
-                                event.description,
-                                event.hangoutLink,
-                                event.htmlLink,
-                                attendees
-                            ]);
-                        }
-                    }
-                }
-            }
-        }
-        else {
-        }
-        pageToken = events.nextPageToken;
-    } while (pageToken);
-    properties.setProperty('syncToken', events.nextSyncToken);
-    if (myEvents.length == 0) {
-        var ui = SpreadsheetApp.getUi();
-        // ui.alert("No records created. Something is probably broken.");
-        var range = ss.getSheetByName('meetings').getRange("A1:H");
-        range.clearContent();
-        // range = ss.getSheetByName('meetings').getRange("A1:A1");
-        // range.setValues([['no iep meetings were found; is something broken?']]);
-    }
-    else {
-        var range = ss.getSheetByName('meetings').getRange("A1:H");
-        range.clearContent();
-        range = ss.getSheetByName('meetings').getRange(1, 1, myEvents.length, myEvents[0].length);
-        range.setValues(myEvents);
-    }
-}
+
+// google code end
+
 /**
  *
  * @param input
@@ -816,33 +677,8 @@ function getAllPupilsList() {
  * @returns [[data from meetings sheet]]
  */
 function getCalData_events() {
-    var x = get('meetings')[1];
-    var y = [];
-    for (let i = 0; i < x.length; i++) {
-        const element = x[i];
-        if (moment(element[2], 'YYYY-MM-DDTHH:mm:SS') < moment()) {
-            // do nothing
-            Logger.log('did nothing for %s', element[1]);
-        }
-        else {
-            Logger.log('did SOMEthing for %s', element[1]);
-            let thisDate = moment(element[2], 'YYYY-MM-DDTHH:mm:SS');
-            element.splice(2, 1, moment(thisDate).format('YYYY-MM-DD HH:mm'));
-            y.push(element);
-        }
-    }
-    y.sort(function (a, b) {
-        if (a[2] > b[2]) {
-            return 1;
-        }
-        else if (a[2] < b[2]) {
-            return -1;
-        }
-        else {
-            return 0;
-        }
-    });
-    return y;
+    var [headings, values, sheet, range, lastR, lastC] = getDisp('meetings')
+    return JSON.stringify(values);
 }
 function getRecord(id) {
     var key = 'rec' + id;
@@ -857,6 +693,7 @@ function getRecord(id) {
         }
     }
 }
+
 function addTimTest() {
     var fileIdS, fileIdD, lastCol, last, destSheet, destR;
     var filesS = ['1SKGEJsXdRcjvGUGT-C6n39JQkINVa_iOiXIYYToEv24', '1enI0CF5MHtkZ1CTRC2xQDSa8EVxTTQvuMlR38_JdgJo'];
@@ -1721,7 +1558,7 @@ function deleteRecord(id = '1010101') {
 function extractLogEntries(id = '1010101') {
     var [headings, values, sheet, range, lastR, lastC] = get('logRespMerged');
     var logsToRemove = [];
-    
+
     for (let j = 0; j < values.length; j++) {
         const elEntry = values[j];
         if (elEntry[5].toString() == id.toString()) {
