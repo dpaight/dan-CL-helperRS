@@ -4,6 +4,9 @@ var module = module || { exports: exports };
 // Compiled using ts2gas 3.6.4 (TypeScript 4.2.4)
 var exports = exports || {};
 var module = module || { exports: exports };
+// Compiled using ts2gas 3.6.4 (TypeScript 4.2.4)
+var exports = exports || {};
+var module = module || { exports: exports };
 Object.defineProperty(exports, "__esModule", { value: true });
 //import { logging } from "googleapis/build/src/apis/logging";
 // Compiled using ts2gas 3.6.4 (TypeScript 4.1.3)
@@ -453,11 +456,9 @@ function createDraftEmail(buttonVal, paramsJSN) {
  * @param {boolean} fullSync If true, throw out any existing sync token and
  *        perform a full sync; if false, use the existing sync token if possible.
  */
-
 function getSyncedEvents(calendarId = "dpaight@hemetusd.org") {
     var myEvents = [];
     // google code
-    
     var calendarId = 'primary';
     var now = new Date();
     var events = Calendar.Events.list(calendarId, {
@@ -475,21 +476,20 @@ function getSyncedEvents(calendarId = "dpaight@hemetusd.org") {
                 var start = new Date(event.start.date);
                 Logger.log('%s (%s)', event.summary, start.toLocaleDateString());
                 myEvents.push([event.summary, start.toLocaleDateString()]);
-            } else {
+            }
+            else {
                 var start = new Date(event.start.dateTime);
                 Logger.log('%s (%s)', event.summary, start.toLocaleString());
                 Logger.log('%s (%s)', event.summary, start.toLocaleString());
                 myEvents.push([event.summary, start.toLocaleDateString()]);
             }
         }
-    } else {
+    }
+    else {
         Logger.log('No events found.');
     }
-
 }
-
 // google code end
-
 /**
  *
  * @param input
@@ -677,7 +677,7 @@ function getAllPupilsList() {
  * @returns [[data from meetings sheet]]
  */
 function getCalData_events() {
-    var [headings, values, sheet, range, lastR, lastC] = getDisp('meetings')
+    var [headings, values, sheet, range, lastR, lastC] = getDisp('meetings');
     return JSON.stringify(values);
 }
 function getRecord(id) {
@@ -693,7 +693,6 @@ function getRecord(id) {
         }
     }
 }
-
 function addTimTest() {
     var fileIdS, fileIdD, lastCol, last, destSheet, destR;
     var filesS = ['1SKGEJsXdRcjvGUGT-C6n39JQkINVa_iOiXIYYToEv24', '1enI0CF5MHtkZ1CTRC2xQDSa8EVxTTQvuMlR38_JdgJo'];
@@ -1010,6 +1009,7 @@ function getRecordIndex(nmJdob, allPupilsArray, allPupilsHeadings) {
             return p;
         }
     }
+    return -1;
 }
 function matchRosterFieldsToSeisAndAllPupils(rosH, seisH, alpH) {
     var fieldMatches = {};
@@ -1025,15 +1025,17 @@ function matchRosterFieldsToSeisAndAllPupils(rosH, seisH, alpH) {
 }
 function updateRoster() {
     // get current data
+    // importXLS_2();
     var roster = SpreadsheetApp.getActiveSpreadsheet().getSheetByName('roster');
     var last = roster.getRange('a1:a').getValues().filter(String).length;
     var rosterVals = roster.getRange(1, 1, last, roster.getLastColumn()).getDisplayValues();
     var rosterHeadings = rosterVals.shift().map(x => x.toString().replace(/[ -\/]/g, "_").toLowerCase());
     // get aeries data for school
     var [allPupilsHeadingsRaw, allPupilsArray, allPupilsSheet, range, lastR, lastC] = get('allPupilsFromRamCurrent');
+    // '1Pe-unMy1vkj3joBvGru03YB1W3a35zNn_vXw9eF0KKk',
     var allPupilsHeadings = allPupilsHeadingsRaw.map(x => x.toString().replace(/[ -\/]/g, "_").toLowerCase());
     // get seis data
-    var folder = DriveApp.getFolderById('1-gZV54ZzShjlmfu91rBmdD7G-XK6Z7bK');
+    var folder = DriveApp.getFolderById('1CZK4YhSS3uiihM-7D-m3sgZWVATWfBK0');
     var files = folder.getFiles();
     var fileIds = [];
     // looking for .csv file
@@ -1055,9 +1057,14 @@ function updateRoster() {
     seisData = addMatchVarColOne(seisData);
     var seisDataHeadings = seisData.shift().map(x => x.toString().replace(/[ -\/]/g, "_").toLowerCase());
     var indexes = matchRosterFieldsToSeisAndAllPupils(rosterHeadings, seisDataHeadings, allPupilsHeadings);
+    Logger.log('headings: roster, seis, and allPupils -- %s \n %s \n %s', JSON.stringify(rosterHeadings),
+        JSON.stringify(seisDataHeadings), JSON.stringify(allPupilsHeadings));
     // find matching records and update with new seis data
     // new seis data by rows
     var newRecords = [];
+    var missingRecords = [];
+    // counter "i" is tracking roster_seis.csv; counter "j" will track "roster"; upon matching, counter "c" will
+    // track the columns of the matching record(s) in roster_seis.csv AND allPupils (from Aeries)
     for (var i = 0; i < seisData.length; i++) {
         var elNew = seisData[i];
         var seisNmjdob = elNew[0];
@@ -1066,7 +1073,13 @@ function updateRoster() {
         var newValue;
         for (var j = 0; j < rosterVals.length; j++) {
             // this gets the row number for the matching record in allPupils
-            var apRi = getRecordIndex(seisNmjdob, allPupilsArray, allPupilsHeadings);
+            //  "api" stands for all pupils record index; it is the index of the record in "allPupils" that matches
+            //  on nmjdob ("name julian date of birth")
+            var api = getRecordIndex(seisNmjdob, allPupilsArray, allPupilsHeadings);
+            if (api == -1) {
+                missingRecords.push(seisNmjdob);
+                break;
+            }
             var elRos = rosterVals[j];
             var nmJdob = elRos[0];
             if (elRos[0] == seisNmjdob) {
@@ -1075,33 +1088,43 @@ function updateRoster() {
                 //  seis or allPupils
                 for (let c = 0; c < elRos.length; c++) {
                     var fieldName = rosterHeadings[c];
-                    var thisFieldCols = indexes[fieldName];
+                    var fld = indexes[fieldName];
                     //  checking seis
-                    if (thisFieldCols[1] != -1) {
-                        newValue = seisData[i][thisFieldCols[1]];
+                    if (fld[1] != -1) {
+                        newValue = seisData[i][fld[1]];
                         rosterVals[j].splice(c, 1, newValue);
                     }
-                    else if (thisFieldCols[2] != -1) {
-                        newValue = allPupilsArray[apRi][thisFieldCols[2]];
-                        rosterVals[j].splice(c, 1, newValue);
+                    else if (fld[2] != -1) {
+                        try {
+                            newValue = allPupilsArray[api][fld[2]];
+                            rosterVals[j].splice(c, 1, newValue);
+                        } catch (error) {
+                            // the record might not be in Aeries if the student has unenrolled
+                            Logger.log("error: " + error);
+                            missingRecords.push()
+                        }
                     }
                 }
             }
         }
-        if (found == false) {
+        if (found == false) {  //  && api != -1
             // make a new record
             var row = [];
             for (let c = 0; c < elRos.length; c++) {
                 var fieldName = rosterHeadings[c];
-                var thisFieldCols = indexes[fieldName];
+                var fld = indexes[fieldName];
                 //  checking seis
-                if (thisFieldCols[1] != -1) {
-                    newValue = seisData[i][thisFieldCols[1]];
+                if (fld[1] != -1) {
+                    newValue = seisData[i][fld[1]];
                     row.push(newValue);
                 }
-                else if (thisFieldCols[2] != -1) {
-                    newValue = allPupilsArray[apRi][thisFieldCols[2]];
-                    row.push(newValue);
+                else if (fld[2] != -1) {
+                    try {
+                        newValue = allPupilsArray[api][fld[2]];
+                        row.push(newValue);
+                    } catch (error) {
+                        row.push(null);
+                    }
                 }
                 else {
                     row.push('');
@@ -1126,6 +1149,18 @@ function updateRoster() {
     var destRng = roster.getRange(1, 1, allData.length, allData[0].length);
     roster.clearContents();
     destRng.setValues(allData);
+
+    if (missingRecords.length == 0) {
+        return null;
+    }
+    var [headings, values, sheet, range, lastR, lastC] = get('roster');
+    for (var i = 0; i < values.length; i++) {
+        var el = values[i][0];
+        if (missingRecords.indexOf(el) != -1) {
+            var highlightRow = sheet.getRange((i + 2), 1, 1, 10);
+            highlightRow.setBackground('#f3c9c9');
+        }
+    }
 }
 /**
  *
@@ -1211,7 +1246,6 @@ function scanForTasks() {
     // if (moment().month() < 8) { return };
     var [taskHeadings, taskNotesVals, taskSheet, taskRange, lastR, lastC] = get('tasks');
     var array = [];
-
     var [headings, values, sheet, range, lastR, lastC] = get('roster');
     var iObj = getIndicesByHeading(headings);
     var taskList = getTaskLists();
@@ -1378,7 +1412,6 @@ function getFirstPointer() {
     return idList[0];
 }
 function getLogEntries(id = '1010101', loc = null, startDate, endDate) {
-
     var [headings, ids, sheet, range, lastR, lastC] = get('roster', 10, true);
     var allRecords = [];
     var [logTableHeadings, values, sheet, range, lastR, lastC] = get('logRespMerged');
@@ -1471,6 +1504,7 @@ function updateLogForm() {
  * adds log entry from Forms to regular sheet for log entries
  */
 function appendNewLogEntry(e) {
+    updateLogForm();
     getNextLogEntryId();
     var v = e.namedValues;
     Logger.log('the object for the form submit event is %s', JSON.stringify(v));
@@ -1486,6 +1520,7 @@ function appendNewLogEntry(e) {
         }
     }
     // updateLogForm();
+    SpreadsheetApp.flush();
     cacheLogEntry(JSON.stringify(record[0]));
 }
 function cacheLogEntry(recordJSN) {
@@ -1503,7 +1538,6 @@ function checkForNewLogEntryRecordInCache() {
     var sp = PropertiesService.getScriptProperties();
     var record = sp.getProperty("newRecord");
     Logger.log('record is %s', record);
-
     if (record == null) {
         throw "no records in properties";
     }
@@ -1533,7 +1567,6 @@ function deleteRecord(id = '1010101') {
     var [headings_del, values_del, sheet_del, range_del, lastR_del, lastC_del] = get('deleted');
     var logsToRemove = [];
     var id_index = headings.indexOf('seis_id');
-
     for (let i = 0; i < values.length; i++) {
         const el = values[i];
         var thisId = el[id_index];
@@ -1542,14 +1575,12 @@ function deleteRecord(id = '1010101') {
             var remainingValues = headings_del.concat(values_del.concat(deleteMe));
             var delDestRange = sheet_del.getRange(lastR_del + 1, 1, 1, deleteMe[0].length);
             delDestRange.setValues(deleteMe);
-
             if (id.toString() != '1010101') {
                 var remainingRosterRange = sheet.getRange(2, 1, values.length, values[0].length);
                 sheet.getRange(2, 1, lastR, lastC).clear();
                 remainingRosterRange.setValues(values);
             }
             extractLogEntries(id);
-
             return id;
         }
     }
@@ -1558,7 +1589,6 @@ function deleteRecord(id = '1010101') {
 function extractLogEntries(id = '1010101') {
     var [headings, values, sheet, range, lastR, lastC] = get('logRespMerged');
     var logsToRemove = [];
-
     for (let j = 0; j < values.length; j++) {
         const elEntry = values[j];
         if (elEntry[5].toString() == id.toString()) {
@@ -1567,18 +1597,17 @@ function extractLogEntries(id = '1010101') {
             j--;
         }
     }
-
     var [headings_rm, values_rm, sheet_rm, range_rm, lastR_rm, lastC_rm] = get('removedLogEntries');
     var rmRng = sheet_rm.getRange(lastR_rm + 1, 1, logsToRemove.length, logsToRemove[0].length);
     rmRng.setValues(logsToRemove);
-
     if (values.length > 0) {
         values = [headings].concat(values);
         range.clear();
         SpreadsheetApp.flush();
         var keepersRng = sheet.getRange(1, 1, values.length, values[0].length);
         keepersRng.setValues(values);
-    } else {
+    }
+    else {
         throw 'we have a problem';
     }
 }
@@ -1593,5 +1622,94 @@ function findIndexOfStringInArray(stringItem, array) {
         }
     }
 }
+function importXLS_2() {
+    var folderID = "1CZK4YhSS3uiihM-7D-m3sgZWVATWfBK0"; // Added // Please set the folder ID of "FolderB".
+    var files = DriveApp.getFolderById(folderID).getFiles();
+    while (files.hasNext()) {
+        var xFile = files.next();
+        var name = xFile.getName();
+        if (name.indexOf('xlsx') > -1) {
+            var ID = xFile.getId();
+            var xBlob = xFile.getBlob();
+            var newFile = {
+                title: (name + '_converted_' + new Date().toUTCString()).replace(/\.xlsx/g, ""),
+                parents: [{ id: folderID }] //  Added
+            };
+            var file = Drive.Files.insert(newFile, xBlob, {
+                convert: true
+            });
+            var fileId = file.id;
+            // Drive.Files.remove(ID); // Added // If this line is run, the original XLSX file is removed. So please be careful this.
+        }
+    }
+    var newData = SpreadsheetApp.openById(fileId).getSheetByName('Sheet1').getDataRange().getValues();
+    for (var i = 0; i < newData.length; i++) {
+        var element = newData[i];
+        element.splice(0, 1, element[0].toString());
+    }
+    var destSheet = SpreadsheetApp.openById('1Pe-unMy1vkj3joBvGru03YB1W3a35zNn_vXw9eF0KKk').getSheetByName('allPupils');
+    var destRange = destSheet.getRange(1, 1, newData.length, newData[0].length);
+    destSheet.getRange(1, 1, 1000, 50).clearContent();
+    SpreadsheetApp.flush();
+    destRange.setValues(newData);
+    var headersAndFormulas = [[
+        '=ArrayFormula(iferror(vlookup($M1:$M, teacherCodes!$B$1:$H, 7,false),if(row($M1:$M) = 1, "teachEmail","")))	',
+        '=ArrayFormula(iferror(vlookup($M1:$M,{teacherCodes!$B$1:$I34 }, 8,false),if(row($M$1:$M) = 1,"teachName","")))	',
+        '=ArrayFormula(if(row($Z$1:$Z) <> 1, if(isBlank($A$1:$A),,if(($M$1:$M = 21) + ($M$1:$M = 100) + ($M$1:$M = 105) + sum($S$1:$S = "X") > 0, 1, 0)),"sdc||rsp"))	',
+        '=ArrayFormula(if(row(A1:A)=1,"nmJdob",regexreplace(if(isblank(A1:A),, REGEXREPLACE(C1:C & D1:D, "[ \'-]", "") & right(year(G1:G),2) & days(\"12/31/\"&(year(G1:G)-1), G1:G)),"-","")))',
+        '=ArrayFormula(if(isblank(id),, regexreplace(C1:C & "_" & firstName & "_" & A1:A, "[ \'-]", "")))',
+        '=ArrayFormula(if(isblank(id),, REGEXREPLACE(C1:C & "_" & firstName & "_dob_" & dob, "[ \'-]", "")))',
+        '=ArrayFormula(if(isblank(id),, REGEXREPLACE(C1:C & "_" & firstName, "[ \'-]", "")))',
+        '=ArrayFormula(if(isblank(id),, REGEXREPLACE(D1:D & "_" & lastName, "[ \'-]", "")))',
+        '=ARRAYFORMULA((H1:H)&", "&(V1:V))'
+    ]];
+    var formulaRng = destSheet.getRange(1, newData[0].length + 1, 1, headersAndFormulas[0].length);
+    formulaRng.setFormulas(headersAndFormulas);
+    SpreadsheetApp.openById('1Pe-unMy1vkj3joBvGru03YB1W3a35zNn_vXw9eF0KKk').getSheetByName('frequency distribution').getRange("E14").setValue(new Date());
+}
+function markNoGo() {
+    var [headings, values, sheet, range, lastR, lastC] = get('scheduleNOGOs');
+    // mark grade
+    var [timesHeadings, times, timesSheet, timesRange, timesLastR, timesLastC] = get('scheduling');
+    // for (let p = 0; p < times.length; p++) {
+    //     const element = times[p];
+    //     element.splice(1, 5, '','','','','');
+    // }
+    for (let gradeLevel = 1; gradeLevel < 6; gradeLevel++) {
 
+        for (let i = 0; i < values.length; i++) {
+            const el = values[i];
+            const grade = el[1];
+            if (grade == gradeLevel) {
+                for (let t = 0; t < times.length; t++) {
+                    const time = moment(times[t][0]);
+                    for (let n = 2; n < 9; n += 2) {
+                        // if (n == 2) {
+                        //     times[t].splice(1, 1, null);
+                        // }
+                        const ngb = moment(el[n]).subtract(1, 'minute');
+                        const nge = moment(el[n + 1]);
+                        const teacher = el[0].toString().substr(0,3);
+                        if (time.isAfter(ngb) && time.isBefore(nge)) {
+                            const currentValue = times[t][gradeLevel].toString();
+                            Logger.log('current value is %s', currentValue);
+                            if (currentValue.indexOf(teacher) == -1) {
+                                const newValue = currentValue + ' ' + teacher;
+                                Logger.log('new value is %s', newValue);
+                                times[t].splice(gradeLevel, 1, newValue);
+                                Logger.log("mark " + JSON.stringify(time.format('HH:mm')));
+                            }
+                        }
+
+                    }
+                    // Logger.log(JSON.stringify(time));
+                }
+            }
+        }
+    }
+    var dest = timesSheet.getRange(2, 1, timesLastR - 1, timesLastC);
+    dest.clear();
+    SpreadsheetApp.flush();
+    dest.setValues(times);
+}
 //# sourceMappingURL=module.jsx.map

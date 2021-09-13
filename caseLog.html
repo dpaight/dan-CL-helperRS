@@ -17,6 +17,15 @@
   <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
   <!-- <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons"> -->
 
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto+Condensed&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Open+Sans&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Open+Sans+Condensed:wght@300&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Barlow&family=Open+Sans+Condensed:wght@300&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Barlow&family=Open+Sans+Condensed:wght@300&display=swap" rel="stylesheet">
+
+
   <!-- Popper JS -->
   <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js"
     integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo"
@@ -112,7 +121,7 @@
     <div class="row">
 
 
-      <div class="card col-sm-12 col-lg-3 col-md-6 p-2 m-0 rosterList" style="background-color: white;">
+      <div class="card col-sm-12 col-lg-3 col-md-6 p-0 m-0 rosterList" style="background-color: white;">
         <div class="card-header">
           <h5>Roster</h5>
           <p>Click a name to view more information.</p>
@@ -145,14 +154,14 @@
         </div>
       </div>
 
-      <div class="card col-sm-12 col-lg-3 col-md-5 p-0 m-0 stuInfo d-flex" style="background-color: white; ">
+      <div class="card col-sm-12 col-lg-3 col-md-6 p-0 m-0 stuInfo d-flex" style="background-color: white; ">
         <div class="card-header d-flex col-12">
 
           <h6 class="col-6">Current Student</h6>
 
           <div id="logEntryButtons" class="svChngs col-5 btn-group flex-row" role="group">
             <!-- <button id="saveEntry" class="btn btn-sm btn-success my-1 saveEntryBtn">SAVE</button> -->
-            <button id="snipThis" class="btn btn-sm btn-success snipThis">SNIP</button>
+            <button id="snipThis" class="btn btn-sm btn-success snipThis">CLIP</button>
             <button id="delThis" onclick="deleteRecord()" class="btn btn-sm btn-danger deleteThis">REMOVE</button>
           </div>
         </div>
@@ -271,7 +280,7 @@
         </div>
       </div>
 
-      <div class="card col-sm-12 col-lg-3 col-md-6 p-2 m-0 contactCaseLog d-flex" style="background-color: white;">
+      <div class="card col-sm-12 col-lg-3 col-md-6 p-0 m-0 contactCaseLog d-flex" style="background-color: white;">
         <div class='card-header'>
 
           <h6>Log Entries</h6>
@@ -292,13 +301,13 @@
         </div>
 
         <div class="card-body p-0 m-0 ">
-          <div class="table my-1 py-1" style="height: 350px;">
+          <div class="table mt-0 mb-1 py-0" style="height: 350px;">
             <table class="table table-sm">
 
               <thead class="table thead sticky">
                 <tr class="d-flex ">
-                  <th scope="col" class="col-4"> Date </th>
-                  <th scope="col" class="col-8"> Entry </th>
+                  <th scope="col" class="col-3"> Date </th>
+                  <th scope="col" class="col-9"> Entry </th>
                 </tr>
 
               </thead>
@@ -310,13 +319,13 @@
 
           <!-- <p class="my-0">body text contact log table</p> -->
         </div>
-        <div class="card-footer my-1 p-1">
+        <div class="card-footer my-1 p-0">
           <iframe
             src="https://calendar.google.com/calendar/embed?height=320&amp;wkst=2&amp;bgcolor=%23ffffff&amp;ctz=America%2FLos_Angeles&amp;src=ZHBhaWdodEBoZW1ldHVzZC5vcmc&amp;src=ZW4udXNhI2hvbGlkYXlAZ3JvdXAudi5jYWxlbmRhci5nb29nbGUuY29t&amp;color=%23039BE5&amp;color=%23009688&amp;showTz=0&amp;showCalendars=0&amp;showTabs=0&amp;showPrint=0&amp;showDate=1&amp;mode=AGENDA"
-            style="border-width:0" width="320" height="320" frameborder="0" scrolling="no"></iframe>
+            style="border-width:0" width="100%" height="320" frameborder="0" scrolling="no"></iframe>
         </div>
       </div>
-      <div class="card col-sm-12 col-lg-3 col-md-5 p-1 m-0 TBlaze d-flex" style="background-color: lightcyan;">
+      <div class="card col-sm-12 col-lg-3 col-md-6 p-0 m-0 TBlaze d-flex" style="background-color: lightcyan;">
         <div class="card-header">
           <h6 class="card-title">TextBlaze Snippets</h6>
           <h6 class="card-subtitle">Levels/Goals Bank</h6>
@@ -360,7 +369,7 @@
 
           <div class="btn-group" role="group" aria-label="Button group">
             <button type="button" class="btn btn-sm btn-primary" onclick="findGoals()">SEARCH</button>
-            <button type="button" class="btn btn-success btn-sm" onclick="getAllLevSnipForTB()">SNIP</button>
+            <button type="button" class="btn btn-success btn-sm" onclick="getAllLevSnipForTB()">CLIP</button>
 
           </div>
           <!-- <h6 class="float-right" style="color: green; font-weight: bold; margin-left: 1rem;" id="ready">READY</h6> -->
@@ -377,455 +386,438 @@
           <textarea id="tbSnippetCopy" class="inline-flex tbSnippet" name="clickCopy" readonly
             style="height: 3rem; width: 100%; margin: 0px; padding: 0px;"></textarea>
 
-          <div class="d-flex flex-row">
-            <div class="centered mx-1">
-              <label for="gl0"></label>
-              <div>
-                <input readonly name="gls" id="gl0" title="" readonly type="text" value="" style="width:  30px;" />
-                <br>gl0
-              </div>
+          <div class="d-flex" style="flex-wrap: wrap;">
+            <div class="d-flex flex-column mx-2">
+              <label for="gl-0"></label>
+              <input readonly name="gls" id="gl-0" title="" readonly type="text" value="" style="width:  30px;">
+              gl-0
             </div>
+            <div class="d-flex flex-column mx-2">
 
-            <div class="centered mx-1">
-              <label for="gl1"></label>
-              <div>
-                <input name="gls" id="gl1" title="" type="text" readonly value="" style="width:  30px;" />
-                <br>gl1
-              </div>
+              <label for="gl-1"></label>
+              <input name="gls" id="gl-1" title="" type="text" readonly value="" style="width:  30px;">
+              gl-1
             </div>
+            <div class="d-flex flex-column mx-2">
 
-            <div class="centered mx-1">
-              <label for="gl2"></label>
-              <div>
-                <input name="gls" id="gl2" title="" type="text" readonly value="" style="width:  30px;" />
-                <br>gl2
-              </div>
+              <label for="gl-2"></label>
+              <input name="gls" id="gl-2" title="" type="text" readonly value="" style="width:  30px;">
+              gl-2
             </div>
+            <div class="d-flex flex-column mx-2">
 
-            <div class="centered mx-1">
-              <label for="gl3"></label>
-              <div>
-                <input name="gls" id="gl3" title="" type="text" readonly value="" style="width:  30px;" />
-                <br>gl3
-              </div>
+              <label for="gl-3"></label>
+              <input name="gls" id="gl-3" title="" type="text" readonly value="" style="width:  30px;">
+              gl-3
             </div>
-          </div>
+            <div class="d-flex flex-column mx-2">
 
-          <div class="d-flex flex-row">
-            <div class="centered mx-1">
-              <label for="gl4"></label>
-              <div>
-                <input name="gls" id="gl4" title="" type="text" readonly value="" style="width:  30px;" />
-                <br>gl4
-              </div>
+              <label for="gl-4"></label>
+              <input name="gls" id="gl-4" title="" type="text" readonly value="" style="width:  30px;">
+              gl-4
             </div>
+            <div class="d-flex flex-column mx-2">
 
-            <div class="centered mx-1">
-              <label for="gl5"></label>
-              <div>
-                <input name="gls" id="gl5" title="" type="text" readonly value="" style="width:  30px;" />
-                <br>gl5
-              </div>
+              <label for="gl-5"></label>
+              <input name="gls" id="gl-5" title="" type="text" readonly value="" style="width:  30px;">
+              gl-5
             </div>
+            <div class="d-flex flex-column mx-2">
 
-            <div class="centered mx-1">
-              <label for="gl6"></label>
-              <div>
-                <input name="gls" id="gl6" title="" type="text" readonly value="" style="width:  30px;" />
-                <br>gl6
-              </div>
+              <label for="gl-6"></label>
+              <input name="gls" id="gl-6" title="" type="text" readonly value="" style="width:  30px;">
+              gl-6
             </div>
+            <div class="d-flex flex-column mx-2">
 
-            <div class="centered mx-1">
-              <label for="gl7"></label>
-              <div>
-                <input name="gls" id="gl7" title="" type="text" readonly value="" style="width:  30px;" />
-                <br>gl7
-              </div>
+              <label for="gl-7"></label>
+              <input name="gls" id="gl-7" title="" type="text" readonly value="" style="width:  30px;">
+              gl-7
             </div>
           </div>
         </div>
-        <br>
-      </div>
-    </div>
-  </div>
 
-  <div class="row">
+        <div class="row">
 
 
-  </div>
-
-  </div>
-
-  <!-- modals and toasts -->
-  <div class="container-fluid">
-    <div class="row">
-      <div class="modal fade centered " id="logEntryModal" tabindex="-1" role="dialog"
-        aria-labelledby="logEntryModalLabel" aria-hidden="true" style="margin-top: 30px;">
-        <div class="modal-dialog" style="height: 500px;" role="document">
-          <div class="modal-content">
-            <div class="modal-header">
-              <h5 class="modal-title" id="logEntryModalLabel">Edit logEntry</h5>
-              <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                <span aria-hidden="true">&times;</span>
-              </button>
-            </div>
-            <div class="modal-body">
-
-              <div container-fluid>
-
-
-
-                <div class="input-group input-group-sm m-1 mb-3">
-                  <div class="input-group-prepend">
-                    <span class="input-group-text  " id="timestamp-pre">Date </span>
-                  </div>
-                  <input type="date" class="form-control spr " id="timestamp" value="">
-                </div>
-              </div>
-
-              <div class="form-row align-items-center">
-                <div class="input-group input-group-sm m-1 mb-3">
-                  <div class="input-group-prepend">
-                    <span class="input-group-text  " id="leEntry-pre">Entry</span>
-                  </div>
-                  <textarea name="leEdit" id="leEntry" class="col-11" name="logEntryText"
-                    style="font-family: Verdana, Geneva, Tahoma, sans-serif; height: 100px;"></textarea>
-                </div>
-
-
-              </div>
-            </div>
-            <div class="modal-footer">
-              <button type="button" class="btn btn-sm btn-success" data-dismiss="modal"
-                onclick="saveEditedEntry()">SAVE</button>
-              <button type="button" class="btn btn-sm btn-secondary" data-dismiss="modal">CANCEL</button>
-              <button type="button" class="btn btn-sm btn-danger" data-dismiss="modal"
-                onclick="saveEditedEntry(-1)">DELETE</button>
-              <input id='lelog_entry_id' type='text' value='' style='background-color: lightyellow; width: 3rem;'>
-            </div>
-
-          </div>
         </div>
+
       </div>
 
+      <!-- modals and toasts -->
+      <div class="container-fluid">
+        <div class="row">
+          <div class="modal fade centered " id="logEntryModal" tabindex="-1" role="dialog"
+            aria-labelledby="logEntryModalLabel" aria-hidden="true" style="margin-top: 30px;">
+            <div class="modal-dialog" style="height: 500px;" role="document">
+              <div class="modal-content">
+                <div class="modal-header">
+                  <h5 class="modal-title" id="logEntryModalLabel">Edit logEntry</h5>
+                  <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                  </button>
+                </div>
+                <div class="modal-body">
 
-      <div class="modal fade centered " id="goalModal" tabindex="-1" role="dialog" aria-labelledby="goalModalLabel"
-        aria-hidden="true" style="margin-top: 30px;">
-        <div class="modal-dialog" style="height: 500px;" role="document">
-          <div class="modal-content">
-            <div class="modal-header">
-              <h5 class="modal-title" id="goalModalLabel">Edit Goal</h5>
-              <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                <span aria-hidden="true">&times;</span>
-              </button>
-            </div>
-            <div container-fluid>
-              <div class="form-row align-items-center p-2" style="display: inline-flexbox;">
+                  <div container-fluid>
 
-                <div class="input-group input-group-sm m-1 col-5">
-                  <div class="input-group-prepend">
-                    <span class="input-group-text" name="glEdit" id="glEditLvlPre">Grade: </span>
+
+
+                    <div class="input-group input-group-sm m-1 mb-3">
+                      <div class="input-group-prepend">
+                        <span class="input-group-text  " id="timestamp-pre">Date </span>
+                      </div>
+                      <input type="date" class="form-control spr " id="timestamp" value="">
+                    </div>
                   </div>
-                  <input type="text" class="form-control" name="glEdit" id="glEditLvl">
-                </div>
 
-                <div class="input-group input-group-sm m-1 col-5">
-                  <div class="input-group-prepend">
-                    <span class="input-group-text" name="glEdit" id="glEditAreaPre">Area: </span>
+                  <div class="form-row align-items-center">
+                    <div class="input-group input-group-sm m-1 mb-3">
+                      <div class="input-group-prepend">
+                        <span class="input-group-text  " id="leEntry-pre">Entry</span>
+                      </div>
+                      <textarea name="leEdit" id="leEntry" class="col-11" name="logEntryText"
+                        style="height: 100px;"></textarea>
+                    </div>
+
+
                   </div>
-                  <input type="text" class="form-control" name="glEdit" id="glEditArea">
                 </div>
-
-                <div class="input-group input-group-sm m-1 col-5">
-                  <div class="input-group-prepend">
-                    <span class="input-group-text" name="glEdit" id="glEditStrandPre">Strand:</span>
-                  </div>
-                  <input type="text" class="form-control" name="glEdit" id="glEditStrand">
+                <div class="modal-footer">
+                  <button type="button" class="btn btn-sm btn-success" data-dismiss="modal"
+                    onclick="saveEditedEntry()">SAVE</button>
+                  <button type="button" class="btn btn-sm btn-secondary" data-dismiss="modal">CANCEL</button>
+                  <button type="button" class="btn btn-sm btn-danger" data-dismiss="modal"
+                    onclick="saveEditedEntry(-1)">DELETE</button>
+                  <input id='lelog_entry_id' type='text' value='' style='background-color: lightyellow; width: 3rem;'>
                 </div>
-
-                <div class="input-group input-group-sm m-1 col-5">
-                  <div class="input-group-prepend">
-                    <span class="input-group-text" name="glEdit" id="glEditStandardPre">Standard:</span>
-                  </div>
-                  <input type="text" class="form-control" name="glEdit" id="glEditStandard">
-                </div>
-
-                <label for="glEditAnnual" class="form" style="margin-bottom: 0;margin-left: 2rem;">Annual
-                  Goal:</label>
-                <br>
-              </div>
-              <textarea name="glEdit" id="glEditAnnual" class="editable goal col-11" style="height: 200px; "
-                name="goalText"></textarea>
-
-              <div class="input-group input-group-sm m-1 col-12">
-                <div class="input-group-prepend">
-                  <span class="input-group-text" name="glEdit" id="glEditobj1Pre">Obj 1: </span>
-                </div>
-                <input type="text" class="form-control" name="glEdit" id="glEditobj1">
-              </div>
-
-              <div class="input-group input-group-sm  m-1 col-12">
-                <div class="input-group-prepend">
-                  <span class="input-group-text" name="glEdit" id="glEditobj2Pre">Obj 2: </span>
-                </div>
-                <input type="text" class="form-control" name="glEdit" id="glEditobj2">
-              </div>
-
-              <div class="input-group input-group-sm m-1 col-12">
-                <div class="input-group-prepend">
-                  <span class="input-group-text" name="glEdit" id="glEditobj3Pre">Obj 3: </span>
-                </div>
-                <input type="text" class="form-control" name="glEdit" id="glEditobj3">
-              </div>
-
-
-            </div>
-            <div class="modal-footer">
-              <input id='glEditId' type='text' value='' style='background-color: lightyellow; width: 3rem;' readonly>
-              <button type="button" class="btn btn-sm btn-secondary" data-dismiss="modal">CANCEL</button>
-              <button type="button" class="btn btn-sm btn-success" data-dismiss="modal"
-                onclick="saveGoal(-1)">SAVE/NEW</button>
-              <button type="button" class="btn btn-sm btn-warning" data-dismiss="modal"
-                onclick="saveGoal()">SAVE/REPLACE</button>
-
-            </div>
-
-          </div>
-        </div>
-      </div>
-
-      <div class="modal fade centered " id="addStuModal" tabindex="-1" role="dialog" aria-labelledby="addStuModalLabel"
-        aria-hidden="true" style="margin-top: 30px;">
-        <div class="modal-dialog" style="height: 500px;" role="document">
-          <div class="modal-content">
-            <div class="modal-header">
-              <h5 class="modal-title" id="addStuModalLabel">Edit addStu</h5>
-              <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                <span aria-hidden="true">&times;</span>
-              </button>
-            </div>
-            <div container-fluid>
-              <div class="form-row align-items-center p-2" style="display: inline-flexbox;">
-
-                <div class='input-group input-group-sm m-1 col-5'>
-                  <div class='input-group-prepend'><span class='input-group-text' name='addFn' id='addFnPre'>First:
-                    </span></div><input type='text' class='form-control' name='addFn' id='addFn'>
-                </div>
-                <div class='input-group input-group-sm m-1 col-5'>
-                  <div class='input-group-prepend'><span class='input-group-text' name='addLn' id='addLnPre'>Last:
-                    </span></div><input type='text' class='form-control' name='addLn' id='addLn'>
-                </div>
-                <div class='input-group input-group-sm m-1 col-5'>
-                  <div class='input-group-prepend'><span class='input-group-text' name='StudentID'
-                      id='StudentIDPre'>StudentID</span></div><input type='text' class='form-control' name='StudentID'
-                    id='StudentID'>
-                </div>
-                <div class='input-group input-group-sm m-1 col-5'>
-                  <div class='input-group-prepend'><span class='input-group-text' name='seisID'
-                      id='seisIDPre'>seisID</span></div><input type='text' class='form-control' name='seisID'
-                    id='seisID'>
-                </div>
-
-                <div class='input-group input-group-sm m-1 col-5'>
-                  <div class='input-group-prepend'><span class='input-group-text' name='lastAnnual'
-                      id='lastAnnualPre'>lastAnnual</span></div><input type='text' class='form-control'
-                    name='lastAnnual' id='lastAnnual'>
-                </div>
-                <div class='input-group input-group-sm m-1 col-5'>
-                  <div class='input-group-prepend'><span class='input-group-text' name='lastEval'
-                      id='lastEvalPre'>lastEval</span></div><input type='text' class='form-control' name='lastEval'
-                    id='lastEval'>
-                </div>
-
 
               </div>
-              <div class="modal-footer">
-                <input id='glEditId' type='text' value='' style='background-color: lightyellow; width: 3rem;' readonly>
-                <button type="button" class="btn btn-sm btn-secondary" data-dismiss="modal">CANCEL</button>
-                <button type="button" class="btn btn-sm btn-success" data-dismiss="modal"
-                  onclick="addStu()">SAVE</button>
-              </div>
-
             </div>
           </div>
-        </div>
-      </div>
 
-      <div class="modal fade centered " id="mailModal" tabindex="-1" role="dialog" aria-labelledby="mailModalLabel"
-        aria-hidden="true" style="margin-top: 30px;">
-        <div class="modal-dialog" style="height: 500px;" role="document">
-          <div class="modal-content">
-            <div class="modal-header">
-              <h5 class="modal-title" id="mailModalLabel">Send email</h5>
-              <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                <span aria-hidden="true">&times;</span>
-              </button>
-            </div>
-            <div class="modal-body" style="text-align: left;">
-              <p>To:</p>
-              <textarea id="emailRecipients" class="editable email" style="width: 425px;"
-                name="emaiRecipients"></textarea>
-              <p>Subject:</p>
-              <textarea id="emailSubject" class="editable email" style="width: 425px;" name="emaiSubject"></textarea>
-              <p>Message:</p>
-              <textarea id="emailBody" class="editable email" style="width: 425px; height: 300px;" name="emailBody"
-                style="height: 400px;"></textarea>
 
-            </div>
-            <div class="modal-footer">
-              <button type="button" class="btn btn-sm btn-secondary" data-dismiss="modal">CLOSE</button>
-              <button type="button" class="btn btn-sm btn-primary" data-dismiss="modal" onclick="sndEm('draft')">Create
-                DRAFT</button>
-              <button type="button" class="btn btn-sm btn-success" data-dismiss="modal" onclick="sndEm('send')">SEND
-                EMAIL</button>
-            </div>
+          <div class="modal fade centered " id="goalModal" tabindex="-1" role="dialog" aria-labelledby="goalModalLabel"
+            aria-hidden="true" style="margin-top: 30px;">
+            <div class="modal-dialog" style="height: 500px;" role="document">
+              <div class="modal-content">
+                <div class="modal-header">
+                  <h5 class="modal-title" id="goalModalLabel">Edit Goal</h5>
+                  <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                  </button>
+                </div>
+                <div container-fluid>
+                  <div class="form-row align-items-center p-2" style="display: inline-flexbox;">
 
+                    <div class="input-group input-group-sm m-1 col-5">
+                      <div class="input-group-prepend">
+                        <span class="input-group-text" name="glEdit" id="glEditLvlPre">Grade: </span>
+                      </div>
+                      <input type="text" class="form-control" name="glEdit" id="glEditLvl">
+                    </div>
+
+                    <div class="input-group input-group-sm m-1 col-5">
+                      <div class="input-group-prepend">
+                        <span class="input-group-text" name="glEdit" id="glEditAreaPre">Area: </span>
+                      </div>
+                      <input type="text" class="form-control" name="glEdit" id="glEditArea">
+                    </div>
+
+                    <div class="input-group input-group-sm m-1 col-5">
+                      <div class="input-group-prepend">
+                        <span class="input-group-text" name="glEdit" id="glEditStrandPre">Strand:</span>
+                      </div>
+                      <input type="text" class="form-control" name="glEdit" id="glEditStrand">
+                    </div>
+
+                    <div class="input-group input-group-sm m-1 col-5">
+                      <div class="input-group-prepend">
+                        <span class="input-group-text" name="glEdit" id="glEditStandardPre">Standard:</span>
+                      </div>
+                      <input type="text" class="form-control" name="glEdit" id="glEditStandard">
+                    </div>
+
+                    <label for="glEditAnnual" class="form" style="margin-bottom: 0;margin-left: 2rem;">Annual
+                      Goal:</label>
+                    <br>
+                  </div>
+                  <textarea name="glEdit" id="glEditAnnual" class="editable goal col-11" style="height: 200px; "
+                    name="goalText"></textarea>
+
+                  <div class="input-group input-group-sm m-1 col-12">
+                    <div class="input-group-prepend">
+                      <span class="input-group-text" name="glEdit" id="glEditobj1Pre">Obj 1: </span>
+                    </div>
+                    <input type="text" class="form-control" name="glEdit" id="glEditobj1">
+                  </div>
+
+                  <div class="input-group input-group-sm  m-1 col-12">
+                    <div class="input-group-prepend">
+                      <span class="input-group-text" name="glEdit" id="glEditobj2Pre">Obj 2: </span>
+                    </div>
+                    <input type="text" class="form-control" name="glEdit" id="glEditobj2">
+                  </div>
+
+                  <div class="input-group input-group-sm m-1 col-12">
+                    <div class="input-group-prepend">
+                      <span class="input-group-text" name="glEdit" id="glEditobj3Pre">Obj 3: </span>
+                    </div>
+                    <input type="text" class="form-control" name="glEdit" id="glEditobj3">
+                  </div>
+
+
+                </div>
+                <div class="modal-footer">
+                  <input id='glEditId' type='text' value='' style='background-color: lightyellow; width: 3rem;'
+                    readonly>
+                  <button type="button" class="btn btn-sm btn-secondary" data-dismiss="modal">CANCEL</button>
+                  <button type="button" class="btn btn-sm btn-success" data-dismiss="modal"
+                    onclick="saveGoal(-1)">SAVE/NEW</button>
+                  <button type="button" class="btn btn-sm btn-warning" data-dismiss="modal"
+                    onclick="saveGoal()">SAVE/REPLACE</button>
+
+                </div>
+
+              </div>
+            </div>
           </div>
-        </div>
-      </div>
 
-      <div id="toModal" class="modal centered" tabindex="-1" role="dialog" style="margin-top: 50px;">
-        <div class="modal-dialog" role="document">
-          <div class="modal-content">
-            <div class="modal-header">
-              <h5 class="modal-title">Send Levels of Performance Form</h5>
-              <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                <span aria-hidden="true">&times;</span>
-              </button>
-            </div>
-            <div class="modal-body">
-              <div class="container-fluid">
-                <div class="row">
-                  <div class="col-12 centered"></div>
+          <div class="modal fade centered " id="addStuModal" tabindex="-1" role="dialog"
+            aria-labelledby="addStuModalLabel" aria-hidden="true" style="margin-top: 30px;">
+            <div class="modal-dialog" style="height: 500px;" role="document">
+              <div class="modal-content">
+                <div class="modal-header">
+                  <h5 class="modal-title" id="addStuModalLabel">Edit addStu</h5>
+                  <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                  </button>
+                </div>
+                <div container-fluid>
+                  <div class="form-row align-items-center p-2" style="display: inline-flexbox;">
+
+                    <div class='input-group input-group-sm m-1 col-5'>
+                      <div class='input-group-prepend'><span class='input-group-text' name='addFn' id='addFnPre'>First:
+                        </span></div><input type='text' class='form-control' name='addFn' id='addFn'>
+                    </div>
+                    <div class='input-group input-group-sm m-1 col-5'>
+                      <div class='input-group-prepend'><span class='input-group-text' name='addLn' id='addLnPre'>Last:
+                        </span></div><input type='text' class='form-control' name='addLn' id='addLn'>
+                    </div>
+                    <div class='input-group input-group-sm m-1 col-5'>
+                      <div class='input-group-prepend'><span class='input-group-text' name='StudentID'
+                          id='StudentIDPre'>StudentID</span></div><input type='text' class='form-control'
+                        name='StudentID' id='StudentID'>
+                    </div>
+                    <div class='input-group input-group-sm m-1 col-5'>
+                      <div class='input-group-prepend'><span class='input-group-text' name='seisID'
+                          id='seisIDPre'>seisID</span></div><input type='text' class='form-control' name='seisID'
+                        id='seisID'>
+                    </div>
+
+                    <div class='input-group input-group-sm m-1 col-5'>
+                      <div class='input-group-prepend'><span class='input-group-text' name='lastAnnual'
+                          id='lastAnnualPre'>lastAnnual</span></div><input type='text' class='form-control'
+                        name='lastAnnual' id='lastAnnual'>
+                    </div>
+                    <div class='input-group input-group-sm m-1 col-5'>
+                      <div class='input-group-prepend'><span class='input-group-text' name='lastEval'
+                          id='lastEvalPre'>lastEval</span></div><input type='text' class='form-control' name='lastEval'
+                        id='lastEval'>
+                    </div>
+
+
+                  </div>
+                  <div class="modal-footer">
+                    <input id='glEditId' type='text' value='' style='background-color: lightyellow; width: 3rem;'
+                      readonly>
+                    <button type="button" class="btn btn-sm btn-secondary" data-dismiss="modal">CANCEL</button>
+                    <button type="button" class="btn btn-sm btn-success" data-dismiss="modal"
+                      onclick="addStu()">SAVE</button>
+                  </div>
+
                 </div>
               </div>
-              <p class="">Do you want to also send the email to the general ed teacher? </p>
-            </div>
-            <div class="modal-footer">
-              <button id="YesButton" type="button" value="Yes" class="btn btn-primary toBtn"
-                data-dismiss="modal">YES</button>
-              <button id="NoButton" type="button" value="No" class="btn btn-secondary toBtn">NO</button>
-              <button id="CancelButton" type="button" value="Cancel" class="btn btn-secondary toBtn">CANCEL</button>
             </div>
           </div>
-        </div>
-      </div>
 
-      <div class="modal fade centered " id="logModal" tabindex="-1" role="dialog" aria-labelledby="logModalLabel"
-        aria-hidden="true" style="margin-top: 30px;">
-        <div class="modal-dialog" style="height: 500px;" role="document">
-          <div class="modal-content">
-            <div class="modal-header">
+          <div class="modal fade centered " id="mailModal" tabindex="-1" role="dialog" aria-labelledby="mailModalLabel"
+            aria-hidden="true" style="margin-top: 30px;">
+            <div class="modal-dialog" style="height: 500px;" role="document">
+              <div class="modal-content">
+                <div class="modal-header">
+                  <h5 class="modal-title" id="mailModalLabel">Send email</h5>
+                  <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                  </button>
+                </div>
+                <div class="modal-body" style="text-align: left;">
+                  <p>To:</p>
+                  <textarea id="emailRecipients" class="editable email" style="width: 425px;"
+                    name="emaiRecipients"></textarea>
+                  <p>Subject:</p>
+                  <textarea id="emailSubject" class="editable email" style="width: 425px;"
+                    name="emaiSubject"></textarea>
+                  <p>Message:</p>
+                  <textarea id="emailBody" class="editable email" style="width: 425px; height: 300px;" name="emailBody"
+                    style="height: 400px;"></textarea>
 
-              <h5 class="modal-title" id="logModalLabel">Print Log</h5>
-              <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                <span aria-hidden="true">&times;</span>
-              </button>
+                </div>
+                <div class="modal-footer">
+                  <button type="button" class="btn btn-sm btn-secondary" data-dismiss="modal">CLOSE</button>
+                  <button type="button" class="btn btn-sm btn-primary" data-dismiss="modal"
+                    onclick="sndEm('draft')">Create
+                    DRAFT</button>
+                  <button type="button" class="btn btn-sm btn-success" data-dismiss="modal" onclick="sndEm('send')">SEND
+                    EMAIL</button>
+                </div>
+
+              </div>
             </div>
-            <div class="modal-body">
+          </div>
 
-              <!-- <div id="spinner02" class="spinner-border text-primary"
+          <div id="toModal" class="modal centered" tabindex="-1" role="dialog" style="margin-top: 50px;">
+            <div class="modal-dialog" role="document">
+              <div class="modal-content">
+                <div class="modal-header">
+                  <h5 class="modal-title">Send Levels of Performance Form</h5>
+                  <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                  </button>
+                </div>
+                <div class="modal-body">
+                  <div class="container-fluid">
+                    <div class="row">
+                      <div class="col-12 centered"></div>
+                    </div>
+                  </div>
+                  <p class="">Do you want to also send the email to the general ed teacher? </p>
+                </div>
+                <div class="modal-footer">
+                  <button id="YesButton" type="button" value="Yes" class="btn btn-primary toBtn"
+                    data-dismiss="modal">YES</button>
+                  <button id="NoButton" type="button" value="No" class="btn btn-secondary toBtn">NO</button>
+                  <button id="CancelButton" type="button" value="Cancel" class="btn btn-secondary toBtn">CANCEL</button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="modal fade centered " id="logModal" tabindex="-1" role="dialog" aria-labelledby="logModalLabel"
+            aria-hidden="true" style="margin-top: 30px;">
+            <div class="modal-dialog" style="height: 500px;" role="document">
+              <div class="modal-content">
+                <div class="modal-header">
+
+                  <h5 class="modal-title" id="logModalLabel">Print Log</h5>
+                  <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                  </button>
+                </div>
+                <div class="modal-body">
+
+                  <!-- <div id="spinner02" class="spinner-border text-primary"
                 style="width:4rem; height:4rem; position: absolute; bottom:5px; left:5px; z-index:100;" role="status">
                 <span class="sr-only">Loading...</span>
               </div> -->
 
-              <div id="printLogStuName" class="container-fluid"> </div>
-              <div class="row">
-                <div class="input-group input-group-sm m-1 col-7">
-                  <div class="input-group-prepend">
-                    <span class="input-group-text" name="stDtEdit" id="stDtEditPre">Start Date:
-                    </span>
+                  <div id="printLogStuName" class="container-fluid"> </div>
+                  <div class="row">
+                    <div class="input-group input-group-sm m-1 col-7">
+                      <div class="input-group-prepend">
+                        <span class="input-group-text" name="stDtEdit" id="stDtEditPre">Start Date:
+                        </span>
+                      </div>
+                      <input type="date" class="form-control logWindow" name="stDtEdit" id="stDtEdit" value="">
+                    </div>
+
+                    <div class="input-group input-group-sm m-1 col-7">
+                      <div class="input-group-prepend">
+                        <span class="input-group-text" name="endDtEdit" id="endDtEditEndDatePre">End
+                          Date:
+                        </span>
+                      </div>
+                      <input type="date" class="form-control logWindow" name="endDtEdit" id="endDtEdit" value="">
+                    </div>
                   </div>
-                  <input type="date" class="form-control logWindow" name="stDtEdit" id="stDtEdit" value="">
+
+                  <div id="pdfUrl" style="text-align: left;">
+
+                  </div>
+
+                  <div class="table sticky-top"
+                    style="height: 300px; padding: 0; margin-top: 0; margin-bottom: 0; margin-left: 1rem; width: 90%;">
+                    <table class="table">
+                      <div class="thead sticky-top" style="padding: 0; margin: 0;">
+
+                        <thead class="thead sticky-top" style="margin-top: 0;">
+                          <th class='sticky-top'> Date </th>
+                          <th class='sticky-top'> Entry </th>
+
+                        </thead>
+                      </div>
+                      <tbody id="loc04" class="table" style="overflow: scroll;">
+                        <!-- insert case log entries -->
+                      </tbody>
+                    </table>
+                  </div>
+
                 </div>
 
-                <div class="input-group input-group-sm m-1 col-7">
-                  <div class="input-group-prepend">
-                    <span class="input-group-text" name="endDtEdit" id="endDtEditEndDatePre">End
-                      Date:
-                    </span>
-                  </div>
-                  <input type="date" class="form-control logWindow" name="endDtEdit" id="endDtEdit" value="">
+                <div class="modal-footer">
+                  <button type="button" class="btn btn-sm btn-secondary" data-dismiss="modal">CANCEL</button>
+                  <button type="button" class="btn btn-sm btn-success" onclick="printSelectedLogEntries()">MAKE
+                    PDF</button>
+
                 </div>
               </div>
-
-              <div id="pdfUrl" style="text-align: left;">
-
-              </div>
-
-              <div class="table sticky-top"
-                style="height: 300px; padding: 0; margin-top: 0; margin-bottom: 0; margin-left: 1rem; width: 90%;">
-                <table class="table">
-                  <div class="thead sticky-top" style="padding: 0; margin: 0;">
-
-                    <thead class="thead sticky-top" style="margin-top: 0;">
-                      <th class='sticky-top'> Date </th>
-                      <th class='sticky-top'> Entry </th>
-
-                    </thead>
-                  </div>
-                  <tbody id="loc04" class="table" style="overflow: scroll;">
-                    <!-- insert case log entries -->
-                  </tbody>
-                </table>
-              </div>
-
             </div>
+          </div>
 
-            <div class="modal-footer">
-              <button type="button" class="btn btn-sm btn-secondary" data-dismiss="modal">CANCEL</button>
-              <button type="button" class="btn btn-sm btn-success" onclick="printSelectedLogEntries()">MAKE PDF</button>
-
+          <div class="modal fade" id="genericModal" tabindex="-1" role="dialog"
+            aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered" role="document">
+              <div class="modal-content">
+                <div class="modal-header">
+                  <h5 class="modal-title" id="exampleModalCenterTitle"></h5>
+                  <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                  </button>
+                </div>
+                <div class="modal-body d-flex inline-flexbox">
+                  <h5 id="genericModalMsg"></h5>
+                  ...
+                </div>
+                <div id="genericButtons" class="modal-footer">
+                  <!-- insert html from script -->
+                  <!-- <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button> -->
+                  <!-- <button type="button" class="btn btn-primary">Save changes</button> -->
+                </div>
+              </div>
             </div>
           </div>
         </div>
-      </div>
 
-      <div class="modal fade" id="genericModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle"
-        aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered" role="document">
-          <div class="modal-content">
-            <div class="modal-header">
-              <h5 class="modal-title" id="exampleModalCenterTitle"></h5>
-              <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                <span aria-hidden="true">&times;</span>
-              </button>
+        <div>
+          <div class="toast ml-2 mb-2" data-autohide="true"
+            style="position: absolute; top: 1rem; right: 2rem; z-index: 2100;">
+            <div class="toast-header">
+              <!-- <small class="text-muted">5 mins ago</small> -->
+              <button type="button" class="ml-2 mb-1 close" data-dismiss="toast">&times;</button>
             </div>
-            <div class="modal-body d-flex inline-flexbox">
-              <h5 id="genericModalMsg"></h5>
-              ...
+            <div id="toastBody" class="toast-body" style="color: black; text-decoration: underline;">
+              data copied to TextBlaze key-value list
             </div>
-            <div id="genericButtons" class="modal-footer">
-              <!-- insert html from script -->
-              <!-- <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button> -->
-              <!-- <button type="button" class="btn btn-primary">Save changes</button> -->
-            </div>
+          </div>
+
+          <!-- alerts -->
+          <div id="a-clpCpy" class="alert alert-primary fade alert-dismisible" role="alert">
+            <p> The data has been copied as a TextBlaze key-value list to the clipboard.</p>
+            <button class="btn btn-sm" data-dismiss="alert">DISMISS</button>
           </div>
         </div>
       </div>
     </div>
-
-    <div>
-      <div class="toast ml-2 mb-2" data-autohide="true"
-        style="position: absolute; top: 1rem; right: 2rem; z-index: 2100;">
-        <div class="toast-header">
-          <!-- <small class="text-muted">5 mins ago</small> -->
-          <button type="button" class="ml-2 mb-1 close" data-dismiss="toast">&times;</button>
-        </div>
-        <div id="toastBody" class="toast-body" style="color: black; text-decoration: underline;">
-          data copied to TextBlaze key-value list
-        </div>
-      </div>
-
-      <!-- alerts -->
-      <div id="a-clpCpy" class="alert alert-primary fade alert-dismisible" role="alert">
-        <p> The data has been copied as a TextBlaze key-value list to the clipboard.</p>
-        <button class="btn btn-sm" data-dismiss="alert">DISMISS</button>
-      </div>
-    </div>
-  </div>
-  </div>
 </body>
 <?!= include('scripts'); ?>
 <?!= include('moment_js'); ?>

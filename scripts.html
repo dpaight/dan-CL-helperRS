@@ -69,6 +69,9 @@
     $("#ready").hide();
     $(".pleaseHide").hide();
     document.body.style.cursor = "wait";
+
+
+
     // click student name in roster table switches to that student for both contact info and
     // log entries
     $("body").on("click tap", ".setStudent", function (event) {
@@ -77,6 +80,8 @@
       console.log('id = %s', id);
       focus(id);
     });
+
+    $("td[data-stuId|='1010101']").css("color", "light-yellow");
 
     $("body").on("dblclick dbl-tap", ".goalList", function (e) {
       // console.log('event triggered a[name=goalList clicked');
@@ -715,11 +720,11 @@
       list.append(
         '<tr class="table table-sm d-flex">' +
         '<td data-entry_id=' +
-        log_entry_id + ' class="col-4 logEntry"' + 'data-toggle="tooltip" data-placement="right" ' +
+        log_entry_id + ' class="col-3 logEntry"' + 'data-toggle="tooltip" data-placement="right" ' +
         'title= "double-click to edit">' +
         moment(el[0]).format("YYYY-MM-DD") +
         '</td>' +
-        '<td data-entry_id=' + log_entry_id + ' class="logEntry col-8">' +
+        '<td data-entry_id=' + log_entry_id + ' class="logEntry col-9">' +
         el[3].toString() +
         '</td>' +
         '</tr>'
@@ -790,10 +795,10 @@
       } else {
         if (moment(Date_of_Last_Evaluation).isValid() == false) {
           var evalDate = moment(Date_of_Initial_Parent_Consent).add(1, 's').format('YYYY-MM-DD');
-          pending = ['#FF3939', '#000000'];
+          pending = ['#f4cccc', '#000000'];
         } else if (moment(Date_of_Last_Evaluation).add(3, 'y').isBefore(moment().add(6, 'month'))) {
           evalDate = moment(Date_of_Last_Evaluation).format('YYYY-MM-DD');
-          pending = ['#39FF39', '#000000'];
+          pending = ['#d9ead3', '#000000'];
         } else {
           evalDate = moment(Date_of_Last_Evaluation).format('YYYY-MM-DD');
           pending = ['#FFFFFF', '#000000'];

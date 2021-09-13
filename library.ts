@@ -1,5 +1,6 @@
 // Compiled using ts2gas 3.6.4 (TypeScript 4.2.4)
 // Compiled using ts2gas 3.6.4 (TypeScript 4.2.4)
+// Compiled using ts2gas 3.6.4 (TypeScript 4.2.4)
 var ss = SpreadsheetApp.getActiveSpreadsheet();
 /**
  *
@@ -19,6 +20,27 @@ function get(sheetName, column = -1, flat = false) {
     var sheet, headings, values, range, lastR, lastC;
     sheet = ss.getSheetByName(sheetName);
     lastR = findLastRow(sheetName, 1);
+    lastC = sheet.getLastColumn();
+    range = (column == -1) ?
+        sheet.getRange(1, 1, lastR, lastC) :
+        sheet.getRange(1, column, lastR, 1);
+    values = (flat == undefined || flat == false) ?
+        range.getValues() :
+        range.getValues().flat();
+    headings = values.shift();
+    return [headings, values, sheet, range, lastR, lastC];
+}
+function getById(fileId, sheetName, column = -1, flat = false) {
+    var ss = SpreadsheetApp.openById(fileId);
+    if (!sheetName) {
+        Logger.log('missing value');
+    }
+    else {
+        Logger.log(sheetName);
+    }
+    var sheet, headings, values, range, lastR, lastC;
+    sheet = ss.getSheetByName(sheetName);
+    lastR = findLastRowById(fileId, sheetName, 1);
     lastC = sheet.getLastColumn();
     range = (column == -1) ?
         sheet.getRange(1, 1, lastR, lastC) :
@@ -65,5 +87,16 @@ function findLastRow(sheet, column) {
         1;
     return last;
 }
+function findLastRowById(fileId, sheet, column) {
+    var ss = SpreadsheetApp.openById(fileId);
+    var theSheet = ss.getSheetByName(sheet);
+    var theValues = theSheet.getRange(1, column, theSheet.getLastRow(), 1)
+        .getValues();
+    var last = (theValues.filter(String).length > 0) ?
+        theValues.filter(String).length :
+        1;
+    return last;
+}
+//# sourceMappingURL=module.jsx.map
 //# sourceMappingURL=module.jsx.map
 //# sourceMappingURL=module.jsx.map
