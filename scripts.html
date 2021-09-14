@@ -36,36 +36,6 @@
   $(document).ready(function () {
     startup();
 
-
-    function startup(id) {
-      $('#spinner01').show();
-      id = getPointer();
-      if (id == undefined) {
-        google.script.run
-          .withSuccessHandler(setPointerAndStart)
-          .getFirstPointer();
-      } else {
-        // contactInfo(id);
-        console.log('current id at startup is %s', id);
-
-        document.body.style.cursor = "wait";
-        google.script.run
-          .withSuccessHandler(showRosterTable)
-          .getTableData_roster(id);
-
-        focus(id);
-      }
-      function setPointerAndStart(id) {
-        setPointer(id);
-        console.log('setPointerAndStart ran');
-        // await sleep(2000);
-        startup(id);
-      }
-
-    }
-
-
-
     $("#ready").hide();
     $(".pleaseHide").hide();
     document.body.style.cursor = "wait";
@@ -87,8 +57,10 @@
       // console.log('event triggered a[name=goalList clicked');
       e.preventDefault();
       // open goal for editing
+      // console.log('this is %s', JSON.stringify($(this).text()));
       var thisGoal = JSON.parse($(this).text());
       var gId = parseInt(thisGoal[thisGoal.length - 1], 10);
+      // console.log('gId = %s', gId);
       google.script.run
         .withSuccessHandler(editGoalInModal)
         .getGoal(gId);
@@ -349,6 +321,32 @@
 
   // named functions
   // calls function on server side to return data for this student
+  function startup(id) {
+    $('#spinner01').show();
+    id = getPointer();
+    if (id == undefined) {
+      google.script.run
+        .withSuccessHandler(setPointerAndStart)
+        .getFirstPointer();
+    } else {
+      // contactInfo(id);
+      console.log('current id at startup is %s', id);
+
+      document.body.style.cursor = "wait";
+      google.script.run
+        .withSuccessHandler(showRosterTable)
+        .getTableData_roster(id);
+
+      focus(id);
+    }
+    function setPointerAndStart(id) {
+      setPointer(id);
+      console.log('setPointerAndStart ran');
+      // await sleep(2000);
+      startup(id);
+    }
+
+  }
 
   function focus(id = getPointer()) {
     setPointer(id);
@@ -944,14 +942,14 @@
 
     obj.glEditId = glEditId;
     obj.glEditLevel = parseInt($('#glEditLvl').val(), 10);
-    obj.glEditArea = $('#glEditArea').val().toString();
-    obj.glEditStrand = $('#glEditStrand').val().toString();
-    obj.glEditStandard = $('#glEditStandard').val().toString();
-    obj.glEditAnnual = $('#glEditAnnual').val().toString();
-    obj.glEditObj1 = $('#glEditobj1').val().toString();
-    obj.glEditObj2 = $('#glEditobj2').val().toString();
-    obj.glEditObj3 = $('#glEditobj3').val().toString();
-    obj.timestamp = new Date().toLocaleDateString();
+    obj.glEditArea = $('#glEditArea').val().toString().replace(/\n/g," ");
+    obj.glEditStrand = $('#glEditStrand').val().toString().replace(/\n/g," ");
+    obj.glEditStandard = $('#glEditStandard').val().toString().replace(/\n/g," ");
+    obj.glEditAnnual = $('#glEditAnnual').val().toString().replace(/\n/g," ");
+    obj.glEditObj1 = $('#glEditobj1').val().toString().replace(/\n/g," ");
+    obj.glEditObj2 = $('#glEditobj2').val().toString().replace(/\n/g," ");
+    obj.glEditObj3 = $('#glEditobj3').val().toString().replace(/\n/g," ");
+    obj.timestamp = new Date().toLocaleDateString().replace(/\n/g," ");
 
     // console.log('data = %s', JSON.stringify(data));
     // console.log('data is %s', JSON.stringify(obj));
