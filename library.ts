@@ -1,6 +1,7 @@
 // Compiled using ts2gas 3.6.4 (TypeScript 4.2.4)
 // Compiled using ts2gas 3.6.4 (TypeScript 4.2.4)
 // Compiled using ts2gas 3.6.4 (TypeScript 4.2.4)
+// Compiled using ts2gas 3.6.4 (TypeScript 4.2.4)
 var ss = SpreadsheetApp.getActiveSpreadsheet();
 /**
  *
@@ -97,6 +98,7 @@ function findLastRowById(fileId, sheet, column) {
         1;
     return last;
 }
+//# sourceMappingURL=module.jsx.map
 //# sourceMappingURL=module.jsx.map
 //# sourceMappingURL=module.jsx.map
 //# sourceMappingURL=module.jsx.map

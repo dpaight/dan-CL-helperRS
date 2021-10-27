@@ -272,8 +272,8 @@
       document.body.style.cursor = "wait";
       var id = $("#seis_id").val();
       google.script.run
-        .withSuccessHandler(reload)
-        .updateRoster(id);
+        .withSuccessHandler(reloadMe)
+        .updateRoster();
     });
     $("body").on("click", ".toBtn", function () {
       $("#toModal").modal("hide");
@@ -856,6 +856,8 @@
     document.body.style.cursor = "default";
   }
   function showTBsnippet(snippet) {
+    console.log('snippet is: %s', JSON.stringify(snippet));
+
     $("#tbSnippetCopy").text(snippet);
     $("#tbSnippetCopy").select();
     document.execCommand('copy');
@@ -901,9 +903,9 @@
       levelsSnip = levelsSnip.toString().replace(/\[/, "");
       // console.log(levelsSnip);
       snip = snip.toString() + levelsSnip.toString();
-      // console.log(snip);
     }
     // copy the whole thing to the clipboard
+    console.log('snip is: %s', JSON.stringify(snip));
     copyToClipboard(snip);
   };
   function copyToClipboard(content) {
@@ -942,14 +944,14 @@
 
     obj.glEditId = glEditId;
     obj.glEditLevel = parseInt($('#glEditLvl').val(), 10);
-    obj.glEditArea = $('#glEditArea').val().toString().replace(/\n/g," ");
-    obj.glEditStrand = $('#glEditStrand').val().toString().replace(/\n/g," ");
-    obj.glEditStandard = $('#glEditStandard').val().toString().replace(/\n/g," ");
-    obj.glEditAnnual = $('#glEditAnnual').val().toString().replace(/\n/g," ");
-    obj.glEditObj1 = $('#glEditobj1').val().toString().replace(/\n/g," ");
-    obj.glEditObj2 = $('#glEditobj2').val().toString().replace(/\n/g," ");
-    obj.glEditObj3 = $('#glEditobj3').val().toString().replace(/\n/g," ");
-    obj.timestamp = new Date().toLocaleDateString().replace(/\n/g," ");
+    obj.glEditArea = $('#glEditArea').val().toString().replace(/\n/g, " ");
+    obj.glEditStrand = $('#glEditStrand').val().toString().replace(/\n/g, " ");
+    obj.glEditStandard = $('#glEditStandard').val().toString().replace(/\n/g, " ");
+    obj.glEditAnnual = $('#glEditAnnual').val().toString().replace(/\n/g, " ");
+    obj.glEditObj1 = $('#glEditobj1').val().toString().replace(/\n/g, " ");
+    obj.glEditObj2 = $('#glEditobj2').val().toString().replace(/\n/g, " ");
+    obj.glEditObj3 = $('#glEditobj3').val().toString().replace(/\n/g, " ");
+    obj.timestamp = new Date().toLocaleDateString().replace(/\n/g, " ");
 
     // console.log('data = %s', JSON.stringify(data));
     // console.log('data is %s', JSON.stringify(obj));
@@ -1085,10 +1087,20 @@
     showLog(logs, 'loc01');
   }
 
-  function reload() {
-    sessionStorage.clear();
-    window.open('https://script.google.com/a/macros/hemetusd.org/s/AKfycbyuLrQ4FFJ2B-wErlCVm4yg9YxldINmlUNE9K0HFCKj/dev', '_top')
+
+
+  function reloadMe() {
+    google.script.run.withSuccessHandler(function (url) { window.open(url, "_self"); })
+      .getScriptURL();
   }
+
+  // function reloadMe() {
+  //   google.script.run
+  //     .withSuccessHandler(function (url) {
+  //       window.open(url, '_top');
+  //     })
+  //     .getScriptURL();
+  // }
 
   function deleteRecord() {
     $('#genericModal').modal({ focus: true });
@@ -1102,7 +1114,7 @@
     var id = $("#seis_id").val();
     console.log('the id to delete is %s', id);
     google.script.run
-      .withSuccessHandler(reload) // reload
+      .withSuccessHandler(reloadMe) // reload
       .withFailureHandler()
       .deleteRecord(id);
   }

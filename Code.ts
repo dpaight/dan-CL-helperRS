@@ -7,6 +7,9 @@ var module = module || { exports: exports };
 // Compiled using ts2gas 3.6.4 (TypeScript 4.2.4)
 var exports = exports || {};
 var module = module || { exports: exports };
+// Compiled using ts2gas 3.6.4 (TypeScript 4.2.4)
+var exports = exports || {};
+var module = module || { exports: exports };
 Object.defineProperty(exports, "__esModule", { value: true });
 //import { logging } from "googleapis/build/src/apis/logging";
 // Compiled using ts2gas 3.6.4 (TypeScript 4.1.3)
@@ -71,8 +74,11 @@ function doGet(e) {
     ss.getSheetByName('roster').sort(1);
     ss.getSheetByName('logRespMerged').sort(1);
     var t = HtmlService.createTemplateFromFile("caseLog");
-    t.version = "v42";
-    return t.evaluate().setXFrameOptionsMode(HtmlService.XFrameOptionsMode.ALLOWALL);
+    t.version = "v44";
+    return t.evaluate().setSandboxMode(HtmlService.SandboxMode.IFRAME).setXFrameOptionsMode(HtmlService.XFrameOptionsMode.ALLOWALL);
+}
+function getScriptURL() {
+    return ScriptApp.getService().getUrl();
 }
 function doPost(e) {
     var sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName('roster_seis');
@@ -80,12 +86,12 @@ function doPost(e) {
     var body = JSON.parse(e.postData.contents);
     //Adding a new row with content from the request body
     sheet.appendRow([body.id,
-    body.date_created,
-    body.first_name,
-    body.shipping.address,
-    body.shipping.phone,
-    body.billing.phone,
-    body.billing.postcode
+        body.date_created,
+        body.first_name,
+        body.shipping.address,
+        body.shipping.phone,
+        body.billing.phone,
+        body.billing.postcode
     ]);
 }
 // script and CSS files have to be stored in HTML files for Google app script
@@ -431,8 +437,8 @@ function createDraftEmail(buttonVal, paramsJSN) {
     }
     else {
         GmailApp.createDraft(params.to, params.subj, params.body, {
-            // @ts-ignore
-            // attachments: [file.getAs(MimeType.PDF), file2.getAs(MimeType.PDF)]
+        // @ts-ignore
+        // attachments: [file.getAs(MimeType.PDF), file2.getAs(MimeType.PDF)]
         });
     }
     return params.body.toString();
@@ -1023,9 +1029,9 @@ function matchRosterFieldsToSeisAndAllPupils(rosH, seisH, alpH) {
     Logger.log('fieldMatches = %s', JSON.stringify(fieldMatches));
     return fieldMatches;
 }
-function updateRoster() {
+function updateRoster(id) {
     // get current data
-    // importXLS_2();
+    // importXLS_2(); 
     var roster = SpreadsheetApp.getActiveSpreadsheet().getSheetByName('roster');
     var last = roster.getRange('a1:a').getValues().filter(String).length;
     var rosterVals = roster.getRange(1, 1, last, roster.getLastColumn()).getDisplayValues();
@@ -1057,8 +1063,7 @@ function updateRoster() {
     seisData = addMatchVarColOne(seisData);
     var seisDataHeadings = seisData.shift().map(x => x.toString().replace(/[ -\/]/g, "_").toLowerCase());
     var indexes = matchRosterFieldsToSeisAndAllPupils(rosterHeadings, seisDataHeadings, allPupilsHeadings);
-    Logger.log('headings: roster, seis, and allPupils -- %s \n %s \n %s', JSON.stringify(rosterHeadings),
-        JSON.stringify(seisDataHeadings), JSON.stringify(allPupilsHeadings));
+    Logger.log('headings: roster, seis, and allPupils -- %s \n %s \n %s', JSON.stringify(rosterHeadings), JSON.stringify(seisDataHeadings), JSON.stringify(allPupilsHeadings));
     // find matching records and update with new seis data
     // new seis data by rows
     var newRecords = [];
@@ -1098,16 +1103,17 @@ function updateRoster() {
                         try {
                             newValue = allPupilsArray[api][fld[2]];
                             rosterVals[j].splice(c, 1, newValue);
-                        } catch (error) {
+                        }
+                        catch (error) {
                             // the record might not be in Aeries if the student has unenrolled
                             Logger.log("error: " + error);
-                            missingRecords.push()
+                            missingRecords.push();
                         }
                     }
                 }
             }
         }
-        if (found == false) {  //  && api != -1
+        if (found == false) { //  && api != -1
             // make a new record
             var row = [];
             for (let c = 0; c < elRos.length; c++) {
@@ -1122,7 +1128,8 @@ function updateRoster() {
                     try {
                         newValue = allPupilsArray[api][fld[2]];
                         row.push(newValue);
-                    } catch (error) {
+                    }
+                    catch (error) {
                         row.push(null);
                     }
                 }
@@ -1149,18 +1156,20 @@ function updateRoster() {
     var destRng = roster.getRange(1, 1, allData.length, allData[0].length);
     roster.clearContents();
     destRng.setValues(allData);
-
     if (missingRecords.length == 0) {
-        return null;
     }
-    var [headings, values, sheet, range, lastR, lastC] = get('roster');
-    for (var i = 0; i < values.length; i++) {
-        var el = values[i][0];
-        if (missingRecords.indexOf(el) != -1) {
-            var highlightRow = sheet.getRange((i + 2), 1, 1, 10);
-            highlightRow.setBackground('#f3c9c9');
+    else {
+        var [headings, values, sheet, range, lastR, lastC] = get('roster');
+        for (var i = 0; i < values.length; i++) {
+            var el = values[i][0];
+            if (missingRecords.indexOf(el) != -1) {
+                var highlightRow = sheet.getRange((i + 2), 1, 1, 10);
+                highlightRow.setBackground('#f3c9c9');
+            }
         }
     }
+    SpreadsheetApp.flush();
+    return;
 }
 /**
  *
@@ -1653,16 +1662,16 @@ function importXLS_2() {
     SpreadsheetApp.flush();
     destRange.setValues(newData);
     var headersAndFormulas = [[
-        '=ArrayFormula(iferror(vlookup($M1:$M, teacherCodes!$B$1:$H, 7,false),if(row($M1:$M) = 1, "teachEmail","")))	',
-        '=ArrayFormula(iferror(vlookup($M1:$M,{teacherCodes!$B$1:$I34 }, 8,false),if(row($M$1:$M) = 1,"teachName","")))	',
-        '=ArrayFormula(if(row($Z$1:$Z) <> 1, if(isBlank($A$1:$A),,if(($M$1:$M = 21) + ($M$1:$M = 100) + ($M$1:$M = 105) + sum($S$1:$S = "X") > 0, 1, 0)),"sdc||rsp"))	',
-        '=ArrayFormula(if(row(A1:A)=1,"nmJdob",regexreplace(if(isblank(A1:A),, REGEXREPLACE(C1:C & D1:D, "[ \'-]", "") & right(year(G1:G),2) & days(\"12/31/\"&(year(G1:G)-1), G1:G)),"-","")))',
-        '=ArrayFormula(if(isblank(id),, regexreplace(C1:C & "_" & firstName & "_" & A1:A, "[ \'-]", "")))',
-        '=ArrayFormula(if(isblank(id),, REGEXREPLACE(C1:C & "_" & firstName & "_dob_" & dob, "[ \'-]", "")))',
-        '=ArrayFormula(if(isblank(id),, REGEXREPLACE(C1:C & "_" & firstName, "[ \'-]", "")))',
-        '=ArrayFormula(if(isblank(id),, REGEXREPLACE(D1:D & "_" & lastName, "[ \'-]", "")))',
-        '=ARRAYFORMULA((H1:H)&", "&(V1:V))'
-    ]];
+            '=ArrayFormula(iferror(vlookup($M1:$M, teacherCodes!$B$1:$H, 7,false),if(row($M1:$M) = 1, "teachEmail","")))	',
+            '=ArrayFormula(iferror(vlookup($M1:$M,{teacherCodes!$B$1:$I34 }, 8,false),if(row($M$1:$M) = 1,"teachName","")))	',
+            '=ArrayFormula(if(row($Z$1:$Z) <> 1, if(isBlank($A$1:$A),,if(($M$1:$M = 21) + ($M$1:$M = 100) + ($M$1:$M = 105) + sum($S$1:$S = "X") > 0, 1, 0)),"sdc||rsp"))	',
+            '=ArrayFormula(if(row(A1:A)=1,"nmJdob",regexreplace(if(isblank(A1:A),, REGEXREPLACE(C1:C & D1:D, "[ \'-]", "") & right(year(G1:G),2) & days(\"12/31/\"&(year(G1:G)-1), G1:G)),"-","")))',
+            '=ArrayFormula(if(isblank(id),, regexreplace(C1:C & "_" & firstName & "_" & A1:A, "[ \'-]", "")))',
+            '=ArrayFormula(if(isblank(id),, REGEXREPLACE(C1:C & "_" & firstName & "_dob_" & dob, "[ \'-]", "")))',
+            '=ArrayFormula(if(isblank(id),, REGEXREPLACE(C1:C & "_" & firstName, "[ \'-]", "")))',
+            '=ArrayFormula(if(isblank(id),, REGEXREPLACE(D1:D & "_" & lastName, "[ \'-]", "")))',
+            '=ARRAYFORMULA((H1:H)&", "&(V1:V))'
+        ]];
     var formulaRng = destSheet.getRange(1, newData[0].length + 1, 1, headersAndFormulas[0].length);
     formulaRng.setFormulas(headersAndFormulas);
     SpreadsheetApp.openById('1Pe-unMy1vkj3joBvGru03YB1W3a35zNn_vXw9eF0KKk').getSheetByName('frequency distribution').getRange("E14").setValue(new Date());
@@ -1676,7 +1685,6 @@ function markNoGo() {
     //     element.splice(1, 5, '','','','','');
     // }
     for (let gradeLevel = 1; gradeLevel < 6; gradeLevel++) {
-
         for (let i = 0; i < values.length; i++) {
             const el = values[i];
             const grade = el[1];
@@ -1689,7 +1697,7 @@ function markNoGo() {
                         // }
                         const ngb = moment(el[n]).subtract(1, 'minute');
                         const nge = moment(el[n + 1]);
-                        const teacher = el[0].toString().substr(0,3);
+                        const teacher = el[0].toString().substr(0, 3);
                         if (time.isAfter(ngb) && time.isBefore(nge)) {
                             const currentValue = times[t][gradeLevel].toString();
                             Logger.log('current value is %s', currentValue);
@@ -1700,7 +1708,6 @@ function markNoGo() {
                                 Logger.log("mark " + JSON.stringify(time.format('HH:mm')));
                             }
                         }
-
                     }
                     // Logger.log(JSON.stringify(time));
                 }
