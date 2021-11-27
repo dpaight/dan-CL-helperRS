@@ -55,7 +55,7 @@
 
   <!-- Navigation bar -->
   <nav class="navbar sticky-top navbar-expand-md navbar-dark bg-primary" style="z-index: 2000;">
-    <a class="navbar-brand data-toggle" href="#" title="clear session cache and reload" onclick="reload()"
+    <a class="navbar-brand data-toggle" href="#" title="clear session cache and reload" onclick="reloadMe()"
       style="font-weight: 500;">CASE LOGS
       <?=version?>
     </a>
@@ -101,8 +101,7 @@
             <!-- <div class="dropdown-divider"></div> -->
             <a class="dropdown-item" id="getIEPcompForm"
               href="https://www.sejda.com/sign-pdf?files=%5B%7B%22downloadUrl%22%3A%22https%3A%2F%2Fdrive.google.com%2Fuc%3Fexport%3Dview%26id%3D16v2LTCtaFY6n2f7IsJaZAFz9k5UXRf2Q%22%7D%5D&returnEmail=paight%40gmail.com"
-              target="_blank">IEP Comp
-              Form</a>
+              target="_blank">IEP Completion Form</a>
             <a id="aeries_form" class="dropdown-item"
               href="https://drive.google.com/open?id=1-lWvtDik9enMSpfp9W-t0u75P8ZBl4Ab" target="_blank">Aeries Change
               Form</a>
@@ -176,18 +175,18 @@
                     <span class="input-group-text   col-12" id="stuName-pre">Name</span>
                   </div>
                   <input type="text" class="form-control" id="stuName" style="font-size: large; font-weight: bold;"
-                    value="" readonly>
+                    value="" >
                 </div>
 
                 <div class="input-group input-group-sm m-1 col-12 mb-3">
                   <div class="input-group-prepend">
                     <span class="input-group-text" id="dob-pre">DOB </span>
                   </div>
-                  <input type="text" class="form-control spr col-5" id="dob" read-only value="" readonly>
+                  <input type="text" class="form-control spr col-5" id="dob" read-only value="" >
                   <div class="input-group-prepend">
                     <span class="input-group-text" id="sex-pre">Sex </span>
                   </div>
-                  <input type="text" class="form-control spr col-3" id="sex" read-only value="" readonly>
+                  <input type="text" class="form-control spr col-3" id="sex" read-only value="" >
 
                 </div>
 
@@ -195,7 +194,7 @@
                   <div class="input-group-prepend">
                     <span class="input-group-text" id="tch-pre">Teacher</span>
                   </div>
-                  <input type="text" class="form-control spr" id="teachname" read-only value="" readonly>
+                  <input type="text" class="form-control spr" id="teachname" read-only value="" >
                 </div>
                 <div class="input-group input-group-sm m-1 col-12 mb-3">
                   <div class="input-group-prepend">
@@ -205,7 +204,7 @@
                   <div class="input-group-prepend">
                     <span class="input-group-text  " id="lang-pre">Lang</span>
                   </div>
-                  <input type="text" class="form-control col-2 spr" id="langflu" value="" readonly>
+                  <input type="text" class="form-control col-2 spr" id="langflu" value="" >
                 </div>
 
                 <div class="input-group input-group-sm m-1 col-12 mb-3">
@@ -222,7 +221,7 @@
                   <div class="input-group-prepend">
                     <span class="input-group-text  " id="seis_id-pre">ID(SEIS) </span>
                   </div>
-                  <input type="text" class="form-control spr" id="seis_id" value="" readonly>
+                  <input type="text" class="form-control spr" id="seis_id" value="" >
                 </div>
               </div>
               <div class="form-row align-items-center">
@@ -230,7 +229,7 @@
                   <div class="input-group-prepend">
                     <span class="input-group-text  " id="stuem-pre">StuEM</span>
                   </div>
-                  <input type="text" class="form-control spr" id="stuemail" value="" readonly>
+                  <input type="text" class="form-control spr" id="stuemail" value="" >
                 </div>
                 <div class="input-group input-group-sm m-1 col-12 mb-3">
                   <div class="input-group-prepend">

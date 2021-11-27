@@ -1,18 +1,3 @@
-// Compiled using ts2gas 3.6.4 (TypeScript 4.2.4)
-var exports = exports || {};
-var module = module || { exports: exports };
-// Compiled using ts2gas 3.6.4 (TypeScript 4.2.4)
-var exports = exports || {};
-var module = module || { exports: exports };
-// Compiled using ts2gas 3.6.4 (TypeScript 4.2.4)
-var exports = exports || {};
-var module = module || { exports: exports };
-// Compiled using ts2gas 3.6.4 (TypeScript 4.2.4)
-var exports = exports || {};
-var module = module || { exports: exports };
-Object.defineProperty(exports, "__esModule", { value: true });
-//import { logging } from "googleapis/build/src/apis/logging";
-// Compiled using ts2gas 3.6.4 (TypeScript 4.1.3)
 var ss = SpreadsheetApp.getActiveSpreadsheet();
 var roster = ss.getSheetByName('roster');
 var ss2 = SpreadsheetApp.openById("1HoulMp8RlpCxvN4qf10TbxW1vzxzTjbA8xKhFjRdZY8");
@@ -74,7 +59,7 @@ function doGet(e) {
     ss.getSheetByName('roster').sort(1);
     ss.getSheetByName('logRespMerged').sort(1);
     var t = HtmlService.createTemplateFromFile("caseLog");
-    t.version = "v44";
+    t.version = "v53";
     return t.evaluate().setSandboxMode(HtmlService.SandboxMode.IFRAME).setXFrameOptionsMode(HtmlService.XFrameOptionsMode.ALLOWALL);
 }
 function getScriptURL() {
@@ -646,13 +631,8 @@ function printSelectedLogEntries(stuName, sDate, eDate, array) {
         'url': url
     };
 }
-// Compiled using ts2gas 3.6.3 (TypeScript 3.9.7)
 // this returns table data to the success Handler on the client side
-function getTableData_roster(id) {
-    if (id === void 0) {
-        throw 'id was not defined at \'getTableData_roster\'';
-    }
-    var loc = 'loc00';
+function getTableData_roster() {
     var [headings, values, sheet, range, lastR, lastC] = get('roster');
     lastR = (lastR > 1) ? lastR : 2;
     var values = sheet.getRange(2, 1, lastR - 1, lastC).getDisplayValues();
@@ -666,17 +646,7 @@ function getTableData_roster(id) {
         else
             return 0;
     });
-    return [loc, values, id];
-}
-/**
- * @returns allPupils table from file currentRamonaStudents
- */
-function getAllPupilsList() {
-    var sheet, last, range, values, keys;
-    sheet = ss2.getSheetByName('allPupils');
-    last = sheet.getRange('a1:a').getValues().filter(String).length;
-    range = sheet.getRange(2, 1, last - 1, 1);
-    values = range.getDisplayValues();
+    // Logger.log([values]);
     return values;
 }
 /**
@@ -690,11 +660,13 @@ function getRecord(id) {
     var key = 'rec' + id;
     // record was not cached; search for it
     var [headings, values, sheet, range, lastR, lastC] = get('roster');
+
     for (var i = 0; i < values.length; i++) {
         var el = values[i];
         // sp.put('rec' + el[9], JSON.stringify(el));
         // cache all records along the way
         if (id == el[9]) {
+            Logger.log('found it %s', JSON.stringify(el));
             return JSON.stringify(el);
         }
     }
@@ -1017,7 +989,7 @@ function getRecordIndex(nmJdob, allPupilsArray, allPupilsHeadings) {
     }
     return -1;
 }
-function matchRosterFieldsToSeisAndAllPupils(rosH, seisH, alpH) {
+function matchRosterFieldsToSeisAndAllPupils(rosH, seisH, alpH?) {
     var fieldMatches = {};
     for (let i = 0; i < rosH.length; i++) {
         var thisFieldName = rosH[i];
@@ -1029,7 +1001,7 @@ function matchRosterFieldsToSeisAndAllPupils(rosH, seisH, alpH) {
     Logger.log('fieldMatches = %s', JSON.stringify(fieldMatches));
     return fieldMatches;
 }
-function updateRoster(id) {
+function updateRoster_OLD(id) {
     // get current data
     // importXLS_2(); 
     var roster = SpreadsheetApp.getActiveSpreadsheet().getSheetByName('roster');

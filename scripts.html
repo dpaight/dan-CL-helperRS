@@ -492,13 +492,16 @@
       record = JSON.parse(record);
     }
     var [
-      nmjdob, idaeries, teachemail, u1_phone, stuemail, u3_parent_1a_email, corrlng, u5_lang, teachname, seis_id, last_name, first_name, date_of_birth, case_manager, date_of_last_annual_iep, date_of_last_evaluation, date_of_initial_parent_consent, parent_1_mail_address, parent_1_email, parent_1_home_phone, parent_1_cell_phone, grade_code, student_eligibility_status, disability_1, disability_2, parent_guardian_1_name, parent_guardian_2_name, date_of_next_annual_iep, gender, reading_group, notes
+      nmjdob, student_id, teachemail, u1_phone, stuemail, u3_parent_1a_email, corrlng, langflu, teachname, seis_id, last_name, first_name, age, alerts_ed_rights_alert, alerts_ed_rights_alert_text, alerts_health_alert, alerts_health_alert_text, case_manager, date_of_birth, date_of_initial_parent_consent, date_of_last_annual_plan_review, date_of_last_eligibility_evaluation, date_of_next_annual_plan_review, date_of_next_eligibility_evaluation, disability_1, disability_1_code, disability_2, disability_2_code, educational_rights_held_by, educational_rights_held_by_other, english_learner, english_proficiency, gender, grade_code, grade_level, parent_1_cell_phone, parent_1_email, parent_1_home_phone, parent_1_mail_address, parent_1_mail_city, parent_1_mail_state, parent_1_mail_zip, parent_1_other_phone, parent_1_street_address, parent_1_street_city, parent_1_street_state, parent_1_street_zip, parent_1_work_phone_h1, parent_2_cell_phone, parent_2_email, parent_2_home_phone, parent_2_mail_address, parent_2_mail_city, parent_2_mail_state, parent_2_mail_zip, parent_2_other_phone, parent_2_street_address, parent_2_street_city, parent_2_street_state, parent_2_street_zip, parent_2_work_phone_h1, parent_2_work_phone_h2, parent_education_level, parent_guardian_1_name, student_eligibility_status, readinggroup, notes, meet, birthdate, sai_minutes
     ] = record;
+
     // console.log('record: %s', JSON.stringify(record));
     var key = seis_id;
     sessionStorage.key = JSON.stringify(record);
 
-    $("#langflu").val(u5_lang);
+    console.log('here we have     langflu, corrlng, first_name, last_name, date_of_birth, langflu, corrlng, first_name, last_name', langflu, corrlng, first_name, last_name, date_of_birth, langflu, corrlng, first_name, last_name, date_of_birth
+    );
+    $("#langflu").val(langflu);
     $("#corrlng").val(corrlng);
     $("#stuName").val(first_name + ' ' + last_name);
     $("#namenav").text(first_name + ' ' + last_name);
@@ -778,39 +781,41 @@
     $("#saveEntry").attr("class", "btn btn-sm btn-success my-1 svChngs");
   }
   // display table of names sorted by due dates
-  function showRosterTable(loc_and_data) {
-    var [loc, data, id] = loc_and_data;
+  function showRosterTable(data) {
+    var loc = 'loc00';
+
     var pending = ['#ffffff', '#000000'];
     for (let i = 0; i < data.length; i++) {
       const el = data[i];
       var [
-        nmJdob, idAeries, teachemail, u1_phone, stuemail, u3_Parent_1a_Email, u4_unused, u5_unused, u6_unused, seis_id, Last_Name, First_Name, Date_of_Birth, Case_Manager, Date_of_Last_Annual_IEP, Date_of_Last_Evaluation, Date_of_Initial_Parent_Consent, Parent_1_Mail_Address, Parent_1_Email, Parent_1_Home_Phone, Parent_1_Cell_Phone, Grade_Code, Student_Eligibility_Status, Disability_1, Disability_2, Parent_Guardian_1_Name, Parent_Guardian_2_Name, Date_of_Next_Annual_IEP
+        nmjdob, student_id, teachemail, u1_phone, stuemail, u3_parent_1a_email, corrlng, langflu, teachname, seis_id, last_name, first_name, age, alerts_ed_rights_alert, alerts_ed_rights_alert_text, alerts_health_alert, alerts_health_alert_text, case_manager, date_of_birth, date_of_initial_parent_consent, date_of_last_annual_plan_review, date_of_last_eligibility_evaluation, date_of_next_annual_plan_review, date_of_next_eligibility_evaluation, disability_1, disability_1_code, disability_2, disability_2_code, educational_rights_held_by, educational_rights_held_by_other, english_learner, english_proficiency, gender, grade_code, grade_level, parent_1_cell_phone, parent_1_email, parent_1_home_phone, parent_1_mail_address, parent_1_mail_city, parent_1_mail_state, parent_1_mail_zip, parent_1_other_phone, parent_1_street_address, parent_1_street_city, parent_1_street_state, parent_1_street_zip, parent_1_work_phone_h1, parent_2_cell_phone, parent_2_email, parent_2_home_phone, parent_2_mail_address, parent_2_mail_city, parent_2_mail_state, parent_2_mail_zip, parent_2_other_phone, parent_2_street_address, parent_2_street_city, parent_2_street_state, parent_2_street_zip, parent_2_work_phone_h1, parent_2_work_phone_h2, parent_education_level, parent_guardian_1_name, student_eligibility_status, readinggroup, notes, meet, birthdate, sai_minutes
       ] = el;
+      console.log(JSON.stringify(el));
       list = $("#" + loc + "tb");
 
       if (!seis_id) {
         alert(" has no id"); // lnCmafn + 
       } else {
-        if (moment(Date_of_Last_Evaluation).isValid() == false) {
-          var evalDate = moment(Date_of_Initial_Parent_Consent).add(1, 's').format('YYYY-MM-DD');
+        if (moment(date_of_last_eligibility_evaluation).isValid() == false) {
+          var evalDate = moment(date_of_initial_parent_consent).add(1, 's').format('YYYY-MM-DD');
           pending = ['#f4cccc', '#000000'];
-        } else if (moment(Date_of_Last_Evaluation).add(3, 'y').isBefore(moment().add(6, 'month'))) {
-          evalDate = moment(Date_of_Last_Evaluation).format('YYYY-MM-DD');
+        } else if (moment(date_of_last_eligibility_evaluation).add(3, 'y').isBefore(moment().add(6, 'month'))) {
+          evalDate = moment(date_of_last_eligibility_evaluation).format('YYYY-MM-DD');
           pending = ['#d9ead3', '#000000'];
         } else {
-          evalDate = moment(Date_of_Last_Evaluation).format('YYYY-MM-DD');
+          evalDate = moment(date_of_last_eligibility_evaluation).format('YYYY-MM-DD');
           pending = ['#FFFFFF', '#000000'];
         }
-        console.log('evalDate is %s for %s', evalDate, First_Name);
+        console.log('evalDate hello is %s for %s', evalDate, first_name);
         list.append(
           '<tr class="d-flex"><td class="setStudent  col-6" data-stuId=' +
           seis_id +
           "> " +
-          Last_Name + ', ' + First_Name +
+          last_name + ', ' + first_name +
           "</td>" +
           '<td class="tableDate setStudent col-3" data-stuId=' +
           seis_id + '>' +
-          moment(Date_of_Last_Annual_IEP).format('YYYY-MM-DD') +
+          moment(date_of_last_annual_plan_review).format('YYYY-MM-DD') +
           "</td>" +
           '<td class="tableDate setStudent col-3" style="background-color:' + pending[0] + '; color:' + pending[1] + ';" data-stuId=' +
           seis_id + '>' +
@@ -1021,26 +1026,6 @@
     return jStat.normal.cdf(z, mean, sd);
   }
 
-  function openAddStudentModal() {
-    $('#addStuModal').modal({
-      focus: true
-    });
-  }
-  function addStu() {
-    var obj = {};
-    obj.first = $("#addFn").val();
-    obj.last = $("#addLn").val();
-    obj.StudentID = $("#StudentID").val();
-    obj.lastAnnual = $("#lastAnnual").val();
-    obj.lastEval = $("#lastEval").val();
-    obj.seisID = $("#seisID").val();
-
-    // console.log(JSON.stringify(obj));
-
-    google.script.run
-      .withSuccessHandler(showNewStu)
-      .addStudentByIdFromRESstudentsServer(obj);
-  }
 
   function getPointer() {
     return sessionStorage.getItem('lastId');
@@ -1118,4 +1103,25 @@
       .withFailureHandler()
       .deleteRecord(id);
   }
+  function openAddStudentModal() {
+    $('#addStuModal').modal({
+      focus: true
+    });
+  }
+  function addStu() {
+    var obj = {};
+    obj.first = $("#addFn").val();
+    obj.last = $("#addLn").val();
+    obj.StudentID = $("#StudentID").val();
+    obj.lastAnnual = $("#lastAnnual").val();
+    obj.lastEval = $("#lastEval").val();
+    obj.seisID = $("#seisID").val();
+
+    // console.log(JSON.stringify(obj));
+
+    google.script.run
+      .withSuccessHandler(reloadMe)
+      .addStudentByIdFromRESstudentsServer(obj);
+  }
+
 </script>
